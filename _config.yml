@@ -8,7 +8,7 @@ palette: blue
 header:
   title: Azimuth
   logo_img: images/logo.png
-  has_nav: true
+  has_nav: false
   nav_links:
     - label: Home
       url: /
