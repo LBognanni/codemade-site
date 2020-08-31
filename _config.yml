@@ -1,4 +1,4 @@
-title: Stackbit Azimuth Theme
+title: CodeMade
 baseurl: /
 permalink: '/:title/'
 collections:
@@ -6,26 +6,22 @@ collections:
     permalink: '/posts/:title/'
 palette: blue
 header:
-  title: Azimuth
-  logo_img: images/logo.png
+  title: CodeMade
+  logo_img: images/logo-blur.svg
   has_nav: true
   nav_links:
     - label: Home
       url: /
-    - label: Features
-      url: /features
-    - label: Pricing
-      url: /pricing
-    - label: Style Guide
-      url: /style-guide
-    - label: Sign Up
-      url: /signup
+    - label: Clock
+      url: /clock
+    - label: Blog
+      url: /blog
       primary: true
 footer:
-  logo_img: images/logo_alt.png
-  tagline: SaaS theme by Stackbit
+  logo_img: images/logo-blur-white.svg
+  tagline: Free software & tech musings
   has_nav: true
-  nav_title: Company
+  nav_title: Menu
   nav_links:
     - label: About Us
       url: /about
@@ -36,23 +32,20 @@ footer:
     - label: Contact
       url: /contact
   has_social: true
-  social_title: Community
+  social_title: Social
   social_links:
     - label: Twitter
-      url: 'https://twitter.com/'
+      url: 'https://twitter.com/lorisdev'
       new_window: true
-    - label: Instagram
-      url: 'https://www.instagram.com/'
-      new_window: true
-    - label: LinkedIn
-      url: 'https://www.linkedin.com/'
+    - label: Github
+      url: 'https://github.com/lbognanni'
       new_window: true
   has_subscribe: true
   subscribe_title: Subscribe
   subscribe_content: Stay up to date with our latest developments.
-  content: '&copy; Stackbit. All rights reserved.'
+  content: 'Content &copy; Loris Bognanni. All rights reserved. Theme: '
   links:
-    - label: Made with Stackbit
+    - label: 'Azimuth by Stackbit'
       url: 'https://www.stackbit.com'
       new_window: true
 sass:
