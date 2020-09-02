@@ -1,0 +1,33 @@
+{% assign section = include.section %}
+<section id="{{ section.section_id }}" class="block bg-{{ section.background }} outer">
+  <div class="block-header inner-small">
+    {% assign title_is_not_empty = section.title | is_not_empty %}
+    {% if title_is_not_empty %}
+    <h2 class="block-title">{{ section.title }}</h2>
+    {% endif %}
+    {% assign subtitle_is_not_empty = section.subtitle | is_not_empty %}
+    {% if subtitle_is_not_empty %}
+    <p class="block-subtitle">
+      {{ section.subtitle }}
+    </p>
+    {% endif %}
+  </div><!-- .block-header -->
+  <div class="inner">
+    <div class="post-feed">
+      {% for post in section.gallery %}
+      <article class="post post-card">
+        <div class="post-card-inside">
+          {% assign image_is_not_empty = post.image | is_not_empty %}
+          {% if image_is_not_empty %}
+          <a class="post-card-thumbnail" href="{{ post.image | relative_url }}">
+            <img class="thumbnail" src="{{ post.image | relative_url }}" alt="{{ post.alt }}" />
+          </a>
+          {% endif %}
+        </div><!-- .post-card-inside -->
+      </article><!-- .post -->
+      {% endfor %}
+    </div><!-- .post-feed -->
+  </div><!-- .inner -->
+</section><!-- .block -->
+
+

@@ -7,3 +7,18 @@ layout: body
   {% assign component = section.type | append: ".html" %}
   {% include {{ component }} section=section site=site %}
 {% endfor %}
+
+{% assign content = content | strip_newlines %}
+{% if content != "" %}
+<div class="outer">
+  <div class="inner-medium">
+
+    <article class="post post-full">
+      <div class="post-content">
+        {{ content }}
+      </div><!-- .post-content -->
+    </article>
+    
+  </div><!-- .inner-medium -->
+</div><!-- .outer-->
+{% endif %}

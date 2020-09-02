@@ -16,7 +16,7 @@ sections:
 
       * 10 different skins
 
-      * another feature
+      * another feature 
 
       * more stuff!
 
@@ -25,13 +25,21 @@ sections:
     actions:
       - label: 🔽 Download now
         url: https://github.com/LBognanni/CodeMadeClock/releases
-  - section_id: clock-screenshots
-    type: section_cta
-    title: This Is Call to Action Block!
-    subtitle: This is an optional description for the call to action block.
-    actions:
-      - label: Get Started
-        url: '#'
+  - section_id: gallery
+    type: section_gallery
+    background: white
+    title: Screenshots
+    gallery:
+      - image: "/images/1.jpg"
+        alt: "image 1"
+      - image: "/images/2_thumb.jpg"
+        alt: "image 2"
+      - image: "/images/3_thumb.jpg"
+        alt: "image 3"
+      - image: "/images/1.jpg"
+        alt: "image 1"
+      - image: "/images/2_thumb.jpg"
+        alt: "image 2"
   - section_id: faq
     type: section_faq
     background: gray
