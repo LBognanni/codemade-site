@@ -30,16 +30,14 @@ sections:
     background: white
     title: Screenshots
     gallery:
-      - image: "/images/1.jpg"
+      - image: "/clock/white.png"
         alt: "image 1"
-      - image: "/images/2_thumb.jpg"
+      - image: "/clock/blue.png"
         alt: "image 2"
-      - image: "/images/3_thumb.jpg"
+      - image: "/clock/red.png"
         alt: "image 3"
-      - image: "/images/1.jpg"
+      - image: "/clock/flat.png"
         alt: "image 1"
-      - image: "/images/2_thumb.jpg"
-        alt: "image 2"
   - section_id: faq
     type: section_faq
     background: gray
