@@ -39,7 +39,7 @@ sections:
           Understand how you spend your time when at the computer. Perfect for freelancers!
         actions:
           - label: Learn More
-            url: /wayd
+            url: https://www.gljakal.com/wayd
   - section_id: recent-posts
     type: section_posts
     background: white
