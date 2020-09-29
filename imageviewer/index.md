@@ -26,5 +26,3 @@ sections:
       - label: 🔽 Download now
         url: https://github.com/LBognanni/ImageViewer/releases/latest/download/ImageViewer_Setup.exe
 ---
-
-Test

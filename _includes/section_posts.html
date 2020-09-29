@@ -3,7 +3,7 @@
   <div class="block-header inner-small">
     {% assign title_is_not_empty = section.title | is_not_empty %}
     {% if title_is_not_empty %}
-    <h2 class="block-title">{{ section.title }}</h2>
+    <h2 class="block-title"><a href="/blog">{{ section.title }}</a></h2>
     {% endif %}
     {% assign subtitle_is_not_empty = section.subtitle | is_not_empty %}
     {% if subtitle_is_not_empty %}
@@ -40,5 +40,6 @@
       </article><!-- .post -->
       {% endfor %}
     </div><!-- .post-feed -->
+    <p><a href="/blog">Read More  &raquo;</a></p>
   </div><!-- .inner -->
 </section><!-- .block -->
