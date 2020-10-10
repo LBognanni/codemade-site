@@ -38,7 +38,7 @@ I love the simplicity that comes with static site generators, and [jekyll](https
 
 This is the dockerfile I use for my jekyll devcontainer. It's a slightly modified version based on the official Microsoft one from some time ago; I had to add a line to install `zlib1g-dev` otherwise it wouldn't work 😅.
 
-{% gist ed91a3b29089b85a23e67bbdafaa10c2  %}
+{% gist LBognanni/ed91a3b29089b85a23e67bbdafaa10c2  %}
 
 Now, when I open the repository in Visual studio code, I just have to run `bundle exec jekyll serve` in the integrated terminal to run it. The container exposes port 4000 so I can just open http://localhost:4000 in my browser and preview the changes.
 What's more, if port 4000 is already used by another program, when clicking on the localhost link in the terminal, VS Code will transparently open the site on a different port!
