@@ -20,17 +20,11 @@ header:
 footer:
   logo_img: images/logo-blur-white.svg
   tagline: Free software & tech musings
-  has_nav: true
+  has_nav: false
   nav_title: Menu
   nav_links:
-    - label: About Us
-      url: /about
     - label: Blog
       url: /blog
-    - label: Sign Up
-      url: signup
-    - label: Contact
-      url: /contact
   has_social: true
   social_title: Social
   social_links:
@@ -40,20 +34,21 @@ footer:
     - label: Github
       url: 'https://github.com/lbognanni'
       new_window: true
-  has_subscribe: true
+  has_subscribe: false
   subscribe_title: Subscribe
   subscribe_content: Stay up to date with our latest developments.
   content: 'Content &copy; Loris Bognanni. All rights reserved. Theme: '
   links:
     - label: 'Azimuth by Stackbit'
       url: 'https://www.stackbit.com'
-      new_window: true
+      new_window: truea
 sass:
   indentWidth: 4
   style: nested
   precision: 10
 plugins:
   - jekyll-menus
+  - jekyll-gist
 exclude:
   - Gemfile
   - Gemfile.lock
