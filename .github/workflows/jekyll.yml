@@ -22,6 +22,7 @@ jobs:
     # Specify the target branch (optional)
     - uses: helaili/jekyll-action@2.0.4
       env:
-        JEKYLL_PAT: ${{ secrets.JEKYLL_PAT }}
+        JEKYLL_PAT: ${{ secrets.JEKYLL_GITHUB_TOKEN }}
+        JEKYLL_GITHUB_TOKEN: ${{ secrets.JEKYLL_GITHUB_TOKEN }}
       with:
         target_branch: 'output'
