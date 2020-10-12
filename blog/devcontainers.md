@@ -10,11 +10,11 @@ layout: post
 ---
 
 One of the best features in VS Code, and my personal favourite is called [Remote Containers](https://code.visualstudio.com/docs/remote/containers). 
-What it does is open the folder you're working on _inside_ a container and then connect to it, so that you can, for example, run your jekyll site on windows without having to install ruby system-wide. Because all the development is done inside the container, you don't have to worry about having multiple version of node or python cluttering your machine.
+What it does is open the folder you're working on _inside_ a container and then connect to it, so that you can, for example, run your jekyll site on windows without having to install ruby system-wide. Because all the development is done inside the container, you don't have to worry about having multiple versions of node or python cluttering your machine.
 
 This is especially useful if your main OS is Windows, as getting set up with some languages is notoriously tougher there.
 
-Working in a devcontainer has the also advantage that all the settings can be committed into source control, so you can share the exact same development environment with the rest of your team. No more 15-step procedure to follow to set up the local dev envoronment!
+Working in a devcontainer has also the advantage that all the settings can be committed into source control, so you can share the exact same development environment with the rest of your team. No more 15-step procedure to follow to set up the local dev environment!
 
 Getting started is really simple: 
 
@@ -27,7 +27,7 @@ Getting started is really simple:
 This will create:
 
  - A `.devcontainer` folder in your project, containing:
- - A `dockerfile` for the deelopment container 
+ - A `dockerfile` for the development container 
  - A file named `devcontainer.json` that is mostly used to define any ports that should be forwarded to the host
  
 You can now open the integrated terminal and type commands directly in your container! 
