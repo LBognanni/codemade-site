@@ -1,5 +1,6 @@
 title: CodeMade
-baseurl: /
+url: https://codemade.net
+baseurl: ""
 permalink: '/:title/'
 collections:
   posts:
