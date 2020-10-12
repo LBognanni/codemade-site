@@ -2,7 +2,7 @@
 title: How to combine Docker and VSCode to reach development nirvana
 author: _data/authors/loris-bognanni.yaml
 excerpt: >-
-  This extension can DESTROY your set up times and make you productive NOW!
+  Use this extension to DESTROY your set up times and make your team productive NOW!
 date: '2020-10-10'
 thumb_image: images/vscode-docker-jekyll_thumb.png
 image: images/vscode-docker-jekyll.png
