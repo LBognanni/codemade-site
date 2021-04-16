@@ -14,17 +14,15 @@ sections:
       Clock is a beautiful, customizable analog clock for Windows that always stays on top of other windows so you always know what time it is! 
 
 
-      * 10 different skins
+      * 8 different skins
 
-      * another feature 
+      * Works great at any screen size
+      
+      * 🤑 free and [❤ open source](https://github.com/LBognanni/CodeMadeClock/)
 
-      * more stuff!
-
-
-      Best of all, Clock is 🤑 free and [❤ open source](https://github.com/LBognanni/CodeMadeClock/)
     actions:
       - label: 🔽 Download now
-        url: https://github.com/LBognanni/CodeMadeClock/releases
+        url: https://github.com/LBognanni/CodeMadeClock/releases/
   - section_id: gallery
     type: section_gallery
     background: white
