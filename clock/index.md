@@ -46,7 +46,7 @@ sections:
         answer: >-
           Absolutely! Clock uses a simple `json` structure to define how a clock face should look like.
           You don't even need Photoshop or any graphic editor to start!
-          You can find more resources in the [skin creator page](/clock/how-to-create-skins)
+          You can find more resources in the [official docs](https://github.com/LBognanni/CodeMadeClock/tree/master/docs#-authoring-new-skins)
       - question: I found a bug, or want to discuss a new feature
         answer: >-
           Head over [the issue page on github](https://github.com/LBognanni/CodeMadeClock/issues) and create a new bug or feature request, contributions are always welcome! If you like coding, you can also fork the repo and submit a pull request 😉
