@@ -21,7 +21,7 @@ sections:
 
         * **~~Less~~ *Absolutely no* spying**: ImageViewer does not "call home", "collect usage statistics" or creepily track any info about you or your photos
          
-        Best of all, ImageViewer is 🤑 free and [❤ open source](https://github.com/LBognanni/CodeMadeClock/)
+        Best of all, ImageViewer is 🤑 free and [❤ open source](https://github.com/LBognanni/ImageViewer/)
     actions:
       - label: 🔽 Download now
         url: https://github.com/LBognanni/ImageViewer/releases/latest/download/ImageViewer_Setup.exe
