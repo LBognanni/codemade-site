@@ -22,7 +22,7 @@ sections:
 
     actions:
       - label: 🔽 Download now
-        url: https://github.com/LBognanni/CodeMadeClock/releases/
+        url: https://github.com/LBognanni/CodeMadeClock/releases/latest/download/clock-setup.exe
   - section_id: gallery
     type: section_gallery
     background: white
