@@ -33,6 +33,13 @@ sections:
         actions:
           - label: Learn More
             url: /imageviewer
+      - title: Roundabout
+        image: /images/hero-roundabout.png
+        content: >-
+          An easy to use browser selector
+        actions:
+          - label: Learn More
+            url: /roundabout
       - title: WAYD
         image: images/hero-wayd.png
         content: >-
