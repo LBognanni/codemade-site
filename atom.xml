@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+>
+	<channel>
+		<title>CodeMade</title>
+		<description></description>		
+		<sy:updatePeriod>daily</sy:updatePeriod>
+		<sy:updateFrequency>1</sy:updateFrequency>
+		<link>https://codemade.net</link>
+		<atom:link href="https://codemade.net/atom.xml" rel="self" type="application/rss+xml" />
+		<lastBuildDate></lastBuildDate>
+        
+		
+			<item>
+				<title>The case of the mysteriously disappearing window</title>
+				
+                <description>&lt;p&gt;One small annoyance I contend with everyday is links opening in the “wrong” browser. See, I use different browsers for different purposes.&lt;/p&gt;
+
+&lt;p&gt;Chrome is the browser I use for all my work stuff, partially because I prefer its Dev tools and also because most SaaS apps I use for work tend to work better with it. Firefox however is my preferred browser and has the advantage of not being built by an advertisement company, so I tend to do all my personal browsing there. I also use Edge for Netflix because why not.&lt;/p&gt;
+
+&lt;p&gt;So I spent a few hours hacking together &lt;a href=&quot;/roundabout&quot;&gt;Roundabout&lt;/a&gt;, a simple app that registers itself as a web browser and allows you to pick the browser you’d like to open your link in.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/hero-roundabout.png&quot; alt=&quot;Roundabout screenshot&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Upon testing, everything looked good: I could click a link in a non-browser application like Telegram Desktop or WhatsApp desktop, and Roundabout would pop up asking me if I’d prefer Chrome or Firefox.&lt;/p&gt;
+
+&lt;h3 id=&quot;except-for-slack&quot;&gt;…except for Slack&lt;/h3&gt;
+
+&lt;p&gt;As it turned out, clicking a link from Slack would… do nothing?&lt;/p&gt;
+
+&lt;p&gt;I started with the usual debugging techniques: add some logs, test again. Build fails. Wait, why? A quick glance at &lt;a href=&quot;https://learn.microsoft.com/en-us/sysinternals/downloads/process-explorer&quot;&gt;Process Explorer&lt;/a&gt; revealed the issue: Roundabout was starting, but somehow it got stuck and wasn’t showing the main window. After terminating all the stuck instances, I was able to test again, this time with logs.&lt;/p&gt;
+
+&lt;p&gt;The logs looked OK, but just stopped after showing the main form 🤔&lt;/p&gt;
+
+&lt;p&gt;Next it was time to investigate &lt;em&gt;how&lt;/em&gt; exactly Slack starts a web browser.
+A few minutes of sleuthing with &lt;a href=&quot;https://learn.microsoft.com/en-us/sysinternals/downloads/procmon&quot;&gt;Process Monitor&lt;/a&gt; got me my answer: when opening links Slack runs a new command, in the form of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;RunDll32.exe URL.dll,FileProtocolHandler {the URL}&lt;/code&gt;; interesting 🤔.&lt;/p&gt;
+
+&lt;p&gt;If you never crossed paths with it, RunDll32 is perhaps one of the most interesting applications in Windows. It allows one to invoke functions that are defined in Dll files, simply by calling &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;rundll32 {the dll},{the function} {any parameters}&lt;/code&gt;. In this case, we’re executing the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;FileProtocolHandler&lt;/code&gt; function that is defined in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;URL.dll&lt;/code&gt;, and passing our URL to it.&lt;/p&gt;
+
+&lt;p&gt;So what happens if I just run that command from a command prompt?&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/rundll32.png&quot; alt=&quot;A command prompt showing that we executed Rundll32, with a Roundabout window open in front of it&quot; /&gt;&lt;br /&gt;Hmmm, it works as expected…&lt;/p&gt;
+
+&lt;p&gt;I began to suspect that there was some sort of problem actually showing the form, when starting from Slack. What would happen if I added a MessageBox just before showing the form? Interestingly, the message box showed just fine, and then the main form also showed up fine 🤔&lt;/p&gt;
+
+&lt;p&gt;Perhaps the issue is just that Roundabout shows up too quickly? I added a 1 second pause just before starting and… nothing, the main window wouldn’t show again. I’m kinda relieved because I really didn’t want to add a huge pause before something happens for the user 😌&lt;/p&gt;
+
+&lt;p&gt;Okay, so it looks like Slack “swallows” the first proper window we create. I wonder what happens if we temporarily create an empty window and immediately close it before showing the main window?&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/roundabout_slack_works.png&quot; alt=&quot;A Roundabout window, open in front of a Slack conversation&quot; /&gt;&lt;br /&gt;🎉It works!&lt;/p&gt;
+
+&lt;p&gt;At this point, it’s been a few hours debugging this on and off, and a hacky workaround sounds like the perfect solution…&lt;/p&gt;
+
+&lt;p&gt;🧹 Time to clean up the code a bit, and hide this monstrosity behind a helper function.&lt;/p&gt;
+
+&lt;p&gt;It would be also good to only do this when starting from Slack, otherwise users would see an empty window flash on screen. Unfortunately there’s no good way to find out what is your “parent” program, but the user likely clicked on the link with their mouse, so finding the right window based on the pointer coordinates should suffice.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/LBognanni/Roundabout/blob/1b8c675c81628b163bb860fc651c19fb9289c04d/src/Roundabout/Program.cs#L68-L88&quot;&gt;Here is the admittedly horrible code that does this&lt;/a&gt;!&lt;/p&gt;
+
+&lt;h3 id=&quot;fin&quot;&gt;Fin.&lt;/h3&gt;
+
+&lt;p&gt;In unraveling the mystery of Slack links not cooperating with Roundabout, we’ve delved into unexpected corners of Windows application development. With the code tweaks and insights gained, Roundabout now seamlessly handles links from various applications, including Slack.&lt;/p&gt;
+
+&lt;p&gt;As with any solution, there’s always room for improvement. Considerations for future versions include refining the code further, and perhaps adpoting this workaround for other apps I missed this time.&lt;/p&gt;
+
+&lt;p&gt;If you do find one such case of an app “swallowing” Roundabout, please do &lt;a href=&quot;https://github.com/LBognanni/Roundabout/issues&quot;&gt;open an issue on Github&lt;/a&gt;!&lt;/p&gt;
+</description>
+				<pubDate>Mon, 24 May 2021 00:00:00 +0000</pubDate>
+				<link>https://codemade.net/blog/the-case-of-the-disappearing-window/</link>
+				<guid isPermaLink="true">https://codemade.net/blog/the-case-of-the-disappearing-window/</guid>
+			</item>
+		
+			<item>
+				<title>How to draw a conic gradient with System.Drawing in gdiPlus</title>
+				
+                <description>&lt;p&gt;Recently, I have been working on adding support for conic gradient (or conical gradients, as some say) to &lt;a href=&quot;/clock&quot;&gt;Clock&lt;/a&gt;. Now, Clock uses GdiPlus, or the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;System.Drawing&lt;/code&gt; namespace in C# to do all of its drawing. My aim was to replicate the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;conic-gradient()&lt;/code&gt; &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/CSS/conic-gradient()&quot;&gt;CSS function&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Imagine my surprise when searching online for “gdiplus conic gradient” yielded few and very old results. Ok, maybe you’re not very surprised because all the cool kids are now writing Electron apps and mid-2000s &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;System.Drawing&lt;/code&gt; has been relegated to history 😄&lt;/p&gt;
+
+&lt;p&gt;Like any other methods of filling a shape, we’re going to need a type of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Brush&lt;/code&gt; to do it. The one we’re going to use for conic gradients is the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PathGradientBrush&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;What’s interesting about &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PathGradientBrush&lt;/code&gt; is that it can be used in many ways. &lt;a href=&quot;https://www.c-sharpcorner.com/uploadfile/puranindia/783/&quot;&gt;This article from C# Corner&lt;/a&gt; goes over a few, but crucially the one that’s missing is a proper conic gradient. 
+After a lot of searching, I finally stumbled on &lt;a href=&quot;https://web.archive.org/web/20140906083853/http://bobpowell.net/pgb.aspx&quot;&gt;this article&lt;/a&gt;(the original website is now offline!) and noticed this image and code snippet:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://web.archive.org/web/20140906083853im_/http://bobpowell.net/images/pgb.ht2.jpg&quot; alt=&quot;&amp;quot;Many vertices, few colors&amp;quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-csharp highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  &lt;span class=&quot;n&quot;&gt;GraphicsPath&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;GraphicsPath&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;pth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;AddEllipse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ClientRectangle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  
+  &lt;span class=&quot;n&quot;&gt;PathGradientBrush&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pgb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;PathGradientBrush&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;pgb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SurroundColors&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]{&lt;/span&gt;
+                    &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Red&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                    &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Orange&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                    &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Yellow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                    &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Green&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                    &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Blue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                    &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Indigo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                    &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Violet&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;pgb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;CenterColor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Gray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Graphics&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;FillRectangle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pgb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ClientRectangle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;It’s not a “real” conic gradient, but close. What’s interesting in that example is that it’s setting a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;SurroundColors&lt;/code&gt; property, but, because a circle in gdi+ has many vertices, only a tiny portion of the whole is occupied by a gradient. Of course the next step to try was using a polygon with the same number of vertices as the number of colors and check the result:&lt;/p&gt;
+
+&lt;div class=&quot;language-csharp highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;using&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pth&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;GraphicsPath&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;colors&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]{&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Red&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Orange&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Yellow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Green&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Blue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Indigo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Violet&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rect&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Rectangle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+&lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;polyPoints&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;List&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Point&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;();&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;double&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;colors&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;++)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;polyPoints&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;Add&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Point&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sz&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;Cos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PI&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;double&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;double&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)),&lt;/span&gt; 
+    &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sz&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;Sin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PI&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;double&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;double&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;pth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;AddPolygon&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;polyPoints&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;ToArray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;PathGradientBrush&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pgb&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;PathGradientBrush&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;pgb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SurroundColors&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;colors&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;g&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;FillRectangle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pgb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/poly-gradient-white.png&quot; alt=&quot;close but no dice&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;It’s close, but where does the white come from? Well if you look closely at the circle example from the article above, there’s a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;CenterColor&lt;/code&gt; property that is set to Gray there. When you don’t specify it, instead of there being no center color, a white shade is used instead. Setting CenterColor to transparent renders the filling itself transparent so that’s no good either.&lt;/p&gt;
+
+&lt;p&gt;But! &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PathGradientBrush&lt;/code&gt; has a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Blend&lt;/code&gt; property that allows us to control the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;CenterColor&lt;/code&gt;’s opacity from the center to the border of the shape. We can just set it to fully opaque at both ends to get our gradient:&lt;/p&gt;
+
+&lt;div class=&quot;language-csharp highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;pgb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Blend&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Blend&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Factors&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Positions&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1f&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/poly-gradient-ok.png&quot; alt=&quot;success!&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Isn’t that something! Now to make it really look like the kind of conic gradient we get in css, we have to make it so the last and the first color don’t blend into each other. We can do this by creating a polygon that has one less vertex, where the last Point is repeated. We also need to specify the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;CenterPoint&lt;/code&gt; property, otherwise Gdi+ will auto-calculate it as being slightly off-center:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/poly-gradient-conic.png&quot; alt=&quot;fully conic&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;One last thing! You might have noticed that, while we’re using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;FillRectangle&lt;/code&gt; to paint our gradient, we’re not really filling &lt;em&gt;all of it&lt;/em&gt;, but we’re drawing a polygon. This is easily fixed by using a suitably large radius for our polygon.&lt;/p&gt;
+
+&lt;p&gt;If you’re interested to see what I ended up with, the &lt;a href=&quot;https://github.com/LBognanni/CodeMadeClock/blob/master/src/CodeMade.ScriptedGraphics/ConicGradient.cs&quot;&gt;full source code&lt;/a&gt; is open source as part of Clock 😊&lt;/p&gt;
+</description>
+				<pubDate>Mon, 24 May 2021 00:00:00 +0000</pubDate>
+				<link>https://codemade.net/blog/conic-gradient/</link>
+				<guid isPermaLink="true">https://codemade.net/blog/conic-gradient/</guid>
+			</item>
+		
+			<item>
+				<title>Fix Windows restarting after sleep or hybernate: the complete 2020 guide</title>
+				
+                <description>&lt;p&gt;So your computer starts on its own after you put it to sleep or even after you turn it off. Maybe it does so immediately or maybe it waits for a few minutes or hours. But you feel like you can’t trust it anymore: there’s few things more unsettling than being woken up by the bright light of your screen in the middle of the night. Well here is my comprehensive list of things to check (and to turn off!) to prevent this from happening again.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;First off, open an admin Powershell terminal.&lt;/strong&gt; You can do so by right-clicking the start menu button and selecting &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Windows PowerShell (Admin)&lt;/code&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;1-check-why-the-system-restarted&quot;&gt;1: Check why the system restarted&lt;/h2&gt;
+
+&lt;p&gt;The first thing to do when diagnosing the problem is to use the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;powercfg /lastwake&lt;/code&gt; command to find out what prompted the system to restart.
+If a hardware device was responsible for restarting windows, you should see it here.&lt;/p&gt;
+
+&lt;p&gt;Sometimes, however, things are more nebulous and you get something like:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;❯ powercfg /lastwake
+Wake History Count - 1
+Wake History [0]
+  Wake Source Count - 0
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;In this case, follow the next steps to make double sure that nothing can wake up your pc.&lt;/p&gt;
+
+&lt;h2 id=&quot;2-disable-wake-timers&quot;&gt;2: Disable wake timers&lt;/h2&gt;
+
+&lt;p&gt;This is fairly straightforward and should really be all you need.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Open the Start menu and type &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Edit power plan&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Choose &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Change advanced power settings&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Navigate to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Sleep&lt;/code&gt; -&amp;gt; &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Allow wake timers&lt;/code&gt; and select &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Disable&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Press OK and close&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/poweroptions.png&quot; alt=&quot;Power options dialog, disable windows wake timers&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;In theory&lt;/em&gt;, the above steps should be enough to stop any device from waking up your computer. In practice, you’ll probably have to explicitly disable more stuff:&lt;/p&gt;
+
+&lt;h2 id=&quot;3-disable-any-peripherals-that-can-wake-up-your-computer&quot;&gt;3: Disable any peripherals that can wake up your computer&lt;/h2&gt;
+
+&lt;p&gt;The main peripherals to take into account here are keyboards, mice and network adapters. The network adapter can be set to wake up your computer whenever it receives any data (a very bad idea!) or when it receives a special “wake up” packet.&lt;/p&gt;
+
+&lt;p&gt;You can check which devices can wake up your pc with the command: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;powercfg /devicequery wake_armed&lt;/code&gt;. You’ll see something like:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;❯ powercfg /devicequery wake_armed
+HID-compliant mouse (006)
+HID Keyboard Device (006)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now comes the fun part. Open the Device manager by right-clicking the Windows button and selecting &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Device Manager&lt;/code&gt; and, one by one, open the property pages for the devices listed above. In the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Power management&lt;/code&gt; tab, you’ll find a flag that you want to disable: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Allow this device to wake the computer&lt;/code&gt;. Do so for each device. For your network card, you can optionally set it so that only a “magic packet” can wake up the computer. If you don’t know what a magic packet is, it’s safe to disable it 😅&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/badkeyboard.png&quot; alt=&quot;Power options for a keyboard in Windows device manager&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;4-find-out-if-any-scheduled-tasks-are-waking-up-your-computer&quot;&gt;4: Find out if any scheduled tasks are waking up your computer&lt;/h2&gt;
+
+&lt;p&gt;If the above steps didn’t work, it’s time to bring out the big guns. And by big guns I mean this powershell command: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Get-ScheduledTask | where {$_.settings.waketorun}&lt;/code&gt;. It will list all the scheduled tasks that are allowed to wake up your computer in order to perform some maintenance, or more likely to install updates:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;❯ Get-ScheduledTask | where {$_.settings.waketorun}
+
+TaskPath                                       TaskName                          State
+--------                                       --------                          -----
+\Microsoft\Windows\.NET Framework\             .NET Framework NGEN v4.0.30319... Disabled
+\Microsoft\Windows\.NET Framework\             .NET Framework NGEN v4.0.30319... Disabled
+\Microsoft\Windows\InstallService\             WakeUpAndContinueUpdates          Disabled
+\Microsoft\Windows\InstallService\             WakeUpAndScanForUpdates           Disabled
+\Microsoft\Windows\SharedPC\                   Account Cleanup                   Disabled
+\Microsoft\Windows\UpdateAssistant\            UpdateAssistantWakeupRun          Disabled
+\Microsoft\Windows\UpdateOrchestrator\         Backup Scan                       Ready
+\Microsoft\Windows\UpdateOrchestrator\         Reboot                            Ready
+\Microsoft\Windows\UpdateOrchestrator\         Reboot_AC                         Disabled
+\Microsoft\Windows\UpdateOrchestrator\         Universal Orchestrator Start      Ready
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;In my case, the “Backup Scan” task above was the culprit, so I disabled it. You could disable it by opening the Windows task scheduler, but sometimes the UI won’t allow you to disable one of the “system” scheduled tasks like the ones related to Windows Update. But a simple powershell command can take care of it:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;❯ Disable-ScheduledTask  &quot;\Microsoft\Windows\UpdateOrchestrator\Backup Scan&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Check again with the previous command, and it will be disabled:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;❯ Get-ScheduledTask | where {$_.settings.waketorun}
+
+TaskPath                                       TaskName                          State
+--------                                       --------                          -----
+\Microsoft\Windows\.NET Framework\             .NET Framework NGEN v4.0.30319... Disabled
+\Microsoft\Windows\.NET Framework\             .NET Framework NGEN v4.0.30319... Disabled
+\Microsoft\Windows\InstallService\             WakeUpAndContinueUpdates          Disabled
+\Microsoft\Windows\InstallService\             WakeUpAndScanForUpdates           Disabled
+\Microsoft\Windows\SharedPC\                   Account Cleanup                   Disabled
+\Microsoft\Windows\UpdateAssistant\            UpdateAssistantWakeupRun          Disabled
+\Microsoft\Windows\UpdateOrchestrator\         Backup Scan                       Disabled
+\Microsoft\Windows\UpdateOrchestrator\         Reboot                            Ready
+\Microsoft\Windows\UpdateOrchestrator\         Reboot_AC                         Disabled
+\Microsoft\Windows\UpdateOrchestrator\         Universal Orchestrator Start      Ready
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now hopefully you can set your device to sleep mode and have some well deserved, uninterrupted sleep yourself! 😁&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;small&gt;&lt;em&gt;The feature image above was taken by &lt;a href=&quot;https://unsplash.com/@cbpsc1&quot;&gt;Clint Patterson&lt;/a&gt;&lt;/em&gt;&lt;/small&gt;&lt;/p&gt;
+</description>
+				<pubDate>Sun, 25 Oct 2020 00:00:00 +0000</pubDate>
+				<link>https://codemade.net/blog/windows-restarts-itself-guide/</link>
+				<guid isPermaLink="true">https://codemade.net/blog/windows-restarts-itself-guide/</guid>
+			</item>
+		
+			<item>
+				<title>How to combine Docker and VSCode to reach development nirvana</title>
+				
+                <description>&lt;p&gt;One of the best features in VS Code, and my personal favourite is called &lt;a href=&quot;https://code.visualstudio.com/docs/remote/containers&quot;&gt;Remote Containers&lt;/a&gt;. 
+What it does is open the folder you’re working on &lt;em&gt;inside&lt;/em&gt; a container and then connect to it, so that you can, for example, run your jekyll site on windows without having to install ruby system-wide. Because all the development is done inside the container, you don’t have to worry about having multiple versions of node or python cluttering your machine.&lt;/p&gt;
+
+&lt;p&gt;This is especially useful if your main OS is Windows, as getting set up with some languages is notoriously tougher there.&lt;/p&gt;
+
+&lt;p&gt;Working in a devcontainer has also the advantage that all the settings can be committed into source control, so you can share the exact same development environment with the rest of your team. No more 15-step procedure to follow to set up the local dev environment!&lt;/p&gt;
+
+&lt;p&gt;Getting started is really simple:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Install the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Remote - Containers&lt;/code&gt; extension&lt;/li&gt;
+  &lt;li&gt;Press F1 to open the command palette&lt;/li&gt;
+  &lt;li&gt;Run “Open folder in container” command&lt;/li&gt;
+  &lt;li&gt;Select “From a predefined container definition”&lt;/li&gt;
+  &lt;li&gt;Select the most appropriate container image.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;This will create:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;A &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.devcontainer&lt;/code&gt; folder in your project, containing:&lt;/li&gt;
+  &lt;li&gt;A &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;dockerfile&lt;/code&gt; for the development container&lt;/li&gt;
+  &lt;li&gt;A file named &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;devcontainer.json&lt;/code&gt; that is mostly used to define any ports that should be forwarded to the host&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;You can now open the integrated terminal and type commands directly in your container!&lt;/p&gt;
+
+&lt;h2 id=&quot;an-example-this-website&quot;&gt;An example: this website&lt;/h2&gt;
+
+&lt;p&gt;I love the simplicity that comes with static site generators, and &lt;a href=&quot;https://jekyllrb.com&quot;&gt;jekyll&lt;/a&gt; is by far the most popular choice. Using a development container setup allows me to edit and test any change on all my computers, without having to install ruby, bundler or any of jekyll’s dependencies.&lt;/p&gt;
+
+&lt;p&gt;This is the dockerfile I use for my jekyll devcontainer. It’s a slightly modified version based on the official Microsoft one from some time ago; I had to add a line to install &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;zlib1g-dev&lt;/code&gt; otherwise it wouldn’t work 😅.&lt;/p&gt;
+
+&lt;p&gt;{% gist LBognanni/ed91a3b29089b85a23e67bbdafaa10c2  %}&lt;/p&gt;
+
+&lt;p&gt;Now, when I open the repository in Visual studio code, I just have to run &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;bundle exec jekyll serve&lt;/code&gt; in the integrated terminal to run it. The container exposes port 4000 so I can just open http://localhost:4000 in my browser and preview the changes.
+What’s more, if port 4000 is already used by another program, when clicking on the localhost link in the terminal, VS Code will transparently open the site on a different port!&lt;/p&gt;
+
+&lt;p&gt;Found this useful? Want to add something? &lt;a href=&quot;https://twitter.com/lorisdev&quot;&gt;Reach out on twitter&lt;/a&gt;!&lt;/p&gt;
+</description>
+				<pubDate>Sat, 10 Oct 2020 00:00:00 +0000</pubDate>
+				<link>https://codemade.net/blog/devcontainers/</link>
+				<guid isPermaLink="true">https://codemade.net/blog/devcontainers/</guid>
+			</item>
+		
+	</channel>
+</rss>
