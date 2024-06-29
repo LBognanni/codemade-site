@@ -3,7 +3,7 @@ title: The case of the mysteriously disappearing window
 author: _data/authors/loris-bognanni.yaml
 excerpt: >-
   When Slack gives you lemons, you make lemonade.
-date: '2021-05-24'
+date: '2023-12-16'
 thumb_image: images/nowindow_small.jpg
 image: images/nowindow.png
 layout: post
