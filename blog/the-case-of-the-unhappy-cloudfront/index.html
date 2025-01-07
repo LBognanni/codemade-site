@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+    <head>    
+        
+        <title>The case of the unhappy CloudFront distribution - CodeMade</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="google" content="notranslate" />
+        <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:400,400i,700,700i" rel="stylesheet">
+        <link rel="stylesheet" href="/assets/css/main.css">
+        <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+
+        <meta name="twitter:creator" content="@lorisdev">
+        <meta name="twitter:site" content="@lorisdev">
+        <meta name="twitter:title" content="The case of the unhappy CloudFront distribution">
+
+
+
+
+        <meta name="twitter:description" content="How to spend a weekend debugging a CloudFront distribution that doesn't want to work. A murder mystery where I'm both the investigator, and the murderer.">
+
+
+
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:image:src" content="https://codemade.net/images/cloudfront-is-not-happy.png">
+
+        <meta name="twitter:url" content="https://codemade.net/blog/the-case-of-the-unhappy-cloudfront/">
+
+    </head>
+    <body>
+        
+        <div id="page" class="site palette-blue">
+  <header id="masthead" class="site-header outer">
+  <div class="inner">
+    <div class="site-header-inside">
+
+      <div class="site-branding">
+        
+        
+        <p class="site-logo">
+          <a href='/'>
+            <img src="/images/logo-blur.svg" alt="Logo" />
+          </a>
+        </p><!-- .site-logo -->
+        
+        
+        <p class="site-title"><a href='/'>CodeMade</a></p>
+        
+      </div><!-- .site-branding -->
+
+      
+      <nav id="main-navigation" class="site-navigation" aria-label="Main Navigation">
+        <div class="site-nav-inside">
+          <button id="menu-close" class="menu-toggle"><span class="screen-reader-text">Open Menu</span><span
+              class="icon-close" aria-hidden="true"></span></button>
+          <ul class="menu">
+            
+              
+              
+              <li class="menu-item">
+                <a href="/"
+                   
+                   >Home</a>
+              </li>
+            
+              
+              
+              <li class="menu-item">
+                <a href="/clock"
+                   
+                   >Clock</a>
+              </li>
+            
+              
+              
+              <li class="menu-item menu-button">
+                <a href="https://games.codemade.net"
+                   
+                   class="button">🕹️ Games!</a>
+              </li>
+            
+              
+              
+              <li class="menu-item menu-button">
+                <a href="/blog"
+                   
+                   class="button">Blog</a>
+              </li>
+            
+          </ul><!-- .menu -->
+        </div><!-- .site-nav-inside -->
+      </nav><!-- .site-navigation -->
+      <button id="menu-open" class="menu-toggle"><span class="screen-reader-text">Close Menu</span><span class="icon-menu"
+          aria-hidden="true"></span></button>
+      
+
+    </div><!-- .site-header-inside -->
+  </div><!-- .inner -->
+</header><!-- .site-header -->
+
+  <main id="content" class="site-content">
+    <div class="outer">
+  <div class="inner-medium">
+
+    <article class="post post-full">
+      <header class="post-header">
+        <h1 class="post-title">The case of the unhappy CloudFront distribution</h1>
+      </header><!-- .post-header -->
+      
+      
+      <div class="post-thumbnail">
+        <img src="/images/cloudfront-is-not-happy.png" alt="The case of the unhappy CloudFront distribution" />
+      </div><!-- .post-thumbnail -->
+      
+      
+      
+      <div class="post-content">
+        <p>For fun, and as a learning experience, I’m building a very simple comment system for this blog.</p>
+
+<p>Currently codemade.net is a simple static website built by Jekyll everytime I push to the <code class="language-plaintext highlighter-rouge">main</code> branch on its <a href="https://github.com/LBognanni/codemade-site">GitHub repo</a>.
+This is a relatively common setup for smaller websites, and it has the benefit of being extremely fast and cheap to host.</p>
+
+<p>There are a number of third party comment systems floating around the internet, but they all have some drawbacks. Some are just too expensive for a small website like mine, others are advertising platforms in disguise, and others still are just too complicated to set up. Perhaps this is why a lot of people rely on social media for comments.</p>
+
+<p>I wanted to build something that was simple, cheap and cheeful. I also wanted to get hands on with tools I rarely use, like ASP.net Core on Lambda, HTMX, terraform, CloudFront, etc.</p>
+
+<p>It follows a relatively common pattern: all the static content is stored in S3, while the dynamic APIs are served by Lambda functions. An HTTP API gateway is used to route requests to the correct Lambda function, and CloudFront sits in front of everything to provide caching, routing, and SSL.</p>
+
+<p><img src="/images/basic-website.png" alt="The architecture of the comment system" /></p>
+
+<p>I built and deployed this in pieces, starting with the main Lambda function. I set it up to serve both the frontend (a simple HTML page), and the backend: a GET endpoint to return the comments for a post, a PUT endpoint to post a new comment. I tested it locally, and it worked fine.</p>
+
+<p>I deployed it to AWS, behind an API Gateway, and surprisingly, it worked!</p>
+
+<p>I then decided to add CloudFront in front of the API Gateway, and store the static content in an S3 bucket.</p>
+
+<p>When configuring CloudFront, one must set up one or more “Origins” (the places where CloudFront will fetch the content from). I set up two origins: the default one being S3 where <code class="language-plaintext highlighter-rouge">index.html</code> is stored, and the API Gateway, only for the <code class="language-plaintext highlighter-rouge">/comments/*</code> path.</p>
+
+<p>Deploy the distribution, and yes! The index page loads, and navigating to a comments page brings up a list of comments.</p>
+
+<p>Try posting a comment however, and… this happens:</p>
+
+<p><img src="/images/cloudfront-is-not-happy.png" alt="CloudFront returns HTTP 403" /></p>
+
+<p>Soo, somehow GETting the comments works, but PUTing a comment doesn’t.</p>
+
+<p>I started debugging by looking at each piece of the puzzle:</p>
+<ul>
+  <li><strong>Does the lambda work?</strong> Yes, testing the lambda in isolation yields the expected result (a comment is posted)</li>
+  <li><strong>Does the API Gateway work?</strong> Yes, invoking the API gateway URL directly calls the lambda and posts a comment</li>
+  <li><strong>Did I set up the CloudFront distribution correctly?</strong> I think so, but let’s check the settings. I double-checked the origins, and they look fine. I also checked the behaviors, and indeed requests to <code class="language-plaintext highlighter-rouge">/comments/*</code> are routed to the API Gateway <em>(of course they are! GET requests work!)</em></li>
+  <li>Maybe it’s a caching issue? I tried invalidating the cache, but it didn’t help.</li>
+  <li>Maybe it’s a CORS issue? I tested by directly invoking the PUT endpoint via Postman, and it worked. So probably it’s not that.</li>
+</ul>
+
+<p>Hmm. Perhaps the CloudFront logs could help me? I enabled logging, and tried to post a comment. I then waited for a few minutes, and checked the logs:</p>
+
+<p><img src="/images/cf-logs-1.png" alt="CloudFront logs" /></p>
+
+<p>(shoutout to the <a href="https://marketplace.visualstudio.com/items?itemName=mechatroner.rainbow-csv">Rainbow CSV</a> Vs Code extension for making this somewhat readable!)</p>
+
+<p>It’s a bit hard to follow, but we can see 3 requests: the first two are GET requests to the <code class="language-plaintext highlighter-rouge">favicon.ico</code> resource (presumably served from S3), and to the a comments page (served by the API Gateway). The third request is a PUT request to the same comments page, and it returns a 403 status code.</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">x-edge-result-type</code> field simply says <code class="language-plaintext highlighter-rouge">Miss</code> for the GET requests (ie they were not in CloudFront’s cache) and <code class="language-plaintext highlighter-rouge">Error</code> for the PUT request. Not very helpful.</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">x-edge-detailed-result-type</code> field looks interesting. It says <code class="language-plaintext highlighter-rouge">InvalidRequestMethod</code> for the PUT request.</p>
+
+<p><strong>Could it be that I didn’t allow PUT requests on the Api Gateway origin?</strong></p>
+
+<p>I checked my terraform code, and nope, all HTTP methods are allowed for that origin 🤔</p>
+
+<p>So I started googling (well <em>duckduckgoing</em>) for every combination of “CloudFront”, “InvalidRequestMethod”, “403”, “PUT”, “API Gateway” I could think of.</p>
+
+<p>I found some StackOverflow posts where folks were having similar issues, but they were all related to not having configured one of the three components (CloudFront, API Gateway, S3) correctly. I double, triple, quadruple checked my configuration, and it all looked fine.</p>
+
+<p>Out of desperation, I tried mixing things up a bit. I changed the CloudFront distribution to have only one origin: the API Gateway. I then tried posting a comment, and… it worked! But why?</p>
+
+<p>I was really tempted to just leave it at that, but the nagging voice at the back of my head, complaining that I would have to invoke the lambda for each. single. static. asset. was too loud.</p>
+
+<p><em>Obviously</em> the moral imperative is to have the static content served from S3 (it’s cheaper, faster, and more reliable). So I re-enabled the S3 origin, and tried posting a comment again. And… back to not working, of course.</p>
+
+<p>Okay. Time to take a step back. Go for a walk. Clear my head.</p>
+
+<p>It’s the next day, and I’m back at it. Time to try and simplify things a bit.</p>
+
+<p>Perhaps my terraform code was too complex, or it was missing something? I decided to try and set up the CloudFront distribution manually, using the AWS console. Manually add both origin, set up the behaviors, and deploy.</p>
+
+<p>Nope, same issue.</p>
+
+<p>There must be a reason.</p>
+
+<p>Maybe I can look at the CloudFront logs again? There are so many fields. Maybe I missed something? Maybe if I cross my eyes just right it will dawn on me?</p>
+
+<p>And oh yes, dawn on me it did. The stupid, obvious little thing that I missed. Let me highlight it for you:</p>
+
+<p><img src="/images/cf-logs-2.png" alt="CloudFront Logs showing a capitalization error on my PUT requests" /></p>
+
+<p>Do you see it? The GET request is being sent to <code class="language-plaintext highlighter-rouge">/comments/foo/bar</code>, but the PUT request is being sent to <code class="language-plaintext highlighter-rouge">/Comments/foo/bar</code>. Capital C. FML 😩</p>
+
+<p>So CloudFront was directing our PUT request to the S3 origin, which of course didn’t have the PUT method enabled, and returned a 403.</p>
+
+<p>Fun fact, because my API gateway was set to proxy all traffic to my lambda, it didn’t care about the capitalization. But CloudFront does.</p>
+
+<p>AWS explicitly call this out in their <a href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/distribution-web-values-specify.html#DownloadDistValuesPathPattern">documentation</a>:</p>
+
+<p><img src="/images/cf-path-patterns.png" alt="A screenshot of the link above" /></p>
+
+<p>And the best part? Not only I <em>knew</em> about this, I must have read that page at least 15 times while debugging this.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>Anyway, to make a long story short, I fixed my frontend code to PUT to the right path, everything started working as expected 🎉</p>
+
+<hr />
+
+<p>I hope you enjoyed this little story. I certainly learned a lot about CloudFront, API Gateway, and Lambda while debugging this. My desk has a fresh head-shaped indentation, but <em>c’est la vie</em>.</p>
+
+<p>Oh, and the comment system is not ready yet 😅, so feel free to discuss this on HN, or Reddit 😅</p>
+
+      </div><!-- .post-content -->
+      
+      
+
+<footer class="post-meta">
+    Posted on
+    <time class="published" datetime="2024-06-29 00:00">
+    
+        Saturday, June 29, 2024
+    
+    </time>
+    
+</footer>
+
+    </article><!-- .post -->
+
+    <!-- Next/previous post navigation TBD -->
+    <!--
+    <nav class="read-next">
+      <h2 class="read-next-title">Read Next</h2>
+      <div class="post-feed">
+        <article class="post post-card">
+          <div class="post-card-inside">
+            <a class="post-card-thumbnail" href="#"><img src="#" alt="" /></a>
+            <div class="post-card-content">
+              <header class="post-header">
+                <h3 class="post-title"><a href="#" rel="bookmark">Previous Post Title</a></h3>
+              </header>
+              <footer class="post-meta">
+                <time class="published" datetime="">Previous post date</time>
+              </footer>
+            </div>
+          </div>
+        </article>
+        <article class="post post-card">
+          <div class="post-card-inside">
+            <a class="post-card-thumbnail" href="#"><img src="#" alt="" /></a>
+            <div class="post-card-content">
+              <header class="post-header">
+                <h3 class="post-title"><a href="#" rel="bookmark">Next Post Title</a></h3>
+              </header>
+              <footer class="post-meta">
+                <time class="published" datetime="">Next post date</time>
+              </footer>
+            </div>
+          </div>
+        </article>
+      </div>
+    </nav>
+    -->
+
+  </div><!-- .inner-medium -->
+</div><!-- .outer-->
+
+  </main><!-- .site-content -->
+  <footer id="colophon" class="site-footer">
+  <div class="footer-top outer">
+    <div class="inner">
+      <div class="footer-widgets">
+
+        <div class="widget footer-branding">
+          
+          
+          <p class="site-logo">
+            <a href='/'><img src="/images/logo-blur-white.svg" alt="Logo" /></a>
+          </p>
+          
+          
+          
+          <p class="site-description">
+            Free software & tech musings
+          </p>
+          
+        </div><!-- .widget -->
+
+        
+        
+        
+      </div><!-- .footer-widgets -->
+    </div><!-- .inner -->
+  </div><!-- .outer -->
+
+  <div class="site-info outer">
+    <div class="inner">
+      Content &copy; Loris Bognanni. All rights reserved. Theme: 
+      &nbsp;
+      
+        
+        
+
+<a href="https://www.stackbit.com"
+   target="_blank" rel="noopener"
+   class="">Azimuth by Stackbit</a>
+
+      
+    </div><!-- .inner -->
+  </div><!-- .site-info -->
+
+</footer><!-- .site-footer -->
+
+</div><!-- .site -->
+
+        <!-- Scripts -->
+        <script src="/js/plugins.js"></script>
+        <script src="/js/init.js"></script>
+        <script src="/js/main.js"></script>
+        <script>
+        window.cmParams = { tenant: "codemade" };
+        </script>
+        <script defer src="https://stats.codemade.net/track.js"></script>
+          
+    </body> 
+</html>
