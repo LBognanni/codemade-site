@@ -9,7 +9,13 @@ image: images/gamey-bg.png
 layout: post
 ---
 
-> **TLDR** I'm excited to announce the launch of [CodeMade Games](https://games.codemade.net), a new website dedicated to fun, casual games that you can play in your browser 🎉
+<div class="callout">
+  <p>🕹️</p>
+  <p>
+    <b>TLDR</b> 
+    I'm excited to announce the launch of <a href="https://games.codemade.net">CodeMade Games</a>, a new website dedicated to fun, casual games that you can play in your browser 🎉
+  </p>
+</div>
 
 ### My game development journey
 

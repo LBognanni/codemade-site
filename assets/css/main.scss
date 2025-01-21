@@ -36,3 +36,27 @@ $palette: (
 @import "imports/palettes";
 @import "imports/banner";
 @import "imports/code";
+
+
+.callout {
+  border: 1px solid lightblue;
+  background-color: aliceblue;
+  padding: 1rex;
+  margin-bottom: 1rem;
+  font-size: 105%;
+
+  p {
+    margin-left: 3rem;
+  }
+
+  p:first-child {
+    font-size: 200%;
+    float: left;
+    margin: 0;
+  }
+
+  p:last-child {
+    margin-bottom: 1rex;
+  }
+
+}
