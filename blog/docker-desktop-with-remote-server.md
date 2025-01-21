@@ -67,7 +67,7 @@ You'll likely also need to open the ssh port on your firewall.
 sudo ufw allow ssh
 ```
 
-# Step 3: Configure Docker Desktop
+## Step 3: Configure Docker Desktop
 
 Easy peasy. You just need to set an environment variable to tell Docker Desktop to connect to the remote server. 
 
@@ -85,7 +85,7 @@ docker ps
 
 You should get a prompt asking you to accept the server's fingerprint, then another prompt asking for your password. If everything goes well, you should see the list of containers running on the remote server. (none if you just installed Docker)
 
-# Step 4: Configure a Persistent Environment Variable
+## Step 4: Configure a Persistent Environment Variable
 
 You don't want to have to set the environment variable every time you open a terminal window. Instead, we can set the environment variable for all of Windows. 
 
@@ -95,7 +95,7 @@ Add a new system variable with the name `DOCKER_HOST` and the value `ssh://your-
 
 Any new terminal window you open will now be using the environment variable, and docker commands will connected to the remote server.
 
-# Step 5: Usability improvements
+## Step 5: Usability improvements
 
 As it is, Docker will ask for your password every time you run a command. This can be a very annoying, especially if you're running a lot of commands. Some commands, like `docker buildx build` implicitly run multiple docker commands, so you'll be asked for your password multiple times.
 
