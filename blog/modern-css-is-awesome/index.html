@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+    <head>    
+        
+        <title>Modern CSS is awesome! - CodeMade</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="google" content="notranslate" />
+        <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:400,400i,700,700i" rel="stylesheet">
+        <link rel="stylesheet" href="/assets/css/main.css">
+        <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+
+        <meta name="twitter:creator" content="@lorisdev">
+        <meta name="twitter:site" content="@lorisdev">
+        <meta name="twitter:title" content="Modern CSS is awesome!">
+
+
+
+
+        <meta name="twitter:description" content="A look at some of the most interesting features of modern CSS, and how they can be used to create beautiful and responsive designs with very few lines of code.">
+
+
+
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:image:src" content="https://codemade.net/images/blocks.png">
+
+        <meta name="twitter:url" content="https://codemade.net/blog/modern-css-is-awesome/">
+
+    </head>
+    <body>
+        
+        <div id="page" class="site palette-blue">
+  <header id="masthead" class="site-header outer">
+  <div class="inner">
+    <div class="site-header-inside">
+
+      <div class="site-branding">
+        
+        
+        <p class="site-logo">
+          <a href='/'>
+            <img src="/images/logo-blur.svg" alt="Logo" />
+          </a>
+        </p><!-- .site-logo -->
+        
+        
+        <p class="site-title"><a href='/'>CodeMade</a></p>
+        
+      </div><!-- .site-branding -->
+
+      
+      <nav id="main-navigation" class="site-navigation" aria-label="Main Navigation">
+        <div class="site-nav-inside">
+          <button id="menu-close" class="menu-toggle"><span class="screen-reader-text">Open Menu</span><span
+              class="icon-close" aria-hidden="true"></span></button>
+          <ul class="menu">
+            
+              
+              
+              <li class="menu-item">
+                <a href="/"
+                   
+                   >Home</a>
+              </li>
+            
+              
+              
+              <li class="menu-item">
+                <a href="/clock"
+                   
+                   >Clock</a>
+              </li>
+            
+              
+              
+              <li class="menu-item menu-button">
+                <a href="https://games.codemade.net"
+                   
+                   class="button">🕹️ Games!</a>
+              </li>
+            
+              
+              
+              <li class="menu-item menu-button">
+                <a href="/blog"
+                   
+                   class="button">Blog</a>
+              </li>
+            
+          </ul><!-- .menu -->
+        </div><!-- .site-nav-inside -->
+      </nav><!-- .site-navigation -->
+      <button id="menu-open" class="menu-toggle"><span class="screen-reader-text">Close Menu</span><span class="icon-menu"
+          aria-hidden="true"></span></button>
+      
+
+    </div><!-- .site-header-inside -->
+  </div><!-- .inner -->
+</header><!-- .site-header -->
+
+  <main id="content" class="site-content">
+    <div class="outer">
+  <div class="inner-medium">
+
+    <article class="post post-full">
+      <header class="post-header">
+        <h1 class="post-title">Modern CSS is awesome!</h1>
+      </header><!-- .post-header -->
+      
+      
+      <div class="post-thumbnail">
+        <img src="/images/blocks.png" alt="Modern CSS is awesome!" />
+      </div><!-- .post-thumbnail -->
+      
+      
+      
+      <div class="post-content">
+        <p>The last time I seriously worked with CSS was back when Firefox was still a relevant browser (😢), and Internet Explorer 11 was <em>just</em> on its way out.</p>
+
+<p>Flexbox had just become a popular way to create layouts, and CSS Grid was new and exciting, but not yet widely supported.
+Not that I could use either, since IE’s implementation of flexbox was so riddled with bugs that it was practically unusable.</p>
+
+<p>But now. We’re in 2024, and things have changed. A lot.</p>
+
+<p>Here are a few of my favourite features of modern CSS, in no particular order:</p>
+
+<h3 id="css-variables">CSS Variables</h3>
+
+<p>CSS variables were once only possible with a preprocessor like SASS or LESS, but now they’re a native feature of CSS.</p>
+
+<p>Here is how to define a variable:</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">:root</span> <span class="p">{</span>
+  <span class="py">--primary-color</span><span class="p">:</span> <span class="m">#ff0000</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>Specifying the variable at the root level makes it available to the entire document.</p>
+
+<p>The variable can then be used with the <code class="language-plaintext highlighter-rouge">var()</code> function:</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">div</span> <span class="p">{</span>
+  <span class="nl">color</span><span class="p">:</span> <span class="n">var</span><span class="p">(</span><span class="n">--primary-color</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The neat thing is that variables follow the cascading logic of CSS, so you can update their value at any level of the document, and all elements that use that variable will automatically update.</p>
+
+<p class="codepen" data-height="300" data-default-tab="css,result" data-slug-hash="XJrJvom" data-pen-title="CSS Variables" data-user="codemade" style="height: 300px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;">
+  <span>See the Pen <a href="https://codepen.io/codemade/pen/XJrJvom">
+  CSS Variables</a> by Loris Bognanni (<a href="https://codepen.io/codemade">@codemade</a>)
+  on <a href="https://codepen.io">CodePen</a>.</span>
+</p>
+
+<h3 id="nesting-in-css">Nesting in CSS</h3>
+
+<p>This is again one of those things that you would have needed a CSS preprocessor for in the past, but is now a native feature of CSS. Useful for keeping your code concise and readable.</p>
+
+<div class="language-scss highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.parent</span> <span class="p">{</span>
+  <span class="nl">color</span><span class="p">:</span> <span class="no">red</span><span class="p">;</span>
+  <span class="nc">.child</span> <span class="p">{</span>
+    <span class="nl">color</span><span class="p">:</span> <span class="no">blue</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>I especially find this useful when styling pseudo-elements and states:</p>
+
+<div class="language-scss highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">button</span> <span class="p">{</span>
+  <span class="nl">background-color</span><span class="p">:</span> <span class="no">blue</span><span class="p">;</span>
+  <span class="k">&amp;</span><span class="nd">:hover</span> <span class="p">{</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="no">red</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">&amp;</span><span class="nd">:after</span> <span class="p">{</span>
+    <span class="nl">content</span><span class="p">:</span> <span class="s1">'🚀'</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<h3 id="centering-a-div-is-now-very-easy">Centering a <code class="language-plaintext highlighter-rouge">div</code> is now very easy</h3>
+
+<p>Centerig a <code class="language-plaintext highlighter-rouge">div</code> has long been a recurring joke amongst web developers, but thanks to CSS Grid, it’s now a two-liner:</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">div</span><span class="nc">.parent</span> <span class="p">{</span>
+  <span class="nl">display</span><span class="p">:</span> <span class="n">grid</span><span class="p">;</span>
+  <span class="py">place-items</span><span class="p">:</span> <span class="nb">center</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="viewport-units">Viewport units</h3>
+
+<p>Viewport units are a way to size elements based on the size of the viewport. They are particularly useful for creating responsive designs.</p>
+
+<p>Viewport units include <code class="language-plaintext highlighter-rouge">vw</code> (viewport width), <code class="language-plaintext highlighter-rouge">vh</code> (viewport height), <code class="language-plaintext highlighter-rouge">vmin</code> (the smaller of the two), and <code class="language-plaintext highlighter-rouge">vmax</code> (the larger of the two). So for example, if you want an element to be half as wide as the viewport, you can do this:</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.my-element</span> <span class="p">{</span>
+  <span class="nl">width</span><span class="p">:</span> <span class="m">50vw</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Here is an example that combines viewport units and CSS Grid to center a div in the middle of the screen:</p>
+
+<p class="codepen" data-height="300" data-default-tab="css,result" data-slug-hash="JoPogQW" data-pen-title="centering" data-user="codemade" style="height: 300px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;">
+  <span>See the Pen <a href="https://codepen.io/codemade/pen/JoPogQW">
+  centering</a> by Loris Bognanni (<a href="https://codepen.io/codemade">@codemade</a>)
+  on <a href="https://codepen.io">CodePen</a>.</span>
+</p>
+
+<h3 id="math-in-css">Math in CSS</h3>
+
+<p>CSS has a <code class="language-plaintext highlighter-rouge">calc()</code> function that allows you to perform calculations right in your stylesheets. This can be useful for things like calculating widths, margins, and padding.</p>
+
+<p>The exciting thing about <code class="language-plaintext highlighter-rouge">calc()</code> is that it can combine different units of measurement, so you can do things like this:</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.my-element</span> <span class="p">{</span>
+  <span class="nl">width</span><span class="p">:</span> <span class="n">calc</span><span class="p">(</span><span class="m">50%</span> <span class="n">-</span> <span class="m">20px</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>You can of course use <code class="language-plaintext highlighter-rouge">calc()</code> with variables as well:</p>
+
+<div class="language-scss highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">:root</span> <span class="p">{</span>
+  <span class="na">--margin</span><span class="p">:</span> <span class="m">20px</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nt">article</span> <span class="p">{</span>
+  <span class="nl">margin</span><span class="p">:</span> <span class="nf">calc</span><span class="p">(</span><span class="nf">var</span><span class="p">(</span><span class="o">--</span><span class="n">margin</span><span class="p">)</span> <span class="o">*</span> <span class="m">2</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="css-containers-container-queries-and-container-measurements">CSS Containers, container queries, and container measurements</h3>
+
+<p>By telling CSS that a certain element is a <code class="language-plaintext highlighter-rouge">container</code>, you can now do things like size its children based on the container’s size, or apply styles based on the container’s size.</p>
+
+<p>Similar to viewport units, container units are based on the size of the container element. They include <code class="language-plaintext highlighter-rouge">cqw</code>, <code class="language-plaintext highlighter-rouge">cqh</code>, <code class="language-plaintext highlighter-rouge">cqmin</code>, and <code class="language-plaintext highlighter-rouge">cqmax</code>.</p>
+
+<p class="codepen" data-height="300" data-default-tab="css,result" data-slug-hash="wBwawvN" data-pen-title="Untitled" data-user="codemade" style="height: 300px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;">
+  <span>See the Pen <a href="https://codepen.io/codemade/pen/wBwawvN">
+  Untitled</a> by Loris Bognanni (<a href="https://codepen.io/codemade">@codemade</a>)
+  on <a href="https://codepen.io">CodePen</a>.</span>
+</p>
+
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_containment/Container_queries">Container queries</a> take this a step further by allowing you to apply styles based on the size of the container. This is particularly useful for creating responsive designs where the layout changes based on the size of the container, rather than the viewport.</p>
+
+<h3 id="aspect-ratio-property"><code class="language-plaintext highlighter-rouge">aspect-ratio</code> property</h3>
+
+<p>If you ever wanted to embed a video in your responsive page in the old days, you probably had to use some javascript to calculate the correct height based on the width of the video.</p>
+
+<p>But now, you can use the <code class="language-plaintext highlighter-rouge">aspect-ratio</code> property:</p>
+
+<div class="language-scss highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.video</span> <span class="p">{</span>
+  <span class="nl">width</span><span class="p">:</span> <span class="m">100%</span><span class="p">;</span>
+  <span class="na">aspect-ratio</span><span class="p">:</span> <span class="m">16</span> <span class="o">/</span> <span class="m">9</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="has-selector"><code class="language-plaintext highlighter-rouge">:has()</code> selector</h3>
+
+<p>The <code class="language-plaintext highlighter-rouge">:has()</code> selector allows you to select an element based on its descendants. This can be useful for styling elements based on their content, or for selecting elements that contain a specific child element.</p>
+
+<p>While before <code class="language-plaintext highlighter-rouge">:has</code> you would have to use javascript or some sort of preprocessing to achieve the same effect, now you can do it with a single line of CSS.</p>
+
+<p>For example, here is a simple way to style a <code class="language-plaintext highlighter-rouge">&lt;label&gt;</code> element when its child <code class="language-plaintext highlighter-rouge">&lt;input&gt;</code> is checked:</p>
+
+<p class="codepen" data-height="200" data-default-tab="css,result" data-slug-hash="gbYpbgG" data-pen-title=":has demo" data-user="codemade" style="height: 200px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;">
+  <span>See the Pen <a href="https://codepen.io/codemade/pen/gbYpbgG">
+  :has demo</a> by Loris Bognanni (<a href="https://codepen.io/codemade">@codemade</a>)
+  on <a href="https://codepen.io">CodePen</a>.</span>
+</p>
+
+<hr />
+
+<script async="" src="https://cpwebassets.codepen.io/assets/embed/ei.js"></script>
+
+
+      </div><!-- .post-content -->
+      
+      
+
+<footer class="post-meta">
+    Posted on
+    <time class="published" datetime="2024-11-25 00:00">
+    
+        Monday, November 25, 2024
+    
+    </time>
+    
+</footer>
+
+    </article><!-- .post -->
+
+    <!-- Next/previous post navigation TBD -->
+    <!--
+    <nav class="read-next">
+      <h2 class="read-next-title">Read Next</h2>
+      <div class="post-feed">
+        <article class="post post-card">
+          <div class="post-card-inside">
+            <a class="post-card-thumbnail" href="#"><img src="#" alt="" /></a>
+            <div class="post-card-content">
+              <header class="post-header">
+                <h3 class="post-title"><a href="#" rel="bookmark">Previous Post Title</a></h3>
+              </header>
+              <footer class="post-meta">
+                <time class="published" datetime="">Previous post date</time>
+              </footer>
+            </div>
+          </div>
+        </article>
+        <article class="post post-card">
+          <div class="post-card-inside">
+            <a class="post-card-thumbnail" href="#"><img src="#" alt="" /></a>
+            <div class="post-card-content">
+              <header class="post-header">
+                <h3 class="post-title"><a href="#" rel="bookmark">Next Post Title</a></h3>
+              </header>
+              <footer class="post-meta">
+                <time class="published" datetime="">Next post date</time>
+              </footer>
+            </div>
+          </div>
+        </article>
+      </div>
+    </nav>
+    -->
+
+  </div><!-- .inner-medium -->
+</div><!-- .outer-->
+
+  </main><!-- .site-content -->
+  <footer id="colophon" class="site-footer">
+  <div class="footer-top outer">
+    <div class="inner">
+      <div class="footer-widgets">
+
+        <div class="widget footer-branding">
+          
+          
+          <p class="site-logo">
+            <a href='/'><img src="/images/logo-blur-white.svg" alt="Logo" /></a>
+          </p>
+          
+          
+          
+          <p class="site-description">
+            Free software & tech musings
+          </p>
+          
+        </div><!-- .widget -->
+
+        
+        
+        
+      </div><!-- .footer-widgets -->
+    </div><!-- .inner -->
+  </div><!-- .outer -->
+
+  <div class="site-info outer">
+    <div class="inner">
+      Content &copy; Loris Bognanni. All rights reserved. Theme: 
+      &nbsp;
+      
+        
+        
+
+<a href="https://www.stackbit.com"
+   target="_blank" rel="noopener"
+   class="">Azimuth by Stackbit</a>
+
+      
+    </div><!-- .inner -->
+  </div><!-- .site-info -->
+
+</footer><!-- .site-footer -->
+
+</div><!-- .site -->
+
+        <!-- Scripts -->
+        <script src="/js/plugins.js"></script>
+        <script src="/js/init.js"></script>
+        <script src="/js/main.js"></script>
+        <script>
+        window.cmParams = { tenant: "codemade" };
+        </script>
+        <script defer src="https://stats.codemade.net/track.js"></script>
+          
+    </body> 
+</html>

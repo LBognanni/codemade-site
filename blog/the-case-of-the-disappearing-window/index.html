@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+    <head>    
+        
+        <title>The case of the mysteriously disappearing window - CodeMade</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="google" content="notranslate" />
+        <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:400,400i,700,700i" rel="stylesheet">
+        <link rel="stylesheet" href="/assets/css/main.css">
+        <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+
+        <meta name="twitter:creator" content="@lorisdev">
+        <meta name="twitter:site" content="@lorisdev">
+        <meta name="twitter:title" content="The case of the mysteriously disappearing window">
+
+
+
+
+        <meta name="twitter:description" content="When Slack gives you lemons, you make lemonade.">
+
+
+
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:image:src" content="https://codemade.net/images/nowindow.png">
+
+        <meta name="twitter:url" content="https://codemade.net/blog/the-case-of-the-disappearing-window/">
+
+    </head>
+    <body>
+        
+        <div id="page" class="site palette-blue">
+  <header id="masthead" class="site-header outer">
+  <div class="inner">
+    <div class="site-header-inside">
+
+      <div class="site-branding">
+        
+        
+        <p class="site-logo">
+          <a href='/'>
+            <img src="/images/logo-blur.svg" alt="Logo" />
+          </a>
+        </p><!-- .site-logo -->
+        
+        
+        <p class="site-title"><a href='/'>CodeMade</a></p>
+        
+      </div><!-- .site-branding -->
+
+      
+      <nav id="main-navigation" class="site-navigation" aria-label="Main Navigation">
+        <div class="site-nav-inside">
+          <button id="menu-close" class="menu-toggle"><span class="screen-reader-text">Open Menu</span><span
+              class="icon-close" aria-hidden="true"></span></button>
+          <ul class="menu">
+            
+              
+              
+              <li class="menu-item">
+                <a href="/"
+                   
+                   >Home</a>
+              </li>
+            
+              
+              
+              <li class="menu-item">
+                <a href="/clock"
+                   
+                   >Clock</a>
+              </li>
+            
+              
+              
+              <li class="menu-item menu-button">
+                <a href="https://games.codemade.net"
+                   
+                   class="button">🕹️ Games!</a>
+              </li>
+            
+              
+              
+              <li class="menu-item menu-button">
+                <a href="/blog"
+                   
+                   class="button">Blog</a>
+              </li>
+            
+          </ul><!-- .menu -->
+        </div><!-- .site-nav-inside -->
+      </nav><!-- .site-navigation -->
+      <button id="menu-open" class="menu-toggle"><span class="screen-reader-text">Close Menu</span><span class="icon-menu"
+          aria-hidden="true"></span></button>
+      
+
+    </div><!-- .site-header-inside -->
+  </div><!-- .inner -->
+</header><!-- .site-header -->
+
+  <main id="content" class="site-content">
+    <div class="outer">
+  <div class="inner-medium">
+
+    <article class="post post-full">
+      <header class="post-header">
+        <h1 class="post-title">The case of the mysteriously disappearing window</h1>
+      </header><!-- .post-header -->
+      
+      
+      <div class="post-thumbnail">
+        <img src="/images/nowindow.png" alt="The case of the mysteriously disappearing window" />
+      </div><!-- .post-thumbnail -->
+      
+      
+      
+      <div class="post-content">
+        <p>One small annoyance I contend with everyday is links opening in the “wrong” browser. See, I use different browsers for different purposes.</p>
+
+<p>Chrome is the browser I use for all my work stuff, partially because I prefer its Dev tools and also because most SaaS apps I use for work tend to work better with it. Firefox however is my preferred browser and has the advantage of not being built by an advertisement company, so I tend to do all my personal browsing there. I also use Edge for Netflix because why not.</p>
+
+<p>So I spent a few hours hacking together <a href="/roundabout">Roundabout</a>, a simple app that registers itself as a web browser and allows you to pick the browser you’d like to open your link in.</p>
+
+<p><img src="/images/hero-roundabout.png" alt="Roundabout screenshot" /></p>
+
+<p>Upon testing, everything looked good: I could click a link in a non-browser application like Telegram Desktop or WhatsApp desktop, and Roundabout would pop up asking me if I’d prefer Chrome or Firefox.</p>
+
+<h3 id="except-for-slack">…except for Slack</h3>
+
+<p>As it turned out, clicking a link from Slack would… do nothing?</p>
+
+<p>I started with the usual debugging techniques: add some logs, test again. Build fails. Wait, why? A quick glance at <a href="https://learn.microsoft.com/en-us/sysinternals/downloads/process-explorer">Process Explorer</a> revealed the issue: Roundabout was starting, but somehow it got stuck and wasn’t showing the main window. After terminating all the stuck instances, I was able to test again, this time with logs.</p>
+
+<p>The logs looked OK, but just stopped after showing the main form 🤔</p>
+
+<p>Next it was time to investigate <em>how</em> exactly Slack starts a web browser.
+A few minutes of sleuthing with <a href="https://learn.microsoft.com/en-us/sysinternals/downloads/procmon">Process Monitor</a> got me my answer: when opening links Slack runs a new command, in the form of <code class="language-plaintext highlighter-rouge">RunDll32.exe URL.dll,FileProtocolHandler {the URL}</code>; interesting 🤔.</p>
+
+<p>If you never crossed paths with it, RunDll32 is perhaps one of the most interesting applications in Windows. It allows one to invoke functions that are defined in Dll files, simply by calling <code class="language-plaintext highlighter-rouge">rundll32 {the dll},{the function} {any parameters}</code>. In this case, we’re executing the <code class="language-plaintext highlighter-rouge">FileProtocolHandler</code> function that is defined in <code class="language-plaintext highlighter-rouge">URL.dll</code>, and passing our URL to it.</p>
+
+<p>So what happens if I just run that command from a command prompt?</p>
+
+<p><img src="/images/rundll32.png" alt="A command prompt showing that we executed Rundll32, with a Roundabout window open in front of it" /><br />Hmmm, it works as expected…</p>
+
+<p>I began to suspect that there was some sort of problem actually showing the form, when starting from Slack. What would happen if I added a MessageBox just before showing the form? Interestingly, the message box showed just fine, and then the main form also showed up fine 🤔</p>
+
+<p>Perhaps the issue is just that Roundabout shows up too quickly? I added a 1 second pause just before starting and… nothing, the main window wouldn’t show again. I’m kinda relieved because I really didn’t want to add a huge pause before something happens for the user 😌</p>
+
+<p>Okay, so it looks like Slack “swallows” the first proper window we create. I wonder what happens if we temporarily create an empty window and immediately close it before showing the main window?</p>
+
+<p><img src="/images/roundabout_slack_works.png" alt="A Roundabout window, open in front of a Slack conversation" /><br />🎉It works!</p>
+
+<p>At this point, it’s been a few hours debugging this on and off, and a hacky workaround sounds like the perfect solution…</p>
+
+<p>🧹 Time to clean up the code a bit, and hide this monstrosity behind a helper function.</p>
+
+<p>It would be also good to only do this when starting from Slack, otherwise users would see an empty window flash on screen. Unfortunately there’s no good way to find out what is your “parent” program, but the user likely clicked on the link with their mouse, so finding the right window based on the pointer coordinates should suffice.</p>
+
+<p><a href="https://github.com/LBognanni/Roundabout/blob/1b8c675c81628b163bb860fc651c19fb9289c04d/src/Roundabout/Program.cs#L68-L88">Here is the admittedly horrible code that does this</a>!</p>
+
+<h3 id="fin">Fin.</h3>
+
+<p>In unraveling the mystery of Slack links not cooperating with Roundabout, we’ve delved into unexpected corners of Windows application development. With the code tweaks and insights gained, Roundabout now seamlessly handles links from various applications, including Slack.</p>
+
+<p>As with any solution, there’s always room for improvement. Considerations for future versions include refining the code further, and perhaps adpoting this workaround for other apps I missed this time.</p>
+
+<p>If you do find one such case of an app “swallowing” Roundabout, please do <a href="https://github.com/LBognanni/Roundabout/issues">open an issue on Github</a>!</p>
+
+      </div><!-- .post-content -->
+      
+      
+
+<footer class="post-meta">
+    Posted on
+    <time class="published" datetime="2023-12-16 00:00">
+    
+        Saturday, December 16, 2023
+    
+    </time>
+    
+</footer>
+
+    </article><!-- .post -->
+
+    <!-- Next/previous post navigation TBD -->
+    <!--
+    <nav class="read-next">
+      <h2 class="read-next-title">Read Next</h2>
+      <div class="post-feed">
+        <article class="post post-card">
+          <div class="post-card-inside">
+            <a class="post-card-thumbnail" href="#"><img src="#" alt="" /></a>
+            <div class="post-card-content">
+              <header class="post-header">
+                <h3 class="post-title"><a href="#" rel="bookmark">Previous Post Title</a></h3>
+              </header>
+              <footer class="post-meta">
+                <time class="published" datetime="">Previous post date</time>
+              </footer>
+            </div>
+          </div>
+        </article>
+        <article class="post post-card">
+          <div class="post-card-inside">
+            <a class="post-card-thumbnail" href="#"><img src="#" alt="" /></a>
+            <div class="post-card-content">
+              <header class="post-header">
+                <h3 class="post-title"><a href="#" rel="bookmark">Next Post Title</a></h3>
+              </header>
+              <footer class="post-meta">
+                <time class="published" datetime="">Next post date</time>
+              </footer>
+            </div>
+          </div>
+        </article>
+      </div>
+    </nav>
+    -->
+
+  </div><!-- .inner-medium -->
+</div><!-- .outer-->
+
+  </main><!-- .site-content -->
+  <footer id="colophon" class="site-footer">
+  <div class="footer-top outer">
+    <div class="inner">
+      <div class="footer-widgets">
+
+        <div class="widget footer-branding">
+          
+          
+          <p class="site-logo">
+            <a href='/'><img src="/images/logo-blur-white.svg" alt="Logo" /></a>
+          </p>
+          
+          
+          
+          <p class="site-description">
+            Free software & tech musings
+          </p>
+          
+        </div><!-- .widget -->
+
+        
+        
+        
+      </div><!-- .footer-widgets -->
+    </div><!-- .inner -->
+  </div><!-- .outer -->
+
+  <div class="site-info outer">
+    <div class="inner">
+      Content &copy; Loris Bognanni. All rights reserved. Theme: 
+      &nbsp;
+      
+        
+        
+
+<a href="https://www.stackbit.com"
+   target="_blank" rel="noopener"
+   class="">Azimuth by Stackbit</a>
+
+      
+    </div><!-- .inner -->
+  </div><!-- .site-info -->
+
+</footer><!-- .site-footer -->
+
+</div><!-- .site -->
+
+        <!-- Scripts -->
+        <script src="/js/plugins.js"></script>
+        <script src="/js/init.js"></script>
+        <script src="/js/main.js"></script>
+        <script>
+        window.cmParams = { tenant: "codemade" };
+        </script>
+        <script defer src="https://stats.codemade.net/track.js"></script>
+          
+    </body> 
+</html>

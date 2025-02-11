@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+    <head>    
+        
+        <title>A journey through Server Side Rendering in Deno - CodeMade</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="google" content="notranslate" />
+        <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:400,400i,700,700i" rel="stylesheet">
+        <link rel="stylesheet" href="/assets/css/main.css">
+        <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+
+        <meta name="twitter:creator" content="@lorisdev">
+        <meta name="twitter:site" content="@lorisdev">
+        <meta name="twitter:title" content="A journey through Server Side Rendering in Deno">
+
+
+
+
+        <meta name="twitter:description" content="A .net developer's tale of navigating typescript, deno, and server side rendering. ">
+
+
+
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:image:src" content="https://codemade.net/images/typescript-landscape.jpg">
+
+        <meta name="twitter:url" content="https://codemade.net/blog/a-journey-through-deno-ssr/">
+
+    </head>
+    <body>
+        
+        <div id="page" class="site palette-blue">
+  <header id="masthead" class="site-header outer">
+  <div class="inner">
+    <div class="site-header-inside">
+
+      <div class="site-branding">
+        
+        
+        <p class="site-logo">
+          <a href='/'>
+            <img src="/images/logo-blur.svg" alt="Logo" />
+          </a>
+        </p><!-- .site-logo -->
+        
+        
+        <p class="site-title"><a href='/'>CodeMade</a></p>
+        
+      </div><!-- .site-branding -->
+
+      
+      <nav id="main-navigation" class="site-navigation" aria-label="Main Navigation">
+        <div class="site-nav-inside">
+          <button id="menu-close" class="menu-toggle"><span class="screen-reader-text">Open Menu</span><span
+              class="icon-close" aria-hidden="true"></span></button>
+          <ul class="menu">
+            
+              
+              
+              <li class="menu-item">
+                <a href="/"
+                   
+                   >Home</a>
+              </li>
+            
+              
+              
+              <li class="menu-item">
+                <a href="/clock"
+                   
+                   >Clock</a>
+              </li>
+            
+              
+              
+              <li class="menu-item menu-button">
+                <a href="https://games.codemade.net"
+                   
+                   class="button">🕹️ Games!</a>
+              </li>
+            
+              
+              
+              <li class="menu-item menu-button">
+                <a href="/blog"
+                   
+                   class="button">Blog</a>
+              </li>
+            
+          </ul><!-- .menu -->
+        </div><!-- .site-nav-inside -->
+      </nav><!-- .site-navigation -->
+      <button id="menu-open" class="menu-toggle"><span class="screen-reader-text">Close Menu</span><span class="icon-menu"
+          aria-hidden="true"></span></button>
+      
+
+    </div><!-- .site-header-inside -->
+  </div><!-- .inner -->
+</header><!-- .site-header -->
+
+  <main id="content" class="site-content">
+    <div class="outer">
+  <div class="inner-medium">
+
+    <article class="post post-full">
+      <header class="post-header">
+        <h1 class="post-title">A journey through Server Side Rendering in Deno</h1>
+      </header><!-- .post-header -->
+      
+      
+      <div class="post-thumbnail">
+        <img src="/images/typescript-landscape.jpg" alt="A journey through Server Side Rendering in Deno" />
+      </div><!-- .post-thumbnail -->
+      
+      
+      
+      <div class="post-content">
+        <p>As a longtime .net developer, I’ve always preferred languages with strong typing. I find that I can reason about the code much better if I understand what data structures are required by a function call, and what it will return.</p>
+
+<p>Naturally, this means that when doing any frontend work, I tend to reach for TypeScript. I find it’s a welcome improvement over vanilla JavaScript, especially when using typed third-party libraries.</p>
+
+<p>There is only one catch: setting up typescript, esm modules, and bundling can be really painful when you’re just trying to get a simple project off the ground. Soon you’re 2 hours in, and you’re still trying to figure out why your imports aren’t working.</p>
+
+<p>This is where Deno comes in! Built by the creators of Node.js, deno sets out to undo the mistakes of their previous project. It has built-in support for TypeScript, esm modules, and even has a built-in bundler. This means that I can write all my code in TypeScript, and run it without any additional setup. It also does away with the <code class="language-plaintext highlighter-rouge">node_modules</code> folder, which makes my hard drive very happy.</p>
+
+<p>So, when starting a new project recently, I decided to give Deno a try. The project is a simple server-side rendered web application, with a bit of interactivity sprinkled in.</p>
+
+<p>It’s now been a few weeks, and I’ve been through several iterations. Here is <em>my</em> journey through server-side rendering in Deno.</p>
+
+<h2 id="deno-has-a-built-in-web-server">Deno has a built-in web server??</h2>
+
+<p>Yes, yes it does. Using the builtin <code class="language-plaintext highlighter-rouge">Deno.Serve()</code> function, you can create a simple web server <a href="https://docs.deno.com/api/deno/~/Deno.serve">in just a few lines of code</a>.</p>
+
+<p>The only downside of this approach is that you’ll have to handle absolutely everything yourself. This means parsing the request, handling the response, and even serving static files. This is easy enough for a simple project, but it can quickly become unwieldy as your project grows.</p>
+
+<h2 id="shopping-for-a-framework">Shopping for a framework</h2>
+
+<p>After deciding that I didn’t want to write my own web server, I started looking for a lightweight framework that would handle the heavy lifting for me. I quickly found <a href="https://oakserver.org/">Oak</a>, a simple framework for Deno that is very similar to Express.js.</p>
+
+<p>Oak has built-in support for things like middleware and routing. It seemed like a great choice for a simple project, and it’s easy to get started with.</p>
+
+<p>The next step was to figure out a way to go beyond serving API endpoints and start rendering HTML on the server. This is where things started to get interesting.</p>
+
+<h2 id="shopping-for-a-templating-engine">Shopping for a templating engine</h2>
+
+<h3 id="handlebars">Handlebars</h3>
+
+<p>When thinking of templating engines, my first idea was to use good old <a href="https://handlebarsjs.com/">Handlebars</a>. I had never used it before, but I remember it being all the rage a few years ago, so I figured it must be good. Right? <em>Right??</em></p>
+
+<p>It was… below my expectations. And by “below my expectations” I mean <em>“It makes me want to stab myself”</em>. The syntax, oh the syntax!! I have nothing but compassion for anyone who has to coexist with it.</p>
+
+<p>The last straw was when I had to declare a helper function to compare two values. I had to write a helper function to compare two values. In a templating engine.</p>
+
+<h3 id="ejs">ejs</h3>
+
+<p>After a good old web search for “handlebars alternatives”, I stumbled upon <a href="https://ejs.co/">ejs</a>.</p>
+
+<p>As a .net developer, I was immediately reminded of Razor Pages / MVC. Simple, clean, and easy to use. I was sold.</p>
+
+<p>…it did however come with its own set of quirks. For example, it doesn’t have the equivalent of “Layouts” in Razor. This means that you have to manually include the header and footer in every page. It also has even weirder syntax than Razor, with various combinations of percent signs and angle brackets.</p>
+
+<p>But mainly, the thing I was really missing until now was being able to <strong>unit test my UI</strong>. Not knowing if my partials were rendering correctly until I manually tested them in the browser was a pain.</p>
+
+<p>In the end, I found that while the syntax was cozy and familiar, the web has moved on. I wanted something more modern, more… reactive. I wanted, in fact, React.</p>
+
+<h3 id="detour-to-the-promised-land-of-deno-fresh">Detour to the promised land of Deno Fresh</h3>
+
+<p>Before I could start using React, I had to figure out how to get it to work with Deno. This is where I found <a href="https://fresh.deno.dev/">🍋 Deno Fresh</a>. Fresh is Deno’s answer to Next.js. With built-in support for JSX and an “islands” architecture that prioritizes minimal client-side JavaScript, it looked very promising.</p>
+
+<p>I quickly cloned the example repo on my machine to try it out. It worked great. Sure, it’s extremely opinionated, but I can live with that.</p>
+
+<p>I decided to try converting one of my ejs partials into a jsx component right inside the example project. Easy. Done. I was sold. Writing JSX instead of ejs felt natural, the way it was supposed to be all along.</p>
+
+<p>At some point, however, things started to fall apart.</p>
+
+<p>Testing components, for example, is not really supported out of the box. There’s <a href="https://github.com/denoland/fresh/issues/427">an open issue on github</a> and the consensus seems to be… let’s wait for Fresh 2.0.</p>
+
+<p>As far as I understand it, the wind behind Fresh’s sails is now more like a gentle breeze. 
+It seems that the team has been busy working on Deno itself, and Fresh has been left behind.</p>
+
+<p>I notice as I write this that the <a href="https://deno.com/blog/fresh-1.6">last official blog about it</a> dates December 1, 2023, which is about 10 years in trendy javascript framework time.</p>
+
+<h3 id="but-i-like-react-maybe-i-can-salvage-this">But I like react! Maybe I can salvage this?</h3>
+
+<p>So it turns out that Deno Fresh uses <code class="language-plaintext highlighter-rouge">preact-render-to-string</code> under the hood to transform JSX components into HTML.</p>
+
+<blockquote>
+  <p>With some clever refactoring, I’m sure I can just replace my ejs Oak middleware with a React one!</p>
+</blockquote>
+
+<p>-famous last words</p>
+
+<p>So I did! I created a new middleware that would render my React components server-side, and it worked like a charm. If you’re curious to see what it looks like, <a href="https://gist.github.com/LBognanni/4ce0247276b7cd77e72a9cc014cd6e12">here is a github gist with the code</a> 🙂</p>
+
+<p>I now had a working server-side rendered web app in Deno under my belt. I was happy with the result, even if it felt a bit of a Frankenstein’s monster.</p>
+
+<h2 id="and-then-i-built-a-second-project">And then I built a second project</h2>
+
+<p>Some time later, I wanted to start a new project. Similar requirements, so I figured I could just copy-paste the code from the first project and be done with it.</p>
+
+<p>But then I thought,</p>
+
+<blockquote>
+  <p>If I need this, maybe others do too? Maybe I should make a library out of it? Maybe I should make my own framework? One framework to rule them all! 😈</p>
+</blockquote>
+
+<p>Yeah, no. No thanks Satan. I’m good.</p>
+
+<p>An important requirement of my second project was user management, authentication, and authorization.</p>
+
+<p><a href="https://better-auth.vercel.app/">Better-Auth</a> looked exactly like the kind of thing I needed. Fully featured, popular, good documentation. I had absolutely no intention of trying to bend my own little framework to work with it. I just wanted to get my project done.</p>
+
+<p>I also had the nagging feeling in the back of my head that I was just <em>writing too much code</em> for something that should be simple.</p>
+
+<h2 id="enter-hono">Enter Hono</h2>
+
+<p>The first backend framework that is mentioned in Better-Auth’s documentation is <a href="https://hono.dev/">Hono</a>. I decided to take a look.</p>
+
+<p>Hono does everything I was trying to build manually—but better. It has <a href="https://hono.dev/docs/guides/jsx#jsx">built-in JSX support</a>, a router, and great documentation. The best thing is that I don’t have to support any of it myself!</p>
+
+<p>It also looks almost exactly like Oak, so that was already a plus.</p>
+
+<p>Unsurprisingly, building my second project was a much smoother experience.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>This was a long journey, but a rewarding one. The nice thing was that at every point during my first project I ended up having something that was working, and that I could build upon.</p>
+
+<p>Refactoring my code to use the next thing was luckily always pretty easy, and I was able to learn a lot along the way.</p>
+
+<p>One thing I learned is that it’s easy to fall into the trap of doing everything “the Deno way”, and assuming that a library or framework that’s written for Deno is the best choice.</p>
+
+<p>In reality, it’s important to evaluate each library or framework on its own merits, and choose the one that best fits your needs.</p>
+
+<p>Frameworks like Hono that are built for multiple runtimes are obviously going to be more popular and better maintained than something that’s built for Deno only.</p>
+
+<p>The great thing about Deno is that you can reference npm modules directly (without worrying about terabytes of <code class="language-plaintext highlighter-rouge">node_modules</code>), so you really have the whole JavaScript ecosystem at your disposal.</p>
+
+<h3 id="-key-takeaways">🔑🥡 Key Takeaways:</h3>
+
+<ul>
+  <li>Don’t assume that a library made for Deno is always the best choice—evaluate based on actual needs.</li>
+  <li>Multi-runtime frameworks like Hono tend to be better maintained and more flexible.</li>
+  <li>Deno’s ability to use npm modules expands its ecosystem significantly.</li>
+  <li>Don’t be afraid to refactor and try new things — each iteration can teach you something new!</li>
+</ul>
+
+      </div><!-- .post-content -->
+      
+      
+
+<footer class="post-meta">
+    Posted on
+    <time class="published" datetime="2025-02-11 00:00">
+    
+        Tuesday, February 11, 2025
+    
+    </time>
+    
+</footer>
+
+    </article><!-- .post -->
+
+    <!-- Next/previous post navigation TBD -->
+    <!--
+    <nav class="read-next">
+      <h2 class="read-next-title">Read Next</h2>
+      <div class="post-feed">
+        <article class="post post-card">
+          <div class="post-card-inside">
+            <a class="post-card-thumbnail" href="#"><img src="#" alt="" /></a>
+            <div class="post-card-content">
+              <header class="post-header">
+                <h3 class="post-title"><a href="#" rel="bookmark">Previous Post Title</a></h3>
+              </header>
+              <footer class="post-meta">
+                <time class="published" datetime="">Previous post date</time>
+              </footer>
+            </div>
+          </div>
+        </article>
+        <article class="post post-card">
+          <div class="post-card-inside">
+            <a class="post-card-thumbnail" href="#"><img src="#" alt="" /></a>
+            <div class="post-card-content">
+              <header class="post-header">
+                <h3 class="post-title"><a href="#" rel="bookmark">Next Post Title</a></h3>
+              </header>
+              <footer class="post-meta">
+                <time class="published" datetime="">Next post date</time>
+              </footer>
+            </div>
+          </div>
+        </article>
+      </div>
+    </nav>
+    -->
+
+  </div><!-- .inner-medium -->
+</div><!-- .outer-->
+
+  </main><!-- .site-content -->
+  <footer id="colophon" class="site-footer">
+  <div class="footer-top outer">
+    <div class="inner">
+      <div class="footer-widgets">
+
+        <div class="widget footer-branding">
+          
+          
+          <p class="site-logo">
+            <a href='/'><img src="/images/logo-blur-white.svg" alt="Logo" /></a>
+          </p>
+          
+          
+          
+          <p class="site-description">
+            Free software & tech musings
+          </p>
+          
+        </div><!-- .widget -->
+
+        
+        
+        
+      </div><!-- .footer-widgets -->
+    </div><!-- .inner -->
+  </div><!-- .outer -->
+
+  <div class="site-info outer">
+    <div class="inner">
+      Content &copy; Loris Bognanni. All rights reserved. Theme: 
+      &nbsp;
+      
+        
+        
+
+<a href="https://www.stackbit.com"
+   target="_blank" rel="noopener"
+   class="">Azimuth by Stackbit</a>
+
+      
+    </div><!-- .inner -->
+  </div><!-- .site-info -->
+
+</footer><!-- .site-footer -->
+
+</div><!-- .site -->
+
+        <!-- Scripts -->
+        <script src="/js/plugins.js"></script>
+        <script src="/js/init.js"></script>
+        <script src="/js/main.js"></script>
+        <script>
+        window.cmParams = { tenant: "codemade" };
+        </script>
+        <script defer src="https://stats.codemade.net/track.js"></script>
+          
+    </body> 
+</html>

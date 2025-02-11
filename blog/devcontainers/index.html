@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+    <head>    
+        
+        <title>How to combine Docker and VSCode to reach development nirvana - CodeMade</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="google" content="notranslate" />
+        <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:400,400i,700,700i" rel="stylesheet">
+        <link rel="stylesheet" href="/assets/css/main.css">
+        <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+
+        <meta name="twitter:creator" content="@lorisdev">
+        <meta name="twitter:site" content="@lorisdev">
+        <meta name="twitter:title" content="How to combine Docker and VSCode to reach development nirvana">
+
+
+
+
+        <meta name="twitter:description" content="Use this extension to DESTROY your set up times and make your team productive NOW!">
+
+
+
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:image:src" content="https://codemade.net/images/vscode-docker-jekyll.png">
+
+        <meta name="twitter:url" content="https://codemade.net/blog/devcontainers/">
+
+    </head>
+    <body>
+        
+        <div id="page" class="site palette-blue">
+  <header id="masthead" class="site-header outer">
+  <div class="inner">
+    <div class="site-header-inside">
+
+      <div class="site-branding">
+        
+        
+        <p class="site-logo">
+          <a href='/'>
+            <img src="/images/logo-blur.svg" alt="Logo" />
+          </a>
+        </p><!-- .site-logo -->
+        
+        
+        <p class="site-title"><a href='/'>CodeMade</a></p>
+        
+      </div><!-- .site-branding -->
+
+      
+      <nav id="main-navigation" class="site-navigation" aria-label="Main Navigation">
+        <div class="site-nav-inside">
+          <button id="menu-close" class="menu-toggle"><span class="screen-reader-text">Open Menu</span><span
+              class="icon-close" aria-hidden="true"></span></button>
+          <ul class="menu">
+            
+              
+              
+              <li class="menu-item">
+                <a href="/"
+                   
+                   >Home</a>
+              </li>
+            
+              
+              
+              <li class="menu-item">
+                <a href="/clock"
+                   
+                   >Clock</a>
+              </li>
+            
+              
+              
+              <li class="menu-item menu-button">
+                <a href="https://games.codemade.net"
+                   
+                   class="button">🕹️ Games!</a>
+              </li>
+            
+              
+              
+              <li class="menu-item menu-button">
+                <a href="/blog"
+                   
+                   class="button">Blog</a>
+              </li>
+            
+          </ul><!-- .menu -->
+        </div><!-- .site-nav-inside -->
+      </nav><!-- .site-navigation -->
+      <button id="menu-open" class="menu-toggle"><span class="screen-reader-text">Close Menu</span><span class="icon-menu"
+          aria-hidden="true"></span></button>
+      
+
+    </div><!-- .site-header-inside -->
+  </div><!-- .inner -->
+</header><!-- .site-header -->
+
+  <main id="content" class="site-content">
+    <div class="outer">
+  <div class="inner-medium">
+
+    <article class="post post-full">
+      <header class="post-header">
+        <h1 class="post-title">How to combine Docker and VSCode to reach development nirvana</h1>
+      </header><!-- .post-header -->
+      
+      
+      <div class="post-thumbnail">
+        <img src="/images/vscode-docker-jekyll.png" alt="How to combine Docker and VSCode to reach development nirvana" />
+      </div><!-- .post-thumbnail -->
+      
+      
+      
+      <div class="post-content">
+        <p>One of the best features in VS Code, and my personal favourite is called <a href="https://code.visualstudio.com/docs/remote/containers">Remote Containers</a>. 
+What it does is open the folder you’re working on <em>inside</em> a container and then connect to it, so that you can, for example, run your jekyll site on windows without having to install ruby system-wide. Because all the development is done inside the container, you don’t have to worry about having multiple versions of node or python cluttering your machine.</p>
+
+<p>This is especially useful if your main OS is Windows, as getting set up with some languages is notoriously tougher there.</p>
+
+<p>Working in a devcontainer has also the advantage that all the settings can be committed into source control, so you can share the exact same development environment with the rest of your team. No more 15-step procedure to follow to set up the local dev environment!</p>
+
+<p>Getting started is really simple:</p>
+
+<ul>
+  <li>Install the <code class="language-plaintext highlighter-rouge">Remote - Containers</code> extension</li>
+  <li>Press F1 to open the command palette</li>
+  <li>Run “Open folder in container” command</li>
+  <li>Select “From a predefined container definition”</li>
+  <li>Select the most appropriate container image.</li>
+</ul>
+
+<p>This will create:</p>
+
+<ul>
+  <li>A <code class="language-plaintext highlighter-rouge">.devcontainer</code> folder in your project, containing:</li>
+  <li>A <code class="language-plaintext highlighter-rouge">dockerfile</code> for the development container</li>
+  <li>A file named <code class="language-plaintext highlighter-rouge">devcontainer.json</code> that is mostly used to define any ports that should be forwarded to the host</li>
+</ul>
+
+<p>You can now open the integrated terminal and type commands directly in your container!</p>
+
+<h2 id="an-example-this-website">An example: this website</h2>
+
+<p>I love the simplicity that comes with static site generators, and <a href="https://jekyllrb.com">jekyll</a> is by far the most popular choice. Using a development container setup allows me to edit and test any change on all my computers, without having to install ruby, bundler or any of jekyll’s dependencies.</p>
+
+<p>This is the dockerfile I use for my jekyll devcontainer. It’s a slightly modified version based on the official Microsoft one from some time ago; I had to add a line to install <code class="language-plaintext highlighter-rouge">zlib1g-dev</code> otherwise it wouldn’t work 😅.</p>
+
+<noscript><pre>FROM debian:latest
+
+# Avoid warnings by switching to noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
+
+# This Dockerfile adds a non-root &#39;vscode&#39; user with sudo access. However, for Linux,
+# this user&#39;s GID/UID must match your local user UID/GID to avoid permission issues
+# with bind mounts. Update USER_UID / USER_GID if yours is not 1000. See
+# https://aka.ms/vscode-remote/containers/non-root-user for details.
+ARG USERNAME=vscode
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+# Configure apt and install packages
+RUN apt-get update \
+    &amp;&amp; apt-get -y install --no-install-recommends apt-utils dialog 2&gt;&amp;1 \
+    #
+    # Install vim, git, process tools, lsb-release
+    &amp;&amp; apt-get install -y \
+        git \
+        openssh-client \
+        less \
+    #
+    # Install ruby
+    &amp;&amp; apt-get install -y \
+        make \
+		build-essential \
+		ruby \
+        ruby-dev \
+    #
+    # Install jekyll
+    &amp;&amp; gem install \
+        bundler \
+        jekyll \
+    &amp;&amp; apt-get install -y zlib1g-dev \
+    #
+    # Create a non-root user to use if preferred - see https://aka.ms/vscode-remote/containers/non-root-user.
+    &amp;&amp; groupadd --gid $USER_GID $USERNAME \
+    &amp;&amp; useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    # [Optional] Add sudo support for the non-root user
+    &amp;&amp; apt-get install -y sudo \
+    &amp;&amp; echo $USERNAME ALL=\(root\) NOPASSWD:ALL &gt; /etc/sudoers.d/$USERNAME\
+    &amp;&amp; chmod 0440 /etc/sudoers.d/$USERNAME \
+    #
+    # Clean up
+    &amp;&amp; apt-get autoremove -y \
+    &amp;&amp; apt-get clean -y \
+    &amp;&amp; rm -rf /var/lib/apt/lists/*
+
+
+# Switch back to dialog for any ad-hoc use of apt-get
+ENV DEBIAN_FRONTEND=dialog</pre></noscript>
+<script src="https://gist.github.com/LBognanni/ed91a3b29089b85a23e67bbdafaa10c2.js"> </script>
+
+<p>Now, when I open the repository in Visual studio code, I just have to run <code class="language-plaintext highlighter-rouge">bundle exec jekyll serve</code> in the integrated terminal to run it. The container exposes port 4000 so I can just open http://localhost:4000 in my browser and preview the changes.
+What’s more, if port 4000 is already used by another program, when clicking on the localhost link in the terminal, VS Code will transparently open the site on a different port!</p>
+
+<p>Found this useful? Want to add something? <a href="https://twitter.com/lorisdev">Reach out on twitter</a>!</p>
+
+      </div><!-- .post-content -->
+      
+      
+
+<footer class="post-meta">
+    Posted on
+    <time class="published" datetime="2020-10-10 00:00">
+    
+        Saturday, October 10, 2020
+    
+    </time>
+    
+</footer>
+
+    </article><!-- .post -->
+
+    <!-- Next/previous post navigation TBD -->
+    <!--
+    <nav class="read-next">
+      <h2 class="read-next-title">Read Next</h2>
+      <div class="post-feed">
+        <article class="post post-card">
+          <div class="post-card-inside">
+            <a class="post-card-thumbnail" href="#"><img src="#" alt="" /></a>
+            <div class="post-card-content">
+              <header class="post-header">
+                <h3 class="post-title"><a href="#" rel="bookmark">Previous Post Title</a></h3>
+              </header>
+              <footer class="post-meta">
+                <time class="published" datetime="">Previous post date</time>
+              </footer>
+            </div>
+          </div>
+        </article>
+        <article class="post post-card">
+          <div class="post-card-inside">
+            <a class="post-card-thumbnail" href="#"><img src="#" alt="" /></a>
+            <div class="post-card-content">
+              <header class="post-header">
+                <h3 class="post-title"><a href="#" rel="bookmark">Next Post Title</a></h3>
+              </header>
+              <footer class="post-meta">
+                <time class="published" datetime="">Next post date</time>
+              </footer>
+            </div>
+          </div>
+        </article>
+      </div>
+    </nav>
+    -->
+
+  </div><!-- .inner-medium -->
+</div><!-- .outer-->
+
+  </main><!-- .site-content -->
+  <footer id="colophon" class="site-footer">
+  <div class="footer-top outer">
+    <div class="inner">
+      <div class="footer-widgets">
+
+        <div class="widget footer-branding">
+          
+          
+          <p class="site-logo">
+            <a href='/'><img src="/images/logo-blur-white.svg" alt="Logo" /></a>
+          </p>
+          
+          
+          
+          <p class="site-description">
+            Free software & tech musings
+          </p>
+          
+        </div><!-- .widget -->
+
+        
+        
+        
+      </div><!-- .footer-widgets -->
+    </div><!-- .inner -->
+  </div><!-- .outer -->
+
+  <div class="site-info outer">
+    <div class="inner">
+      Content &copy; Loris Bognanni. All rights reserved. Theme: 
+      &nbsp;
+      
+        
+        
+
+<a href="https://www.stackbit.com"
+   target="_blank" rel="noopener"
+   class="">Azimuth by Stackbit</a>
+
+      
+    </div><!-- .inner -->
+  </div><!-- .site-info -->
+
+</footer><!-- .site-footer -->
+
+</div><!-- .site -->
+
+        <!-- Scripts -->
+        <script src="/js/plugins.js"></script>
+        <script src="/js/init.js"></script>
+        <script src="/js/main.js"></script>
+        <script>
+        window.cmParams = { tenant: "codemade" };
+        </script>
+        <script defer src="https://stats.codemade.net/track.js"></script>
+          
+    </body> 
+</html>

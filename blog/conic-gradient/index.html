@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+    <head>    
+        
+        <title>How to draw a conic gradient with System.Drawing in gdiPlus - CodeMade</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="google" content="notranslate" />
+        <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:400,400i,700,700i" rel="stylesheet">
+        <link rel="stylesheet" href="/assets/css/main.css">
+        <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+
+        <meta name="twitter:creator" content="@lorisdev">
+        <meta name="twitter:site" content="@lorisdev">
+        <meta name="twitter:title" content="How to draw a conic gradient with System.Drawing in gdiPlus">
+
+
+
+
+        <meta name="twitter:description" content="Here is how to replicate the CSS `conic-gradient()` function in C# with System.Drawing">
+
+
+
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:image:src" content="https://codemade.net/images/conic-gradient.jpg">
+
+        <meta name="twitter:url" content="https://codemade.net/blog/conic-gradient/">
+
+    </head>
+    <body>
+        
+        <div id="page" class="site palette-blue">
+  <header id="masthead" class="site-header outer">
+  <div class="inner">
+    <div class="site-header-inside">
+
+      <div class="site-branding">
+        
+        
+        <p class="site-logo">
+          <a href='/'>
+            <img src="/images/logo-blur.svg" alt="Logo" />
+          </a>
+        </p><!-- .site-logo -->
+        
+        
+        <p class="site-title"><a href='/'>CodeMade</a></p>
+        
+      </div><!-- .site-branding -->
+
+      
+      <nav id="main-navigation" class="site-navigation" aria-label="Main Navigation">
+        <div class="site-nav-inside">
+          <button id="menu-close" class="menu-toggle"><span class="screen-reader-text">Open Menu</span><span
+              class="icon-close" aria-hidden="true"></span></button>
+          <ul class="menu">
+            
+              
+              
+              <li class="menu-item">
+                <a href="/"
+                   
+                   >Home</a>
+              </li>
+            
+              
+              
+              <li class="menu-item">
+                <a href="/clock"
+                   
+                   >Clock</a>
+              </li>
+            
+              
+              
+              <li class="menu-item menu-button">
+                <a href="https://games.codemade.net"
+                   
+                   class="button">🕹️ Games!</a>
+              </li>
+            
+              
+              
+              <li class="menu-item menu-button">
+                <a href="/blog"
+                   
+                   class="button">Blog</a>
+              </li>
+            
+          </ul><!-- .menu -->
+        </div><!-- .site-nav-inside -->
+      </nav><!-- .site-navigation -->
+      <button id="menu-open" class="menu-toggle"><span class="screen-reader-text">Close Menu</span><span class="icon-menu"
+          aria-hidden="true"></span></button>
+      
+
+    </div><!-- .site-header-inside -->
+  </div><!-- .inner -->
+</header><!-- .site-header -->
+
+  <main id="content" class="site-content">
+    <div class="outer">
+  <div class="inner-medium">
+
+    <article class="post post-full">
+      <header class="post-header">
+        <h1 class="post-title">How to draw a conic gradient with System.Drawing in gdiPlus</h1>
+      </header><!-- .post-header -->
+      
+      
+      <div class="post-thumbnail">
+        <img src="/images/conic-gradient.jpg" alt="How to draw a conic gradient with System.Drawing in gdiPlus" />
+      </div><!-- .post-thumbnail -->
+      
+      
+      
+      <div class="post-content">
+        <p>Recently, I have been working on adding support for conic gradient (or conical gradients, as some say) to <a href="/clock">Clock</a>. Now, Clock uses GdiPlus, or the <code class="language-plaintext highlighter-rouge">System.Drawing</code> namespace in C# to do all of its drawing. My aim was to replicate the <code class="language-plaintext highlighter-rouge">conic-gradient()</code> <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/conic-gradient()">CSS function</a>.</p>
+
+<p>Imagine my surprise when searching online for “gdiplus conic gradient” yielded few and very old results. Ok, maybe you’re not very surprised because all the cool kids are now writing Electron apps and mid-2000s <code class="language-plaintext highlighter-rouge">System.Drawing</code> has been relegated to history 😄</p>
+
+<p>Like any other methods of filling a shape, we’re going to need a type of <code class="language-plaintext highlighter-rouge">Brush</code> to do it. The one we’re going to use for conic gradients is the <code class="language-plaintext highlighter-rouge">PathGradientBrush</code>.</p>
+
+<p>What’s interesting about <code class="language-plaintext highlighter-rouge">PathGradientBrush</code> is that it can be used in many ways. <a href="https://www.c-sharpcorner.com/uploadfile/puranindia/783/">This article from C# Corner</a> goes over a few, but crucially the one that’s missing is a proper conic gradient. 
+After a lot of searching, I finally stumbled on <a href="https://web.archive.org/web/20140906083853/http://bobpowell.net/pgb.aspx">this article</a>(the original website is now offline!) and noticed this image and code snippet:</p>
+
+<p><img src="https://web.archive.org/web/20140906083853im_/http://bobpowell.net/images/pgb.ht2.jpg" alt="&quot;Many vertices, few colors&quot;" /></p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="n">GraphicsPath</span> <span class="n">pth</span><span class="p">=</span><span class="k">new</span> <span class="nf">GraphicsPath</span><span class="p">();</span>
+  <span class="n">pth</span><span class="p">.</span><span class="nf">AddEllipse</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">ClientRectangle</span><span class="p">);</span>
+  
+  <span class="n">PathGradientBrush</span> <span class="n">pgb</span><span class="p">=</span><span class="k">new</span> <span class="nf">PathGradientBrush</span><span class="p">(</span><span class="n">pth</span><span class="p">);</span>
+  <span class="n">pgb</span><span class="p">.</span><span class="n">SurroundColors</span><span class="p">=</span><span class="k">new</span> <span class="n">Color</span><span class="p">[]{</span>
+                    <span class="n">Color</span><span class="p">.</span><span class="n">Red</span><span class="p">,</span>
+                    <span class="n">Color</span><span class="p">.</span><span class="n">Orange</span><span class="p">,</span>
+                    <span class="n">Color</span><span class="p">.</span><span class="n">Yellow</span><span class="p">,</span>
+                    <span class="n">Color</span><span class="p">.</span><span class="n">Green</span><span class="p">,</span>
+                    <span class="n">Color</span><span class="p">.</span><span class="n">Blue</span><span class="p">,</span>
+                    <span class="n">Color</span><span class="p">.</span><span class="n">Indigo</span><span class="p">,</span>
+                    <span class="n">Color</span><span class="p">.</span><span class="n">Violet</span> <span class="p">};</span>
+
+  <span class="n">pgb</span><span class="p">.</span><span class="n">CenterColor</span><span class="p">=</span><span class="n">Color</span><span class="p">.</span><span class="n">Gray</span><span class="p">;</span>
+
+  <span class="n">e</span><span class="p">.</span><span class="n">Graphics</span><span class="p">.</span><span class="nf">FillRectangle</span><span class="p">(</span><span class="n">pgb</span><span class="p">,</span><span class="k">this</span><span class="p">.</span><span class="n">ClientRectangle</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>It’s not a “real” conic gradient, but close. What’s interesting in that example is that it’s setting a <code class="language-plaintext highlighter-rouge">SurroundColors</code> property, but, because a circle in gdi+ has many vertices, only a tiny portion of the whole is occupied by a gradient. Of course the next step to try was using a polygon with the same number of vertices as the number of colors and check the result:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">var</span> <span class="n">pth</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">GraphicsPath</span><span class="p">();</span>
+<span class="kt">var</span> <span class="n">colors</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Color</span><span class="p">[]{</span>
+  <span class="n">Color</span><span class="p">.</span><span class="n">Red</span><span class="p">,</span>
+  <span class="n">Color</span><span class="p">.</span><span class="n">Orange</span><span class="p">,</span>
+  <span class="n">Color</span><span class="p">.</span><span class="n">Yellow</span><span class="p">,</span>
+  <span class="n">Color</span><span class="p">.</span><span class="n">Green</span><span class="p">,</span>
+  <span class="n">Color</span><span class="p">.</span><span class="n">Blue</span><span class="p">,</span>
+  <span class="n">Color</span><span class="p">.</span><span class="n">Indigo</span><span class="p">,</span>
+  <span class="n">Color</span><span class="p">.</span><span class="n">Violet</span> <span class="p">}</span>
+
+<span class="kt">var</span> <span class="n">rect</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">Rectangle</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span> <span class="n">sz</span><span class="p">,</span> <span class="n">sz</span><span class="p">);</span>
+
+<span class="kt">var</span> <span class="n">polyPoints</span> <span class="p">=</span> <span class="k">new</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">Point</span><span class="p">&gt;();</span>
+<span class="k">for</span> <span class="p">(</span><span class="kt">double</span> <span class="n">i</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="p">&lt;=</span> <span class="n">colors</span><span class="p">.</span><span class="n">Length</span><span class="p">;</span> <span class="n">i</span><span class="p">++)</span>
+<span class="p">{</span>
+  <span class="n">polyPoints</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="k">new</span> <span class="nf">Point</span><span class="p">(</span>
+    <span class="p">(</span><span class="n">sz</span> <span class="p">/</span> <span class="m">2</span><span class="p">)</span> <span class="p">+</span> <span class="p">(</span><span class="kt">int</span><span class="p">)(</span><span class="n">Math</span><span class="p">.</span><span class="nf">Cos</span><span class="p">((</span><span class="n">Math</span><span class="p">.</span><span class="n">PI</span> <span class="p">*</span> <span class="m">2</span><span class="p">)</span> <span class="p">*</span> <span class="p">(</span><span class="n">i</span> <span class="p">/</span> <span class="p">(</span><span class="kt">double</span><span class="p">)</span><span class="n">pts</span><span class="p">))</span> <span class="p">*</span> <span class="p">(</span><span class="kt">double</span><span class="p">)(</span><span class="n">sz</span><span class="p">/</span><span class="m">2</span><span class="p">)),</span> 
+    <span class="p">(</span><span class="n">sz</span> <span class="p">/</span> <span class="m">2</span><span class="p">)</span> <span class="p">+</span> <span class="p">(</span><span class="kt">int</span><span class="p">)(</span><span class="n">Math</span><span class="p">.</span><span class="nf">Sin</span><span class="p">((</span><span class="n">Math</span><span class="p">.</span><span class="n">PI</span> <span class="p">*</span> <span class="m">2</span><span class="p">)</span> <span class="p">*</span> <span class="p">(</span><span class="n">i</span> <span class="p">/</span> <span class="p">(</span><span class="kt">double</span><span class="p">)</span><span class="n">pts</span><span class="p">))</span> <span class="p">*</span> <span class="p">(</span><span class="kt">double</span><span class="p">)(</span><span class="n">sz</span><span class="p">/</span><span class="m">2</span><span class="p">))</span>
+  <span class="p">));</span>
+<span class="p">}</span>
+<span class="n">pth</span><span class="p">.</span><span class="nf">AddPolygon</span><span class="p">(</span><span class="n">polyPoints</span><span class="p">.</span><span class="nf">ToArray</span><span class="p">());</span>
+
+<span class="n">PathGradientBrush</span> <span class="n">pgb</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">PathGradientBrush</span><span class="p">(</span><span class="n">pth</span><span class="p">);</span>
+
+<span class="n">pgb</span><span class="p">.</span><span class="n">SurroundColors</span> <span class="p">=</span> <span class="n">colors</span><span class="p">;</span>
+
+<span class="n">g</span><span class="p">.</span><span class="nf">FillRectangle</span><span class="p">(</span><span class="n">pgb</span><span class="p">,</span> <span class="n">rect</span><span class="p">);</span>
+
+</code></pre></div></div>
+
+<p><img src="/images/poly-gradient-white.png" alt="close but no dice" /></p>
+
+<p>It’s close, but where does the white come from? Well if you look closely at the circle example from the article above, there’s a <code class="language-plaintext highlighter-rouge">CenterColor</code> property that is set to Gray there. When you don’t specify it, instead of there being no center color, a white shade is used instead. Setting CenterColor to transparent renders the filling itself transparent so that’s no good either.</p>
+
+<p>But! <code class="language-plaintext highlighter-rouge">PathGradientBrush</code> has a <code class="language-plaintext highlighter-rouge">Blend</code> property that allows us to control the <code class="language-plaintext highlighter-rouge">CenterColor</code>’s opacity from the center to the border of the shape. We can just set it to fully opaque at both ends to get our gradient:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">pgb</span><span class="p">.</span><span class="n">Blend</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Blend</span> <span class="p">{</span>
+  <span class="n">Factors</span> <span class="p">=</span> <span class="k">new</span> <span class="kt">float</span><span class="p">[]</span> <span class="p">{</span> <span class="m">1</span><span class="p">,</span> <span class="m">1</span> <span class="p">},</span>
+  <span class="n">Positions</span> <span class="p">=</span> <span class="k">new</span> <span class="kt">float</span><span class="p">[]</span> <span class="p">{</span> <span class="m">0</span><span class="p">,</span> <span class="m">1f</span> <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p><img src="/images/poly-gradient-ok.png" alt="success!" /></p>
+
+<p>Isn’t that something! Now to make it really look like the kind of conic gradient we get in css, we have to make it so the last and the first color don’t blend into each other. We can do this by creating a polygon that has one less vertex, where the last Point is repeated. We also need to specify the <code class="language-plaintext highlighter-rouge">CenterPoint</code> property, otherwise Gdi+ will auto-calculate it as being slightly off-center:</p>
+
+<p><img src="/images/poly-gradient-conic.png" alt="fully conic" /></p>
+
+<p>One last thing! You might have noticed that, while we’re using <code class="language-plaintext highlighter-rouge">FillRectangle</code> to paint our gradient, we’re not really filling <em>all of it</em>, but we’re drawing a polygon. This is easily fixed by using a suitably large radius for our polygon.</p>
+
+<p>If you’re interested to see what I ended up with, the <a href="https://github.com/LBognanni/CodeMadeClock/blob/master/src/CodeMade.ScriptedGraphics/ConicGradient.cs">full source code</a> is open source as part of Clock 😊</p>
+
+      </div><!-- .post-content -->
+      
+      
+
+<footer class="post-meta">
+    Posted on
+    <time class="published" datetime="2021-05-24 00:00">
+    
+        Monday, May 24, 2021
+    
+    </time>
+    
+</footer>
+
+    </article><!-- .post -->
+
+    <!-- Next/previous post navigation TBD -->
+    <!--
+    <nav class="read-next">
+      <h2 class="read-next-title">Read Next</h2>
+      <div class="post-feed">
+        <article class="post post-card">
+          <div class="post-card-inside">
+            <a class="post-card-thumbnail" href="#"><img src="#" alt="" /></a>
+            <div class="post-card-content">
+              <header class="post-header">
+                <h3 class="post-title"><a href="#" rel="bookmark">Previous Post Title</a></h3>
+              </header>
+              <footer class="post-meta">
+                <time class="published" datetime="">Previous post date</time>
+              </footer>
+            </div>
+          </div>
+        </article>
+        <article class="post post-card">
+          <div class="post-card-inside">
+            <a class="post-card-thumbnail" href="#"><img src="#" alt="" /></a>
+            <div class="post-card-content">
+              <header class="post-header">
+                <h3 class="post-title"><a href="#" rel="bookmark">Next Post Title</a></h3>
+              </header>
+              <footer class="post-meta">
+                <time class="published" datetime="">Next post date</time>
+              </footer>
+            </div>
+          </div>
+        </article>
+      </div>
+    </nav>
+    -->
+
+  </div><!-- .inner-medium -->
+</div><!-- .outer-->
+
+  </main><!-- .site-content -->
+  <footer id="colophon" class="site-footer">
+  <div class="footer-top outer">
+    <div class="inner">
+      <div class="footer-widgets">
+
+        <div class="widget footer-branding">
+          
+          
+          <p class="site-logo">
+            <a href='/'><img src="/images/logo-blur-white.svg" alt="Logo" /></a>
+          </p>
+          
+          
+          
+          <p class="site-description">
+            Free software & tech musings
+          </p>
+          
+        </div><!-- .widget -->
+
+        
+        
+        
+      </div><!-- .footer-widgets -->
+    </div><!-- .inner -->
+  </div><!-- .outer -->
+
+  <div class="site-info outer">
+    <div class="inner">
+      Content &copy; Loris Bognanni. All rights reserved. Theme: 
+      &nbsp;
+      
+        
+        
+
+<a href="https://www.stackbit.com"
+   target="_blank" rel="noopener"
+   class="">Azimuth by Stackbit</a>
+
+      
+    </div><!-- .inner -->
+  </div><!-- .site-info -->
+
+</footer><!-- .site-footer -->
+
+</div><!-- .site -->
+
+        <!-- Scripts -->
+        <script src="/js/plugins.js"></script>
+        <script src="/js/init.js"></script>
+        <script src="/js/main.js"></script>
+        <script>
+        window.cmParams = { tenant: "codemade" };
+        </script>
+        <script defer src="https://stats.codemade.net/track.js"></script>
+          
+    </body> 
+</html>
