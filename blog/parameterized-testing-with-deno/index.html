@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+    <head>    
+        
+        <title>Running parameterized tests in Deno - CodeMade</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="google" content="notranslate" />
+        <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:400,400i,700,700i" rel="stylesheet">
+        <link rel="stylesheet" href="/assets/css/main.css">
+        <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+
+        <meta name="twitter:creator" content="@lorisdev">
+        <meta name="twitter:site" content="@lorisdev">
+        <meta name="twitter:title" content="Running parameterized tests in Deno">
+
+
+
+
+        <meta name="twitter:description" content="A quick guide to running parameterized tests in Deno.">
+
+
+
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:image:src" content="https://codemade.net/images/deno_tests_b.png">
+
+        <meta name="twitter:url" content="https://codemade.net/blog/parameterized-testing-with-deno/">
+
+    </head>
+    <body>
+        
+        <div id="page" class="site palette-blue">
+  <header id="masthead" class="site-header outer">
+  <div class="inner">
+    <div class="site-header-inside">
+
+      <div class="site-branding">
+        
+        
+        <p class="site-logo">
+          <a href='/'>
+            <img src="/images/logo-blur.svg" alt="Logo" />
+          </a>
+        </p><!-- .site-logo -->
+        
+        
+        <p class="site-title"><a href='/'>CodeMade</a></p>
+        
+      </div><!-- .site-branding -->
+
+      
+      <nav id="main-navigation" class="site-navigation" aria-label="Main Navigation">
+        <div class="site-nav-inside">
+          <button id="menu-close" class="menu-toggle"><span class="screen-reader-text">Open Menu</span><span
+              class="icon-close" aria-hidden="true"></span></button>
+          <ul class="menu">
+            
+              
+              
+              <li class="menu-item">
+                <a href="/"
+                   
+                   >Home</a>
+              </li>
+            
+              
+              
+              <li class="menu-item">
+                <a href="/clock"
+                   
+                   >Clock</a>
+              </li>
+            
+              
+              
+              <li class="menu-item menu-button">
+                <a href="https://games.codemade.net"
+                   
+                   class="button">🕹️ Games!</a>
+              </li>
+            
+              
+              
+              <li class="menu-item menu-button">
+                <a href="/blog"
+                   
+                   class="button">Blog</a>
+              </li>
+            
+          </ul><!-- .menu -->
+        </div><!-- .site-nav-inside -->
+      </nav><!-- .site-navigation -->
+      <button id="menu-open" class="menu-toggle"><span class="screen-reader-text">Close Menu</span><span class="icon-menu"
+          aria-hidden="true"></span></button>
+      
+
+    </div><!-- .site-header-inside -->
+  </div><!-- .inner -->
+</header><!-- .site-header -->
+
+  <main id="content" class="site-content">
+    <div class="outer">
+  <div class="inner-medium">
+
+    <article class="post post-full">
+      <header class="post-header">
+        <h1 class="post-title">Running parameterized tests in Deno</h1>
+      </header><!-- .post-header -->
+      
+      
+      <div class="post-thumbnail">
+        <img src="/images/deno_tests_b.png" alt="Running parameterized tests in Deno" />
+      </div><!-- .post-thumbnail -->
+      
+      
+      
+      <div class="post-content">
+        <p>When writing tests, it’s common to want to run the same test with different inputs. This is called parameterized testing, and it’s a great way to ensure that your code behaves correctly under different conditions.</p>
+
+<p>This is usually done by writing a single test function that takes parameters, and then calling that function with different inputs. Here is an example in C# using NUnit:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="nf">TestCase</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">3</span><span class="p">)]</span>
+<span class="p">[</span><span class="nf">TestCase</span><span class="p">(</span><span class="m">2</span><span class="p">,</span> <span class="m">3</span><span class="p">,</span> <span class="m">5</span><span class="p">)]</span>
+<span class="p">[</span><span class="nf">TestCase</span><span class="p">(</span><span class="m">3</span><span class="p">,</span> <span class="m">4</span><span class="p">,</span> <span class="m">7</span><span class="p">)]</span>
+<span class="k">public</span> <span class="k">void</span> <span class="nf">TestAdd</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">b</span><span class="p">,</span> <span class="kt">int</span> <span class="n">expected</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">var</span> <span class="n">result</span> <span class="p">=</span> <span class="n">a</span> <span class="p">+</span> <span class="n">b</span><span class="p">;</span>
+    <span class="n">Assert</span><span class="p">.</span><span class="nf">AreEqual</span><span class="p">(</span><span class="n">expected</span><span class="p">,</span> <span class="n">result</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="testing-in-deno">Testing in Deno</h2>
+
+<p>In Deno, we can take advantage of the integrated testing library by using <code class="language-plaintext highlighter-rouge">Deno.test()</code> to define our tests. We can further split our tests into separate steps, like so:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">Deno</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="dl">"</span><span class="s2">When activating the flux capacitor</span><span class="dl">"</span><span class="p">,</span> <span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">capacitor</span> <span class="o">=</span> <span class="nx">activateFluxCapacitor</span><span class="p">();</span>
+  
+  <span class="nx">t</span><span class="p">.</span><span class="nx">step</span><span class="p">(</span><span class="dl">"</span><span class="s2">It should generate 1.21 gigawatts of power</span><span class="dl">"</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">power</span> <span class="o">=</span> <span class="nx">capacitor</span><span class="p">.</span><span class="nx">generatePower</span><span class="p">();</span>
+    <span class="nx">t</span><span class="p">.</span><span class="nx">assertEquals</span><span class="p">(</span><span class="nx">power</span><span class="p">,</span> <span class="mf">1.21</span><span class="p">);</span>
+  <span class="p">});</span>
+
+  <span class="nx">t</span><span class="p">.</span><span class="nx">step</span><span class="p">(</span><span class="dl">"</span><span class="s2">It should travel through time</span><span class="dl">"</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">time</span> <span class="o">=</span> <span class="nx">capacitor</span><span class="p">.</span><span class="nx">travelThroughTime</span><span class="p">();</span>
+    <span class="nx">t</span><span class="p">.</span><span class="nx">assertEquals</span><span class="p">(</span><span class="nx">time</span><span class="p">,</span> <span class="dl">"</span><span class="s2">1985</span><span class="dl">"</span><span class="p">);</span>
+  <span class="p">});</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>Sometimes however we want to test a function with multiple inputs. An easy way to do so would be to iterate over an array of inputs and call the test function for each input. This can be a bit cumbersome, especially if we have a lot of inputs:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">Deno</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="dl">"</span><span class="s2">TestAdd</span><span class="dl">"</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">testCases</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span> <span class="na">a</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">b</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="na">expected</span><span class="p">:</span> <span class="mi">3</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="na">a</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="na">b</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="na">expected</span><span class="p">:</span> <span class="mi">5</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="na">a</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="na">b</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="na">expected</span><span class="p">:</span> <span class="mi">7</span> <span class="p">},</span>
+  <span class="p">];</span>
+
+  <span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="nx">input</span> <span class="k">of</span> <span class="nx">testCases</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="p">{</span> <span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">expected</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">input</span><span class="p">;</span>
+    <span class="kd">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span>
+    <span class="nx">assertEquals</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">expected</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>A disadvantage of this approach is that if any of the test cases fail, the test will stop running and we won’t know the results of the remaining test cases. The test runner will also simply mark the whole test as failed, without providing any information about which test case failed!</p>
+
+<h2 id="how-to-run-parameterized-tests-in-deno">How to run parameterized tests in Deno</h2>
+
+<p>After searching online for a bit and finding nothing helpful, I decided to take a look at how Deno’s developers write tests.
+A quick github search took me to <a href="https://github.com/denoland/deno/blob/0ef3f6ba887d7aed2d94c8b622563d13bfecda2c/tests/unit/serve_test.ts#L2441">the tests for Deno’s <code class="language-plaintext highlighter-rouge">serve</code> function</a>. Here we can see that they use a helper function to generate multiple test cases.</p>
+
+<p>The trick is that they call <code class="language-plaintext highlighter-rouge">Deno.test()</code> <em>inside</em> the helper function!</p>
+
+<p>We can adapt this trick in our tests like so:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">testAdd</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">expected</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">Deno</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="s2">`TestAdd(</span><span class="p">${</span><span class="nx">a</span><span class="p">}</span><span class="s2">, </span><span class="p">${</span><span class="nx">b</span><span class="p">}</span><span class="s2">)`</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span>
+    <span class="nx">assertEquals</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">expected</span><span class="p">);</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+
+<span class="nx">testAdd</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+<span class="nx">testAdd</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
+<span class="nx">testAdd</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">7</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Another approach is to use an array and a for loop:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">testCases</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span> <span class="na">a</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">b</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="na">expected</span><span class="p">:</span> <span class="mi">3</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="na">a</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="na">b</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="na">expected</span><span class="p">:</span> <span class="mi">5</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="na">a</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="na">b</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="na">expected</span><span class="p">:</span> <span class="mi">7</span> <span class="p">},</span>
+<span class="p">];</span>
+
+<span class="k">for</span><span class="p">(</span><span class="kd">const</span> <span class="p">{</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">expected</span><span class="p">}</span> <span class="k">of</span> <span class="nx">testCases</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">Deno</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="s2">`TestAdd(</span><span class="p">${</span><span class="nx">a</span><span class="p">}</span><span class="s2">, </span><span class="p">${</span><span class="nx">b</span><span class="p">}</span><span class="s2">)`</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span>
+    <span class="nx">assertEquals</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">expected</span><span class="p">);</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>This way, if any of the test cases fail, the test runner will still run the remaining test cases and provide information about which test case failed.</p>
+
+<p>Additionally, by specifying unique test names in each Deno.test() call, we can easily identify which test case failed!</p>
+
+<h3 id="a-note-on-the-visual-studio-code-deno-extension">A note on the Visual Studio Code Deno extension</h3>
+
+<p>At the time of writing, you won’t be able to run individual tests in Visual Studio Code from the test file itself (ie you won’t see a “Run Test” button next to each test).</p>
+
+<p>You can still run the whole test file by right-clicking on the file and selecting “Run Test” from the context menu.</p>
+
+<p>Once you’ve done that, the tests will also be visible in the “Testing” tab, where you can see the results of each test case.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Test files in Deno are just regular TypeScript files, so you can use any TypeScript feature you like to write your tests. This includes using helper functions to generate multiple test cases, as we’ve seen in this article.</p>
+
+<p>The key takeaway is that you can use <code class="language-plaintext highlighter-rouge">Deno.test()</code> inside a helper function or a for loop to generate multiple test cases. This allows you to run parameterized tests in Deno, and get detailed information about which test cases failed.</p>
+
+      </div><!-- .post-content -->
+      
+      
+
+<footer class="post-meta">
+    Posted on
+    <time class="published" datetime="2025-03-09 00:00">
+    
+        Sunday, March  9, 2025
+    
+    </time>
+    
+</footer>
+
+    </article><!-- .post -->
+
+    <!-- Next/previous post navigation TBD -->
+    <!--
+    <nav class="read-next">
+      <h2 class="read-next-title">Read Next</h2>
+      <div class="post-feed">
+        <article class="post post-card">
+          <div class="post-card-inside">
+            <a class="post-card-thumbnail" href="#"><img src="#" alt="" /></a>
+            <div class="post-card-content">
+              <header class="post-header">
+                <h3 class="post-title"><a href="#" rel="bookmark">Previous Post Title</a></h3>
+              </header>
+              <footer class="post-meta">
+                <time class="published" datetime="">Previous post date</time>
+              </footer>
+            </div>
+          </div>
+        </article>
+        <article class="post post-card">
+          <div class="post-card-inside">
+            <a class="post-card-thumbnail" href="#"><img src="#" alt="" /></a>
+            <div class="post-card-content">
+              <header class="post-header">
+                <h3 class="post-title"><a href="#" rel="bookmark">Next Post Title</a></h3>
+              </header>
+              <footer class="post-meta">
+                <time class="published" datetime="">Next post date</time>
+              </footer>
+            </div>
+          </div>
+        </article>
+      </div>
+    </nav>
+    -->
+
+  </div><!-- .inner-medium -->
+</div><!-- .outer-->
+
+  </main><!-- .site-content -->
+  <footer id="colophon" class="site-footer">
+  <div class="footer-top outer">
+    <div class="inner">
+      <div class="footer-widgets">
+
+        <div class="widget footer-branding">
+          
+          
+          <p class="site-logo">
+            <a href='/'><img src="/images/logo-blur-white.svg" alt="Logo" /></a>
+          </p>
+          
+          
+          
+          <p class="site-description">
+            Free software & tech musings
+          </p>
+          
+        </div><!-- .widget -->
+
+        
+        
+        
+      </div><!-- .footer-widgets -->
+    </div><!-- .inner -->
+  </div><!-- .outer -->
+
+  <div class="site-info outer">
+    <div class="inner">
+      Content &copy; Loris Bognanni. All rights reserved. Theme: 
+      &nbsp;
+      
+        
+        
+
+<a href="https://www.stackbit.com"
+   target="_blank" rel="noopener"
+   class="">Azimuth by Stackbit</a>
+
+      
+    </div><!-- .inner -->
+  </div><!-- .site-info -->
+
+</footer><!-- .site-footer -->
+
+</div><!-- .site -->
+
+        <!-- Scripts -->
+        <script src="/js/plugins.js"></script>
+        <script src="/js/init.js"></script>
+        <script src="/js/main.js"></script>
+        <script>
+        window.cmParams = { tenant: "codemade" };
+        </script>
+        <script defer src="https://stats.codemade.net/track.js"></script>
+          
+    </body> 
+</html>

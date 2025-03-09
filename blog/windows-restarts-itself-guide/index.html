@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+    <head>    
+        
+        <title>Fix Windows restarting after sleep or hybernate: the complete 2020 guide - CodeMade</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="google" content="notranslate" />
+        <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:400,400i,700,700i" rel="stylesheet">
+        <link rel="stylesheet" href="/assets/css/main.css">
+        <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+
+        <meta name="twitter:creator" content="@lorisdev">
+        <meta name="twitter:site" content="@lorisdev">
+        <meta name="twitter:title" content="Fix Windows restarting after sleep or hybernate: the complete 2020 guide">
+
+
+
+
+        <meta name="twitter:description" content="So your computer starts on its own after you put it to sleep or even after you turn it off. Maybe it does so immediately or maybe it waits for a few minites or hours. But you feel like you can't trust it anymore. Here are all the things you can turn off.">
+
+
+
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:image:src" content="https://codemade.net/images/nighttimeupdates.jpg">
+
+        <meta name="twitter:url" content="https://codemade.net/blog/windows-restarts-itself-guide/">
+
+    </head>
+    <body>
+        
+        <div id="page" class="site palette-blue">
+  <header id="masthead" class="site-header outer">
+  <div class="inner">
+    <div class="site-header-inside">
+
+      <div class="site-branding">
+        
+        
+        <p class="site-logo">
+          <a href='/'>
+            <img src="/images/logo-blur.svg" alt="Logo" />
+          </a>
+        </p><!-- .site-logo -->
+        
+        
+        <p class="site-title"><a href='/'>CodeMade</a></p>
+        
+      </div><!-- .site-branding -->
+
+      
+      <nav id="main-navigation" class="site-navigation" aria-label="Main Navigation">
+        <div class="site-nav-inside">
+          <button id="menu-close" class="menu-toggle"><span class="screen-reader-text">Open Menu</span><span
+              class="icon-close" aria-hidden="true"></span></button>
+          <ul class="menu">
+            
+              
+              
+              <li class="menu-item">
+                <a href="/"
+                   
+                   >Home</a>
+              </li>
+            
+              
+              
+              <li class="menu-item">
+                <a href="/clock"
+                   
+                   >Clock</a>
+              </li>
+            
+              
+              
+              <li class="menu-item menu-button">
+                <a href="https://games.codemade.net"
+                   
+                   class="button">🕹️ Games!</a>
+              </li>
+            
+              
+              
+              <li class="menu-item menu-button">
+                <a href="/blog"
+                   
+                   class="button">Blog</a>
+              </li>
+            
+          </ul><!-- .menu -->
+        </div><!-- .site-nav-inside -->
+      </nav><!-- .site-navigation -->
+      <button id="menu-open" class="menu-toggle"><span class="screen-reader-text">Close Menu</span><span class="icon-menu"
+          aria-hidden="true"></span></button>
+      
+
+    </div><!-- .site-header-inside -->
+  </div><!-- .inner -->
+</header><!-- .site-header -->
+
+  <main id="content" class="site-content">
+    <div class="outer">
+  <div class="inner-medium">
+
+    <article class="post post-full">
+      <header class="post-header">
+        <h1 class="post-title">Fix Windows restarting after sleep or hybernate: the complete 2020 guide</h1>
+      </header><!-- .post-header -->
+      
+      
+      <div class="post-thumbnail">
+        <img src="/images/nighttimeupdates.jpg" alt="Fix Windows restarting after sleep or hybernate: the complete 2020 guide" />
+      </div><!-- .post-thumbnail -->
+      
+      
+      
+      <div class="post-content">
+        <p>So your computer starts on its own after you put it to sleep or even after you turn it off. Maybe it does so immediately or maybe it waits for a few minutes or hours. But you feel like you can’t trust it anymore: there’s few things more unsettling than being woken up by the bright light of your screen in the middle of the night. Well here is my comprehensive list of things to check (and to turn off!) to prevent this from happening again.</p>
+
+<p><strong>First off, open an admin Powershell terminal.</strong> You can do so by right-clicking the start menu button and selecting <code class="language-plaintext highlighter-rouge">Windows PowerShell (Admin)</code></p>
+
+<h2 id="1-check-why-the-system-restarted">1: Check why the system restarted</h2>
+
+<p>The first thing to do when diagnosing the problem is to use the <code class="language-plaintext highlighter-rouge">powercfg /lastwake</code> command to find out what prompted the system to restart.
+If a hardware device was responsible for restarting windows, you should see it here.</p>
+
+<p>Sometimes, however, things are more nebulous and you get something like:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>❯ powercfg /lastwake
+Wake History Count - 1
+Wake History [0]
+  Wake Source Count - 0
+</code></pre></div></div>
+
+<p>In this case, follow the next steps to make double sure that nothing can wake up your pc.</p>
+
+<h2 id="2-disable-wake-timers">2: Disable wake timers</h2>
+
+<p>This is fairly straightforward and should really be all you need.</p>
+
+<ul>
+  <li>Open the Start menu and type <code class="language-plaintext highlighter-rouge">Edit power plan</code></li>
+  <li>Choose <code class="language-plaintext highlighter-rouge">Change advanced power settings</code></li>
+  <li>Navigate to <code class="language-plaintext highlighter-rouge">Sleep</code> -&gt; <code class="language-plaintext highlighter-rouge">Allow wake timers</code> and select <code class="language-plaintext highlighter-rouge">Disable</code></li>
+  <li>Press OK and close</li>
+</ul>
+
+<p><img src="/images/poweroptions.png" alt="Power options dialog, disable windows wake timers" /></p>
+
+<p><em>In theory</em>, the above steps should be enough to stop any device from waking up your computer. In practice, you’ll probably have to explicitly disable more stuff:</p>
+
+<h2 id="3-disable-any-peripherals-that-can-wake-up-your-computer">3: Disable any peripherals that can wake up your computer</h2>
+
+<p>The main peripherals to take into account here are keyboards, mice and network adapters. The network adapter can be set to wake up your computer whenever it receives any data (a very bad idea!) or when it receives a special “wake up” packet.</p>
+
+<p>You can check which devices can wake up your pc with the command: <code class="language-plaintext highlighter-rouge">powercfg /devicequery wake_armed</code>. You’ll see something like:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>❯ powercfg /devicequery wake_armed
+HID-compliant mouse (006)
+HID Keyboard Device (006)
+</code></pre></div></div>
+
+<p>Now comes the fun part. Open the Device manager by right-clicking the Windows button and selecting <code class="language-plaintext highlighter-rouge">Device Manager</code> and, one by one, open the property pages for the devices listed above. In the <code class="language-plaintext highlighter-rouge">Power management</code> tab, you’ll find a flag that you want to disable: <code class="language-plaintext highlighter-rouge">Allow this device to wake the computer</code>. Do so for each device. For your network card, you can optionally set it so that only a “magic packet” can wake up the computer. If you don’t know what a magic packet is, it’s safe to disable it 😅</p>
+
+<p><img src="/images/badkeyboard.png" alt="Power options for a keyboard in Windows device manager" /></p>
+
+<h2 id="4-find-out-if-any-scheduled-tasks-are-waking-up-your-computer">4: Find out if any scheduled tasks are waking up your computer</h2>
+
+<p>If the above steps didn’t work, it’s time to bring out the big guns. And by big guns I mean this powershell command: <code class="language-plaintext highlighter-rouge">Get-ScheduledTask | where {$_.settings.waketorun}</code>. It will list all the scheduled tasks that are allowed to wake up your computer in order to perform some maintenance, or more likely to install updates:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>❯ Get-ScheduledTask | where {$_.settings.waketorun}
+
+TaskPath                                       TaskName                          State
+--------                                       --------                          -----
+\Microsoft\Windows\.NET Framework\             .NET Framework NGEN v4.0.30319... Disabled
+\Microsoft\Windows\.NET Framework\             .NET Framework NGEN v4.0.30319... Disabled
+\Microsoft\Windows\InstallService\             WakeUpAndContinueUpdates          Disabled
+\Microsoft\Windows\InstallService\             WakeUpAndScanForUpdates           Disabled
+\Microsoft\Windows\SharedPC\                   Account Cleanup                   Disabled
+\Microsoft\Windows\UpdateAssistant\            UpdateAssistantWakeupRun          Disabled
+\Microsoft\Windows\UpdateOrchestrator\         Backup Scan                       Ready
+\Microsoft\Windows\UpdateOrchestrator\         Reboot                            Ready
+\Microsoft\Windows\UpdateOrchestrator\         Reboot_AC                         Disabled
+\Microsoft\Windows\UpdateOrchestrator\         Universal Orchestrator Start      Ready
+</code></pre></div></div>
+
+<p>In my case, the “Backup Scan” task above was the culprit, so I disabled it. You could disable it by opening the Windows task scheduler, but sometimes the UI won’t allow you to disable one of the “system” scheduled tasks like the ones related to Windows Update. But a simple powershell command can take care of it:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>❯ Disable-ScheduledTask  "\Microsoft\Windows\UpdateOrchestrator\Backup Scan"
+</code></pre></div></div>
+
+<p>Check again with the previous command, and it will be disabled:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>❯ Get-ScheduledTask | where {$_.settings.waketorun}
+
+TaskPath                                       TaskName                          State
+--------                                       --------                          -----
+\Microsoft\Windows\.NET Framework\             .NET Framework NGEN v4.0.30319... Disabled
+\Microsoft\Windows\.NET Framework\             .NET Framework NGEN v4.0.30319... Disabled
+\Microsoft\Windows\InstallService\             WakeUpAndContinueUpdates          Disabled
+\Microsoft\Windows\InstallService\             WakeUpAndScanForUpdates           Disabled
+\Microsoft\Windows\SharedPC\                   Account Cleanup                   Disabled
+\Microsoft\Windows\UpdateAssistant\            UpdateAssistantWakeupRun          Disabled
+\Microsoft\Windows\UpdateOrchestrator\         Backup Scan                       Disabled
+\Microsoft\Windows\UpdateOrchestrator\         Reboot                            Ready
+\Microsoft\Windows\UpdateOrchestrator\         Reboot_AC                         Disabled
+\Microsoft\Windows\UpdateOrchestrator\         Universal Orchestrator Start      Ready
+</code></pre></div></div>
+
+<p>Now hopefully you can set your device to sleep mode and have some well deserved, uninterrupted sleep yourself! 😁</p>
+
+<hr />
+
+<p><small><em>The feature image above was taken by <a href="https://unsplash.com/@cbpsc1">Clint Patterson</a></em></small></p>
+
+      </div><!-- .post-content -->
+      
+      
+
+<footer class="post-meta">
+    Posted on
+    <time class="published" datetime="2020-10-25 00:00">
+    
+        Sunday, October 25, 2020
+    
+    </time>
+    
+</footer>
+
+    </article><!-- .post -->
+
+    <!-- Next/previous post navigation TBD -->
+    <!--
+    <nav class="read-next">
+      <h2 class="read-next-title">Read Next</h2>
+      <div class="post-feed">
+        <article class="post post-card">
+          <div class="post-card-inside">
+            <a class="post-card-thumbnail" href="#"><img src="#" alt="" /></a>
+            <div class="post-card-content">
+              <header class="post-header">
+                <h3 class="post-title"><a href="#" rel="bookmark">Previous Post Title</a></h3>
+              </header>
+              <footer class="post-meta">
+                <time class="published" datetime="">Previous post date</time>
+              </footer>
+            </div>
+          </div>
+        </article>
+        <article class="post post-card">
+          <div class="post-card-inside">
+            <a class="post-card-thumbnail" href="#"><img src="#" alt="" /></a>
+            <div class="post-card-content">
+              <header class="post-header">
+                <h3 class="post-title"><a href="#" rel="bookmark">Next Post Title</a></h3>
+              </header>
+              <footer class="post-meta">
+                <time class="published" datetime="">Next post date</time>
+              </footer>
+            </div>
+          </div>
+        </article>
+      </div>
+    </nav>
+    -->
+
+  </div><!-- .inner-medium -->
+</div><!-- .outer-->
+
+  </main><!-- .site-content -->
+  <footer id="colophon" class="site-footer">
+  <div class="footer-top outer">
+    <div class="inner">
+      <div class="footer-widgets">
+
+        <div class="widget footer-branding">
+          
+          
+          <p class="site-logo">
+            <a href='/'><img src="/images/logo-blur-white.svg" alt="Logo" /></a>
+          </p>
+          
+          
+          
+          <p class="site-description">
+            Free software & tech musings
+          </p>
+          
+        </div><!-- .widget -->
+
+        
+        
+        
+      </div><!-- .footer-widgets -->
+    </div><!-- .inner -->
+  </div><!-- .outer -->
+
+  <div class="site-info outer">
+    <div class="inner">
+      Content &copy; Loris Bognanni. All rights reserved. Theme: 
+      &nbsp;
+      
+        
+        
+
+<a href="https://www.stackbit.com"
+   target="_blank" rel="noopener"
+   class="">Azimuth by Stackbit</a>
+
+      
+    </div><!-- .inner -->
+  </div><!-- .site-info -->
+
+</footer><!-- .site-footer -->
+
+</div><!-- .site -->
+
+        <!-- Scripts -->
+        <script src="/js/plugins.js"></script>
+        <script src="/js/init.js"></script>
+        <script src="/js/main.js"></script>
+        <script>
+        window.cmParams = { tenant: "codemade" };
+        </script>
+        <script defer src="https://stats.codemade.net/track.js"></script>
+          
+    </body> 
+</html>

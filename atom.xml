@@ -1,0 +1,1028 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+>
+	<channel>
+		<title>CodeMade</title>
+		<description></description>		
+		<sy:updatePeriod>daily</sy:updatePeriod>
+		<sy:updateFrequency>1</sy:updateFrequency>
+		<link>https://codemade.net</link>
+		<atom:link href="https://codemade.net/atom.xml" rel="self" type="application/rss+xml" />
+		<lastBuildDate></lastBuildDate>
+        
+		
+			<item>
+				<title>Running parameterized tests in Deno</title>
+				
+                <description>&lt;p&gt;When writing tests, it’s common to want to run the same test with different inputs. This is called parameterized testing, and it’s a great way to ensure that your code behaves correctly under different conditions.&lt;/p&gt;
+
+&lt;p&gt;This is usually done by writing a single test function that takes parameters, and then calling that function with different inputs. Here is an example in C# using NUnit:&lt;/p&gt;
+
+&lt;div class=&quot;language-csharp highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;TestCase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)]&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;TestCase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)]&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;TestCase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;7&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)]&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;TestAdd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;expected&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Assert&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;AreEqual&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;expected&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;testing-in-deno&quot;&gt;Testing in Deno&lt;/h2&gt;
+
+&lt;p&gt;In Deno, we can take advantage of the integrated testing library by using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Deno.test()&lt;/code&gt; to define our tests. We can further split our tests into separate steps, like so:&lt;/p&gt;
+
+&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;Deno&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;test&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;When activating the flux capacitor&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;capacitor&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;activateFluxCapacitor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+  
+  &lt;span class=&quot;nx&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;step&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;It should generate 1.21 gigawatts of power&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;power&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;capacitor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;generatePower&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;assertEquals&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;power&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.21&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+
+  &lt;span class=&quot;nx&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;step&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;It should travel through time&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;time&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;capacitor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;travelThroughTime&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;assertEquals&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;time&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;1985&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Sometimes however we want to test a function with multiple inputs. An easy way to do so would be to iterate over an array of inputs and call the test function for each input. This can be a bit cumbersome, especially if we have a lot of inputs:&lt;/p&gt;
+
+&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;Deno&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;test&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;TestAdd&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;testCases&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;expected&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;expected&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;expected&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;7&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;input&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;of&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;testCases&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;expected&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;result&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;assertEquals&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;expected&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;A disadvantage of this approach is that if any of the test cases fail, the test will stop running and we won’t know the results of the remaining test cases. The test runner will also simply mark the whole test as failed, without providing any information about which test case failed!&lt;/p&gt;
+
+&lt;h2 id=&quot;how-to-run-parameterized-tests-in-deno&quot;&gt;How to run parameterized tests in Deno&lt;/h2&gt;
+
+&lt;p&gt;After searching online for a bit and finding nothing helpful, I decided to take a look at how Deno’s developers write tests.
+A quick github search took me to &lt;a href=&quot;https://github.com/denoland/deno/blob/0ef3f6ba887d7aed2d94c8b622563d13bfecda2c/tests/unit/serve_test.ts#L2441&quot;&gt;the tests for Deno’s &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;serve&lt;/code&gt; function&lt;/a&gt;. Here we can see that they use a helper function to generate multiple test cases.&lt;/p&gt;
+
+&lt;p&gt;The trick is that they call &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Deno.test()&lt;/code&gt; &lt;em&gt;inside&lt;/em&gt; the helper function!&lt;/p&gt;
+
+&lt;p&gt;We can adapt this trick in our tests like so:&lt;/p&gt;
+
+&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;testAdd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;expected&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;Deno&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;test&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;`TestAdd(&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;, &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;)`&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;result&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;assertEquals&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;expected&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;nx&quot;&gt;testAdd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;testAdd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;testAdd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;7&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Another approach is to use an array and a for loop:&lt;/p&gt;
+
+&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;testCases&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;expected&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;expected&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;expected&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;7&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;expected&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;of&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;testCases&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;Deno&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;test&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;`TestAdd(&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;, &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;)`&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;result&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;assertEquals&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;expected&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This way, if any of the test cases fail, the test runner will still run the remaining test cases and provide information about which test case failed.&lt;/p&gt;
+
+&lt;p&gt;Additionally, by specifying unique test names in each Deno.test() call, we can easily identify which test case failed!&lt;/p&gt;
+
+&lt;h3 id=&quot;a-note-on-the-visual-studio-code-deno-extension&quot;&gt;A note on the Visual Studio Code Deno extension&lt;/h3&gt;
+
+&lt;p&gt;At the time of writing, you won’t be able to run individual tests in Visual Studio Code from the test file itself (ie you won’t see a “Run Test” button next to each test).&lt;/p&gt;
+
+&lt;p&gt;You can still run the whole test file by right-clicking on the file and selecting “Run Test” from the context menu.&lt;/p&gt;
+
+&lt;p&gt;Once you’ve done that, the tests will also be visible in the “Testing” tab, where you can see the results of each test case.&lt;/p&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;Test files in Deno are just regular TypeScript files, so you can use any TypeScript feature you like to write your tests. This includes using helper functions to generate multiple test cases, as we’ve seen in this article.&lt;/p&gt;
+
+&lt;p&gt;The key takeaway is that you can use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Deno.test()&lt;/code&gt; inside a helper function or a for loop to generate multiple test cases. This allows you to run parameterized tests in Deno, and get detailed information about which test cases failed.&lt;/p&gt;
+</description>
+				<pubDate>Sun, 09 Mar 2025 00:00:00 +0000</pubDate>
+				<link>https://codemade.net/blog/parameterized-testing-with-deno/</link>
+				<guid isPermaLink="true">https://codemade.net/blog/parameterized-testing-with-deno/</guid>
+			</item>
+		
+			<item>
+				<title>A journey through Server Side Rendering in Deno</title>
+				
+                <description>&lt;p&gt;As a longtime .net developer, I’ve always preferred languages with strong typing. I find that I can reason about the code much better if I understand what data structures are required by a function call, and what it will return.&lt;/p&gt;
+
+&lt;p&gt;Naturally, this means that when doing any frontend work, I tend to reach for TypeScript. I find it’s a welcome improvement over vanilla JavaScript, especially when using typed third-party libraries.&lt;/p&gt;
+
+&lt;p&gt;There is only one catch: setting up typescript, esm modules, and bundling can be really painful when you’re just trying to get a simple project off the ground. Soon you’re 2 hours in, and you’re still trying to figure out why your imports aren’t working.&lt;/p&gt;
+
+&lt;p&gt;This is where Deno comes in! Built by the creators of Node.js, deno sets out to undo the mistakes of their previous project. It has built-in support for TypeScript, esm modules, and even has a built-in bundler. This means that I can write all my code in TypeScript, and run it without any additional setup. It also does away with the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;node_modules&lt;/code&gt; folder, which makes my hard drive very happy.&lt;/p&gt;
+
+&lt;p&gt;So, when starting a new project recently, I decided to give Deno a try. The project is a simple server-side rendered web application, with a bit of interactivity sprinkled in.&lt;/p&gt;
+
+&lt;p&gt;It’s now been a few weeks, and I’ve been through several iterations. Here is &lt;em&gt;my&lt;/em&gt; journey through server-side rendering in Deno.&lt;/p&gt;
+
+&lt;h2 id=&quot;deno-has-a-built-in-web-server&quot;&gt;Deno has a built-in web server??&lt;/h2&gt;
+
+&lt;p&gt;Yes, yes it does. Using the builtin &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Deno.Serve()&lt;/code&gt; function, you can create a simple web server &lt;a href=&quot;https://docs.deno.com/api/deno/~/Deno.serve&quot;&gt;in just a few lines of code&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The only downside of this approach is that you’ll have to handle absolutely everything yourself. This means parsing the request, handling the response, and even serving static files. This is easy enough for a simple project, but it can quickly become unwieldy as your project grows.&lt;/p&gt;
+
+&lt;h2 id=&quot;shopping-for-a-framework&quot;&gt;Shopping for a framework&lt;/h2&gt;
+
+&lt;p&gt;After deciding that I didn’t want to write my own web server, I started looking for a lightweight framework that would handle the heavy lifting for me. I quickly found &lt;a href=&quot;https://oakserver.org/&quot;&gt;Oak&lt;/a&gt;, a simple framework for Deno that is very similar to Express.js.&lt;/p&gt;
+
+&lt;p&gt;Oak has built-in support for things like middleware and routing. It seemed like a great choice for a simple project, and it’s easy to get started with.&lt;/p&gt;
+
+&lt;p&gt;The next step was to figure out a way to go beyond serving API endpoints and start rendering HTML on the server. This is where things started to get interesting.&lt;/p&gt;
+
+&lt;h2 id=&quot;shopping-for-a-templating-engine&quot;&gt;Shopping for a templating engine&lt;/h2&gt;
+
+&lt;h3 id=&quot;handlebars&quot;&gt;Handlebars&lt;/h3&gt;
+
+&lt;p&gt;When thinking of templating engines, my first idea was to use good old &lt;a href=&quot;https://handlebarsjs.com/&quot;&gt;Handlebars&lt;/a&gt;. I had never used it before, but I remember it being all the rage a few years ago, so I figured it must be good. Right? &lt;em&gt;Right??&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;It was… below my expectations. And by “below my expectations” I mean &lt;em&gt;“It makes me want to stab myself”&lt;/em&gt;. The syntax, oh the syntax!! I have nothing but compassion for anyone who has to coexist with it.&lt;/p&gt;
+
+&lt;p&gt;The last straw was when I had to declare a helper function to compare two values. I had to write a helper function to compare two values. In a templating engine.&lt;/p&gt;
+
+&lt;h3 id=&quot;ejs&quot;&gt;ejs&lt;/h3&gt;
+
+&lt;p&gt;After a good old web search for “handlebars alternatives”, I stumbled upon &lt;a href=&quot;https://ejs.co/&quot;&gt;ejs&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;As a .net developer, I was immediately reminded of Razor Pages / MVC. Simple, clean, and easy to use. I was sold.&lt;/p&gt;
+
+&lt;p&gt;…it did however come with its own set of quirks. For example, it doesn’t have the equivalent of “Layouts” in Razor. This means that you have to manually include the header and footer in every page. It also has even weirder syntax than Razor, with various combinations of percent signs and angle brackets.&lt;/p&gt;
+
+&lt;p&gt;But mainly, the thing I was really missing until now was being able to &lt;strong&gt;unit test my UI&lt;/strong&gt;. Not knowing if my partials were rendering correctly until I manually tested them in the browser was a pain.&lt;/p&gt;
+
+&lt;p&gt;In the end, I found that while the syntax was cozy and familiar, the web has moved on. I wanted something more modern, more… reactive. I wanted, in fact, React.&lt;/p&gt;
+
+&lt;h3 id=&quot;detour-to-the-promised-land-of-deno-fresh&quot;&gt;Detour to the promised land of Deno Fresh&lt;/h3&gt;
+
+&lt;p&gt;Before I could start using React, I had to figure out how to get it to work with Deno. This is where I found &lt;a href=&quot;https://fresh.deno.dev/&quot;&gt;🍋 Deno Fresh&lt;/a&gt;. Fresh is Deno’s answer to Next.js. With built-in support for JSX and an “islands” architecture that prioritizes minimal client-side JavaScript, it looked very promising.&lt;/p&gt;
+
+&lt;p&gt;I quickly cloned the example repo on my machine to try it out. It worked great. Sure, it’s extremely opinionated, but I can live with that.&lt;/p&gt;
+
+&lt;p&gt;I decided to try converting one of my ejs partials into a jsx component right inside the example project. Easy. Done. I was sold. Writing JSX instead of ejs felt natural, the way it was supposed to be all along.&lt;/p&gt;
+
+&lt;p&gt;At some point, however, things started to fall apart.&lt;/p&gt;
+
+&lt;p&gt;Testing components, for example, is not really supported out of the box. There’s &lt;a href=&quot;https://github.com/denoland/fresh/issues/427&quot;&gt;an open issue on github&lt;/a&gt; and the consensus seems to be… let’s wait for Fresh 2.0.&lt;/p&gt;
+
+&lt;p&gt;As far as I understand it, the wind behind Fresh’s sails is now more like a gentle breeze. 
+It seems that the team has been busy working on Deno itself, and Fresh has been left behind.&lt;/p&gt;
+
+&lt;p&gt;I notice as I write this that the &lt;a href=&quot;https://deno.com/blog/fresh-1.6&quot;&gt;last official blog about it&lt;/a&gt; dates December 1, 2023, which is about 10 years in trendy javascript framework time.&lt;/p&gt;
+
+&lt;h3 id=&quot;but-i-like-react-maybe-i-can-salvage-this&quot;&gt;But I like react! Maybe I can salvage this?&lt;/h3&gt;
+
+&lt;p&gt;So it turns out that Deno Fresh uses &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;preact-render-to-string&lt;/code&gt; under the hood to transform JSX components into HTML.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;With some clever refactoring, I’m sure I can just replace my ejs Oak middleware with a React one!&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;-famous last words&lt;/p&gt;
+
+&lt;p&gt;So I did! I created a new middleware that would render my React components server-side, and it worked like a charm. If you’re curious to see what it looks like, &lt;a href=&quot;https://gist.github.com/LBognanni/4ce0247276b7cd77e72a9cc014cd6e12&quot;&gt;here is a github gist with the code&lt;/a&gt; 🙂&lt;/p&gt;
+
+&lt;p&gt;I now had a working server-side rendered web app in Deno under my belt. I was happy with the result, even if it felt a bit of a Frankenstein’s monster.&lt;/p&gt;
+
+&lt;h2 id=&quot;and-then-i-built-a-second-project&quot;&gt;And then I built a second project&lt;/h2&gt;
+
+&lt;p&gt;Some time later, I wanted to start a new project. Similar requirements, so I figured I could just copy-paste the code from the first project and be done with it.&lt;/p&gt;
+
+&lt;p&gt;But then I thought,&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;If I need this, maybe others do too? Maybe I should make a library out of it? Maybe I should make my own framework? One framework to rule them all! 😈&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Yeah, no. No thanks Satan. I’m good.&lt;/p&gt;
+
+&lt;p&gt;An important requirement of my second project was user management, authentication, and authorization.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://better-auth.vercel.app/&quot;&gt;Better-Auth&lt;/a&gt; looked exactly like the kind of thing I needed. Fully featured, popular, good documentation. I had absolutely no intention of trying to bend my own little framework to work with it. I just wanted to get my project done.&lt;/p&gt;
+
+&lt;p&gt;I also had the nagging feeling in the back of my head that I was just &lt;em&gt;writing too much code&lt;/em&gt; for something that should be simple.&lt;/p&gt;
+
+&lt;h2 id=&quot;enter-hono&quot;&gt;Enter Hono&lt;/h2&gt;
+
+&lt;p&gt;The first backend framework that is mentioned in Better-Auth’s documentation is &lt;a href=&quot;https://hono.dev/&quot;&gt;Hono&lt;/a&gt;. I decided to take a look.&lt;/p&gt;
+
+&lt;p&gt;Hono does everything I was trying to build manually—but better. It has &lt;a href=&quot;https://hono.dev/docs/guides/jsx#jsx&quot;&gt;built-in JSX support&lt;/a&gt;, a router, and great documentation. The best thing is that I don’t have to support any of it myself!&lt;/p&gt;
+
+&lt;p&gt;It also looks almost exactly like Oak, so that was already a plus.&lt;/p&gt;
+
+&lt;p&gt;Unsurprisingly, building my second project was a much smoother experience.&lt;/p&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;This was a long journey, but a rewarding one. The nice thing was that at every point during my first project I ended up having something that was working, and that I could build upon.&lt;/p&gt;
+
+&lt;p&gt;Refactoring my code to use the next thing was luckily always pretty easy, and I was able to learn a lot along the way.&lt;/p&gt;
+
+&lt;p&gt;One thing I learned is that it’s easy to fall into the trap of doing everything “the Deno way”, and assuming that a library or framework that’s written for Deno is the best choice.&lt;/p&gt;
+
+&lt;p&gt;In reality, it’s important to evaluate each library or framework on its own merits, and choose the one that best fits your needs.&lt;/p&gt;
+
+&lt;p&gt;Frameworks like Hono that are built for multiple runtimes are obviously going to be more popular and better maintained than something that’s built for Deno only.&lt;/p&gt;
+
+&lt;p&gt;The great thing about Deno is that you can reference npm modules directly (without worrying about terabytes of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;node_modules&lt;/code&gt;), so you really have the whole JavaScript ecosystem at your disposal.&lt;/p&gt;
+
+&lt;h3 id=&quot;-key-takeaways&quot;&gt;🔑🥡 Key Takeaways:&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Don’t assume that a library made for Deno is always the best choice—evaluate based on actual needs.&lt;/li&gt;
+  &lt;li&gt;Multi-runtime frameworks like Hono tend to be better maintained and more flexible.&lt;/li&gt;
+  &lt;li&gt;Deno’s ability to use npm modules expands its ecosystem significantly.&lt;/li&gt;
+  &lt;li&gt;Don’t be afraid to refactor and try new things — each iteration can teach you something new!&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+				<pubDate>Tue, 11 Feb 2025 00:00:00 +0000</pubDate>
+				<link>https://codemade.net/blog/a-journey-through-deno-ssr/</link>
+				<guid isPermaLink="true">https://codemade.net/blog/a-journey-through-deno-ssr/</guid>
+			</item>
+		
+			<item>
+				<title>Running Docker in Windows without virtualization</title>
+				
+                <description>&lt;p&gt;Docker is an essential tool for developers. It allows you to run applications in isolated containers, making it easy to manage dependencies and run the same code in different environments.&lt;/p&gt;
+
+&lt;p&gt;However, on Windows Docker requires virtualization support, which may not always be enabled or available. Even when using WSL2 as an alternative to Hyper-V, your machine must still support and enable Hyper-V.&lt;/p&gt;
+
+&lt;p&gt;Recently I needed to run docker on a Windows virtual machine, running inside VirtualBox on a Linux host.&lt;/p&gt;
+
+&lt;p&gt;Contrary to KVM/QEMU, VirtualBox does not support nested virtualization, &lt;em&gt;unless&lt;/em&gt; you’re using VirtualBox inside the VM too.&lt;/p&gt;
+
+&lt;p&gt;What VirtualBox offers, however, is much better (read: acceptable) video hardware acceleration compared to QEMU - and for someone like me who spends more time attending remote meetings than running containers, this is a good tradeoff.&lt;/p&gt;
+
+&lt;p&gt;I &lt;em&gt;do&lt;/em&gt; however need to run containers from time to time, and having to switch to a different machine just for that is a bit of a hassle.&lt;/p&gt;
+
+&lt;div class=&quot;callout&quot;&gt;
+&lt;p&gt;⚠️&lt;/p&gt;
+&lt;p&gt;
+  &lt;strong&gt;Important!&lt;/strong&gt; We're going to install Docker Desktop in this guide &amp;mdash; however, without Hyper-V &lt;strong&gt;you won't be able&lt;/strong&gt; to run the docker engine or &lt;strong&gt;do anything in the GUI&lt;/strong&gt;.
+&lt;/p&gt;
+&lt;p&gt;
+  Instead, we're relying on Docker desktop to provide the &lt;code&gt;docker&lt;/code&gt; command line tool, which we'll be using to connect to a Linux server.
+&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&quot;step-1-install-docker-desktop&quot;&gt;Step 1: Install Docker Desktop&lt;/h2&gt;
+
+&lt;p&gt;Most online resources will point you to Docker Toolbox, which as of 2025 is a legacy solution that is no longer maintained. While you &lt;em&gt;can&lt;/em&gt; still download it and install it, it’s stuck on a very old version of Docker and is missing some crucial components like &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;buildx&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Here is the link to the &lt;a href=&quot;https://docs.docker.com/desktop/setup/install/windows-install/&quot;&gt;Docker Desktop download page&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Docker Desktop should install just fine, but of course it will complain if you try to run it.&lt;/p&gt;
+
+&lt;h2 id=&quot;step-2-install-docker-on-the-remote-server&quot;&gt;Step 2: Install Docker on the remote server&lt;/h2&gt;
+
+&lt;p&gt;If you haven’t already done so, you’ll need to install Docker on the remote server. There are plenty of resources online on how to do this, so I won’t go into details here. The official docker docs have plenty of information on how to install Docker on different platforms.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://docs.docker.com/engine/install/ubuntu/&quot;&gt;Here’s the link to the instructions for Ubuntu&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Be sure to add your user to the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;docker&lt;/code&gt; group so you can run docker commands without &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sudo&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;step-2-enable-ssh-on-the-remote-server&quot;&gt;Step 2: Enable ssh on the remote server&lt;/h2&gt;
+
+&lt;p&gt;You’ll need to be able to connect to the remote server via ssh. If you’re using a cloud provider, you’ll likely already have this set up. If you’re using a local server, or Desktop Ubuntu, you’ll need to install an ssh server.&lt;/p&gt;
+
+&lt;p&gt;This is simply done by running:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;openssh-server
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;You’ll likely also need to open the ssh port on your firewall.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;ufw allow ssh
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;step-3-configure-docker-desktop&quot;&gt;Step 3: Configure Docker Desktop&lt;/h2&gt;
+
+&lt;p&gt;Easy peasy. You just need to set an environment variable to tell Docker Desktop to connect to the remote server.&lt;/p&gt;
+
+&lt;p&gt;Try it out in a terminal window. First, set the variable:&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$env&lt;/span&gt;:DOCKER_HOST&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ssh://your-username@your-server:22&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Then run a docker command:&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker ps
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;You should get a prompt asking you to accept the server’s fingerprint, then another prompt asking for your password. If everything goes well, you should see the list of containers running on the remote server. (none if you just installed Docker)&lt;/p&gt;
+
+&lt;h2 id=&quot;step-4-configure-a-persistent-environment-variable&quot;&gt;Step 4: Configure a Persistent Environment Variable&lt;/h2&gt;
+
+&lt;p&gt;You don’t want to have to set the environment variable every time you open a terminal window. Instead, we can set the environment variable for all of Windows.&lt;/p&gt;
+
+&lt;p&gt;Right-click on the start button and select “System”. Then click on “Advanced system settings” and then “Environment Variables”.&lt;/p&gt;
+
+&lt;p&gt;Add a new system variable with the name &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;DOCKER_HOST&lt;/code&gt; and the value &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ssh://your-username@your-server&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Any new terminal window you open will now be using the environment variable, and docker commands will connected to the remote server.&lt;/p&gt;
+
+&lt;h2 id=&quot;step-5-usability-improvements&quot;&gt;Step 5: Usability improvements&lt;/h2&gt;
+
+&lt;p&gt;As it is, Docker will ask for your password every time you run a command. This can be a very annoying, especially if you’re running a lot of commands. Some commands, like &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;docker buildx build&lt;/code&gt; implicitly run multiple docker commands, so you’ll be asked for your password multiple times.&lt;/p&gt;
+
+&lt;p&gt;Instead, we can use ssh keys to authenticate.&lt;/p&gt;
+
+&lt;p&gt;On your Windows machine, generate a new ssh key pair:&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ssh-keygen
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;You’ll be asked where to store the key. Be sure to enter this path: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;C:\Users\your-username\.ssh\id_rsa&lt;/code&gt;. This is the default path where Docker will look for the key. (Some guides will tell you to just accept the default path, but doing so made the ssh-keygen command hang indefinitely in my case.)&lt;/p&gt;
+
+&lt;p&gt;You’ll be then asked for a passphrase. I recommend leaving this empty so you don’t have to enter it every time you run a docker command.&lt;/p&gt;
+
+&lt;p&gt;The next step is to copy the public key to the remote server. You can do this with the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ssh-copy-id&lt;/code&gt; command, but this command is not available on Windows.&lt;/p&gt;
+
+&lt;p&gt;Instead, we can copy the key manually.&lt;/p&gt;
+
+&lt;p&gt;First, print the public key:&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; ~&lt;span class=&quot;se&quot;&gt;\.&lt;/span&gt;ssh&lt;span class=&quot;se&quot;&gt;\i&lt;/span&gt;d_rsa.pub
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Copy the whole line that is printed.
+Next, connect to the remote server and add the key at the end of the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;authorized_keys&lt;/code&gt; file, using your favorite text editor (&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nano&lt;/code&gt; in this case):&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ssh your-username@your-server
+&lt;span class=&quot;nb&quot;&gt;mkdir&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; ~/.ssh
+nano ~/.ssh/authorized_keys
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This is it! You should now be able to run docker commands without being asked for your password. Try by running &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;docker ps&lt;/code&gt; again in a new terminal window.&lt;/p&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;While this article focussed on connecting docker to a local server, you can also follow the same steps to connect to a server in the cloud.&lt;/p&gt;
+
+&lt;p&gt;This can be useful if you want to run docker commands on a more powerful machine, or if you want to run docker commands on a machine that is serving web traffic to the internet!&lt;/p&gt;
+</description>
+				<pubDate>Tue, 21 Jan 2025 00:00:00 +0000</pubDate>
+				<link>https://codemade.net/blog/docker-desktop-with-remote-server/</link>
+				<guid isPermaLink="true">https://codemade.net/blog/docker-desktop-with-remote-server/</guid>
+			</item>
+		
+			<item>
+				<title>Announcing CodeMade Games!</title>
+				
+                <description>&lt;div class=&quot;callout&quot;&gt;
+  &lt;p&gt;🕹️&lt;/p&gt;
+  &lt;p&gt;
+    &lt;b&gt;TLDR&lt;/b&gt; 
+    I'm excited to announce the launch of &lt;a href=&quot;https://games.codemade.net&quot;&gt;CodeMade Games&lt;/a&gt;, a new website dedicated to fun, casual games that you can play in your browser 🎉
+  &lt;/p&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;my-game-development-journey&quot;&gt;My game development journey&lt;/h3&gt;
+
+&lt;p&gt;Since I started playing videogames in my childhood, I’ve always been fascinated by the idea of creating my own games. Building games takes a lot of time and effort, but it’s also incredibly rewarding.&lt;/p&gt;
+
+&lt;p&gt;I had somewhat of a failed start many, many years ago when I tried to build &lt;a href=&quot;https://www.gljakal.com/blog/2010/08/16/screenshot-update/&quot;&gt;a platformer game&lt;/a&gt; in C++. While I did get some traction initially, with a nice prototype and some basic game mechanics, I eventually lost interest and moved on to other projects. One of the main reasons for this was that I have no artistic skills whatsoever, and the little art I could produce would take many long hours to create.&lt;/p&gt;
+
+&lt;h3 id=&quot;a-new-beginning&quot;&gt;A new beginning&lt;/h3&gt;
+
+&lt;p&gt;Fast forward to a few weeks ago, when I wanted a break from my usual backend development work and decided to play around with the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;:has&lt;/code&gt; CSS selector. 
+I ended up building &lt;a href=&quot;https://games.codemade.net/swep/index.html&quot;&gt;a simple minesweeper clone&lt;/a&gt; - and had a lot of fun doing it!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://games.codemade.net/sweep.png&quot; alt=&quot;A screenshot of Sweep, my minesweeper clone&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;After comprehensively testing the game on my couch, on my way to work, and during my lunch breaks, I decided that it was time to release it to the world. 
+And so, &lt;a href=&quot;https://games.codemade.net&quot;&gt;CodeMade Games&lt;/a&gt; was born!&lt;/p&gt;
+
+&lt;h3 id=&quot;my-core-game-development-principles&quot;&gt;My core game development principles&lt;/h3&gt;
+
+&lt;p&gt;It’s been almost 15 years since I last worked on a game, and I’ve learned a lot since then. Here are some of the core principles that I’m following with CodeMade Games:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;Do less&lt;/strong&gt;: Like, way less. No fancy graphics, no complex mechanics. Art was always my biggest blocker, so I’m focusing on simple, available assets. Emojis are a great way to add some personality to the games without spending hours on art! 🔥&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Build for the web&lt;/strong&gt;: I want my games to be accessible to everyone, so I’m building them to be played in the browser. Mobile is also a priority, mostly because I want to be able to play them on my phone!&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Respect the user&lt;/strong&gt;: Games should be fun, not annoying. With most game companies trying to &lt;a href=&quot;https://www.howtogeek.com/fortnite-was-busted-for-using-dark-patterns-heres-what-that-means/&quot;&gt;manipulate their users&lt;/a&gt; into spending more time and money, I want to take a different approach. No ads, no invasive tracking, no dark patterns. Have your 10 minutes of fun and then go back to your life!&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Learn something&lt;/strong&gt;: Writing games is my way to relax and have fun, but I also want to learn new things. Whether it’s a new CSS trick, a new JavaScript feature, or a new game design pattern, I want to keep pushing myself to learn and improve.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;whats-next&quot;&gt;What’s next?&lt;/h3&gt;
+&lt;p&gt;I’m working on a few new games that I’m excited to share with you soon.&lt;/p&gt;
+
+&lt;p&gt;I’m also planning to write more about my game development journey, the tools I’m using, and the lessons I’m learning along the way.&lt;/p&gt;
+
+&lt;p&gt;Be sure to subscribe to the &lt;a href=&quot;/atom.xml&quot;&gt;RSS feed&lt;/a&gt; or follow me on &lt;a href=&quot;https://bsky.app/profile/loris.codes&quot;&gt;BlueSky&lt;/a&gt; to stay updated!&lt;/p&gt;
+
+&lt;h4 id=&quot;and-of-course-see-you-on-codemade-games-&quot;&gt;And of course, see you on &lt;a href=&quot;https://games.codemade.net&quot;&gt;CodeMade Games&lt;/a&gt; 🎮&lt;/h4&gt;
+</description>
+				<pubDate>Tue, 07 Jan 2025 00:00:00 +0000</pubDate>
+				<link>https://codemade.net/blog/announcing-codemade-games/</link>
+				<guid isPermaLink="true">https://codemade.net/blog/announcing-codemade-games/</guid>
+			</item>
+		
+			<item>
+				<title>Modern CSS is awesome!</title>
+				
+                <description>&lt;p&gt;The last time I seriously worked with CSS was back when Firefox was still a relevant browser (😢), and Internet Explorer 11 was &lt;em&gt;just&lt;/em&gt; on its way out.&lt;/p&gt;
+
+&lt;p&gt;Flexbox had just become a popular way to create layouts, and CSS Grid was new and exciting, but not yet widely supported.
+Not that I could use either, since IE’s implementation of flexbox was so riddled with bugs that it was practically unusable.&lt;/p&gt;
+
+&lt;p&gt;But now. We’re in 2024, and things have changed. A lot.&lt;/p&gt;
+
+&lt;p&gt;Here are a few of my favourite features of modern CSS, in no particular order:&lt;/p&gt;
+
+&lt;h3 id=&quot;css-variables&quot;&gt;CSS Variables&lt;/h3&gt;
+
+&lt;p&gt;CSS variables were once only possible with a preprocessor like SASS or LESS, but now they’re a native feature of CSS.&lt;/p&gt;
+
+&lt;p&gt;Here is how to define a variable:&lt;/p&gt;
+
+&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nd&quot;&gt;:root&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;py&quot;&gt;--primary-color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;#ff0000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Specifying the variable at the root level makes it available to the entire document.&lt;/p&gt;
+
+&lt;p&gt;The variable can then be used with the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;var()&lt;/code&gt; function:&lt;/p&gt;
+
+&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;div&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;--primary-color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The neat thing is that variables follow the cascading logic of CSS, so you can update their value at any level of the document, and all elements that use that variable will automatically update.&lt;/p&gt;
+
+&lt;p class=&quot;codepen&quot; data-height=&quot;300&quot; data-default-tab=&quot;css,result&quot; data-slug-hash=&quot;XJrJvom&quot; data-pen-title=&quot;CSS Variables&quot; data-user=&quot;codemade&quot; style=&quot;height: 300px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+  &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/codemade/pen/XJrJvom&quot;&gt;
+  CSS Variables&lt;/a&gt; by Loris Bognanni (&lt;a href=&quot;https://codepen.io/codemade&quot;&gt;@codemade&lt;/a&gt;)
+  on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+&lt;/p&gt;
+
+&lt;h3 id=&quot;nesting-in-css&quot;&gt;Nesting in CSS&lt;/h3&gt;
+
+&lt;p&gt;This is again one of those things that you would have needed a CSS preprocessor for in the past, but is now a native feature of CSS. Useful for keeping your code concise and readable.&lt;/p&gt;
+
+&lt;div class=&quot;language-scss highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nc&quot;&gt;.parent&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;red&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nc&quot;&gt;.child&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;blue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;I especially find this useful when styling pseudo-elements and states:&lt;/p&gt;
+
+&lt;div class=&quot;language-scss highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;button&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;background-color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;blue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;nd&quot;&gt;:hover&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;background-color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;red&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;nd&quot;&gt;:after&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;content&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'🚀'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;centering-a-div-is-now-very-easy&quot;&gt;Centering a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;div&lt;/code&gt; is now very easy&lt;/h3&gt;
+
+&lt;p&gt;Centerig a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;div&lt;/code&gt; has long been a recurring joke amongst web developers, but thanks to CSS Grid, it’s now a two-liner:&lt;/p&gt;
+
+&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;div&lt;/span&gt;&lt;span class=&quot;nc&quot;&gt;.parent&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;grid&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;py&quot;&gt;place-items&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;center&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;viewport-units&quot;&gt;Viewport units&lt;/h3&gt;
+
+&lt;p&gt;Viewport units are a way to size elements based on the size of the viewport. They are particularly useful for creating responsive designs.&lt;/p&gt;
+
+&lt;p&gt;Viewport units include &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;vw&lt;/code&gt; (viewport width), &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;vh&lt;/code&gt; (viewport height), &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;vmin&lt;/code&gt; (the smaller of the two), and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;vmax&lt;/code&gt; (the larger of the two). So for example, if you want an element to be half as wide as the viewport, you can do this:&lt;/p&gt;
+
+&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nc&quot;&gt;.my-element&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;50vw&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Here is an example that combines viewport units and CSS Grid to center a div in the middle of the screen:&lt;/p&gt;
+
+&lt;p class=&quot;codepen&quot; data-height=&quot;300&quot; data-default-tab=&quot;css,result&quot; data-slug-hash=&quot;JoPogQW&quot; data-pen-title=&quot;centering&quot; data-user=&quot;codemade&quot; style=&quot;height: 300px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+  &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/codemade/pen/JoPogQW&quot;&gt;
+  centering&lt;/a&gt; by Loris Bognanni (&lt;a href=&quot;https://codepen.io/codemade&quot;&gt;@codemade&lt;/a&gt;)
+  on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+&lt;/p&gt;
+
+&lt;h3 id=&quot;math-in-css&quot;&gt;Math in CSS&lt;/h3&gt;
+
+&lt;p&gt;CSS has a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;calc()&lt;/code&gt; function that allows you to perform calculations right in your stylesheets. This can be useful for things like calculating widths, margins, and padding.&lt;/p&gt;
+
+&lt;p&gt;The exciting thing about &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;calc()&lt;/code&gt; is that it can combine different units of measurement, so you can do things like this:&lt;/p&gt;
+
+&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nc&quot;&gt;.my-element&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;calc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;50%&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;20px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;You can of course use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;calc()&lt;/code&gt; with variables as well:&lt;/p&gt;
+
+&lt;div class=&quot;language-scss highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nd&quot;&gt;:root&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;--margin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;20px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;article&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;margin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;calc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;--&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;margin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;css-containers-container-queries-and-container-measurements&quot;&gt;CSS Containers, container queries, and container measurements&lt;/h3&gt;
+
+&lt;p&gt;By telling CSS that a certain element is a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;container&lt;/code&gt;, you can now do things like size its children based on the container’s size, or apply styles based on the container’s size.&lt;/p&gt;
+
+&lt;p&gt;Similar to viewport units, container units are based on the size of the container element. They include &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cqw&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cqh&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cqmin&lt;/code&gt;, and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cqmax&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p class=&quot;codepen&quot; data-height=&quot;300&quot; data-default-tab=&quot;css,result&quot; data-slug-hash=&quot;wBwawvN&quot; data-pen-title=&quot;Untitled&quot; data-user=&quot;codemade&quot; style=&quot;height: 300px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+  &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/codemade/pen/wBwawvN&quot;&gt;
+  Untitled&lt;/a&gt; by Loris Bognanni (&lt;a href=&quot;https://codepen.io/codemade&quot;&gt;@codemade&lt;/a&gt;)
+  on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_containment/Container_queries&quot;&gt;Container queries&lt;/a&gt; take this a step further by allowing you to apply styles based on the size of the container. This is particularly useful for creating responsive designs where the layout changes based on the size of the container, rather than the viewport.&lt;/p&gt;
+
+&lt;h3 id=&quot;aspect-ratio-property&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;aspect-ratio&lt;/code&gt; property&lt;/h3&gt;
+
+&lt;p&gt;If you ever wanted to embed a video in your responsive page in the old days, you probably had to use some javascript to calculate the correct height based on the width of the video.&lt;/p&gt;
+
+&lt;p&gt;But now, you can use the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;aspect-ratio&lt;/code&gt; property:&lt;/p&gt;
+
+&lt;div class=&quot;language-scss highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nc&quot;&gt;.video&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;aspect-ratio&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;16&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;9&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;has-selector&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;:has()&lt;/code&gt; selector&lt;/h3&gt;
+
+&lt;p&gt;The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;:has()&lt;/code&gt; selector allows you to select an element based on its descendants. This can be useful for styling elements based on their content, or for selecting elements that contain a specific child element.&lt;/p&gt;
+
+&lt;p&gt;While before &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;:has&lt;/code&gt; you would have to use javascript or some sort of preprocessing to achieve the same effect, now you can do it with a single line of CSS.&lt;/p&gt;
+
+&lt;p&gt;For example, here is a simple way to style a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;&amp;lt;label&amp;gt;&lt;/code&gt; element when its child &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;&amp;lt;input&amp;gt;&lt;/code&gt; is checked:&lt;/p&gt;
+
+&lt;p class=&quot;codepen&quot; data-height=&quot;200&quot; data-default-tab=&quot;css,result&quot; data-slug-hash=&quot;gbYpbgG&quot; data-pen-title=&quot;:has demo&quot; data-user=&quot;codemade&quot; style=&quot;height: 200px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+  &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/codemade/pen/gbYpbgG&quot;&gt;
+  :has demo&lt;/a&gt; by Loris Bognanni (&lt;a href=&quot;https://codepen.io/codemade&quot;&gt;@codemade&lt;/a&gt;)
+  on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;script async=&quot;&quot; src=&quot;https://cpwebassets.codepen.io/assets/embed/ei.js&quot;&gt;&lt;/script&gt;
+
+</description>
+				<pubDate>Mon, 25 Nov 2024 00:00:00 +0000</pubDate>
+				<link>https://codemade.net/blog/modern-css-is-awesome/</link>
+				<guid isPermaLink="true">https://codemade.net/blog/modern-css-is-awesome/</guid>
+			</item>
+		
+			<item>
+				<title>The case of the unhappy CloudFront distribution</title>
+				
+                <description>&lt;p&gt;For fun, and as a learning experience, I’m building a very simple comment system for this blog.&lt;/p&gt;
+
+&lt;p&gt;Currently codemade.net is a simple static website built by Jekyll everytime I push to the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;main&lt;/code&gt; branch on its &lt;a href=&quot;https://github.com/LBognanni/codemade-site&quot;&gt;GitHub repo&lt;/a&gt;.
+This is a relatively common setup for smaller websites, and it has the benefit of being extremely fast and cheap to host.&lt;/p&gt;
+
+&lt;p&gt;There are a number of third party comment systems floating around the internet, but they all have some drawbacks. Some are just too expensive for a small website like mine, others are advertising platforms in disguise, and others still are just too complicated to set up. Perhaps this is why a lot of people rely on social media for comments.&lt;/p&gt;
+
+&lt;p&gt;I wanted to build something that was simple, cheap and cheeful. I also wanted to get hands on with tools I rarely use, like ASP.net Core on Lambda, HTMX, terraform, CloudFront, etc.&lt;/p&gt;
+
+&lt;p&gt;It follows a relatively common pattern: all the static content is stored in S3, while the dynamic APIs are served by Lambda functions. An HTTP API gateway is used to route requests to the correct Lambda function, and CloudFront sits in front of everything to provide caching, routing, and SSL.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/basic-website.png&quot; alt=&quot;The architecture of the comment system&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;I built and deployed this in pieces, starting with the main Lambda function. I set it up to serve both the frontend (a simple HTML page), and the backend: a GET endpoint to return the comments for a post, a PUT endpoint to post a new comment. I tested it locally, and it worked fine.&lt;/p&gt;
+
+&lt;p&gt;I deployed it to AWS, behind an API Gateway, and surprisingly, it worked!&lt;/p&gt;
+
+&lt;p&gt;I then decided to add CloudFront in front of the API Gateway, and store the static content in an S3 bucket.&lt;/p&gt;
+
+&lt;p&gt;When configuring CloudFront, one must set up one or more “Origins” (the places where CloudFront will fetch the content from). I set up two origins: the default one being S3 where &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;index.html&lt;/code&gt; is stored, and the API Gateway, only for the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/comments/*&lt;/code&gt; path.&lt;/p&gt;
+
+&lt;p&gt;Deploy the distribution, and yes! The index page loads, and navigating to a comments page brings up a list of comments.&lt;/p&gt;
+
+&lt;p&gt;Try posting a comment however, and… this happens:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/cloudfront-is-not-happy.png&quot; alt=&quot;CloudFront returns HTTP 403&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Soo, somehow GETting the comments works, but PUTing a comment doesn’t.&lt;/p&gt;
+
+&lt;p&gt;I started debugging by looking at each piece of the puzzle:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Does the lambda work?&lt;/strong&gt; Yes, testing the lambda in isolation yields the expected result (a comment is posted)&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Does the API Gateway work?&lt;/strong&gt; Yes, invoking the API gateway URL directly calls the lambda and posts a comment&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Did I set up the CloudFront distribution correctly?&lt;/strong&gt; I think so, but let’s check the settings. I double-checked the origins, and they look fine. I also checked the behaviors, and indeed requests to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/comments/*&lt;/code&gt; are routed to the API Gateway &lt;em&gt;(of course they are! GET requests work!)&lt;/em&gt;&lt;/li&gt;
+  &lt;li&gt;Maybe it’s a caching issue? I tried invalidating the cache, but it didn’t help.&lt;/li&gt;
+  &lt;li&gt;Maybe it’s a CORS issue? I tested by directly invoking the PUT endpoint via Postman, and it worked. So probably it’s not that.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Hmm. Perhaps the CloudFront logs could help me? I enabled logging, and tried to post a comment. I then waited for a few minutes, and checked the logs:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/cf-logs-1.png&quot; alt=&quot;CloudFront logs&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;(shoutout to the &lt;a href=&quot;https://marketplace.visualstudio.com/items?itemName=mechatroner.rainbow-csv&quot;&gt;Rainbow CSV&lt;/a&gt; Vs Code extension for making this somewhat readable!)&lt;/p&gt;
+
+&lt;p&gt;It’s a bit hard to follow, but we can see 3 requests: the first two are GET requests to the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;favicon.ico&lt;/code&gt; resource (presumably served from S3), and to the a comments page (served by the API Gateway). The third request is a PUT request to the same comments page, and it returns a 403 status code.&lt;/p&gt;
+
+&lt;p&gt;The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;x-edge-result-type&lt;/code&gt; field simply says &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Miss&lt;/code&gt; for the GET requests (ie they were not in CloudFront’s cache) and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Error&lt;/code&gt; for the PUT request. Not very helpful.&lt;/p&gt;
+
+&lt;p&gt;The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;x-edge-detailed-result-type&lt;/code&gt; field looks interesting. It says &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;InvalidRequestMethod&lt;/code&gt; for the PUT request.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Could it be that I didn’t allow PUT requests on the Api Gateway origin?&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;I checked my terraform code, and nope, all HTTP methods are allowed for that origin 🤔&lt;/p&gt;
+
+&lt;p&gt;So I started googling (well &lt;em&gt;duckduckgoing&lt;/em&gt;) for every combination of “CloudFront”, “InvalidRequestMethod”, “403”, “PUT”, “API Gateway” I could think of.&lt;/p&gt;
+
+&lt;p&gt;I found some StackOverflow posts where folks were having similar issues, but they were all related to not having configured one of the three components (CloudFront, API Gateway, S3) correctly. I double, triple, quadruple checked my configuration, and it all looked fine.&lt;/p&gt;
+
+&lt;p&gt;Out of desperation, I tried mixing things up a bit. I changed the CloudFront distribution to have only one origin: the API Gateway. I then tried posting a comment, and… it worked! But why?&lt;/p&gt;
+
+&lt;p&gt;I was really tempted to just leave it at that, but the nagging voice at the back of my head, complaining that I would have to invoke the lambda for each. single. static. asset. was too loud.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Obviously&lt;/em&gt; the moral imperative is to have the static content served from S3 (it’s cheaper, faster, and more reliable). So I re-enabled the S3 origin, and tried posting a comment again. And… back to not working, of course.&lt;/p&gt;
+
+&lt;p&gt;Okay. Time to take a step back. Go for a walk. Clear my head.&lt;/p&gt;
+
+&lt;p&gt;It’s the next day, and I’m back at it. Time to try and simplify things a bit.&lt;/p&gt;
+
+&lt;p&gt;Perhaps my terraform code was too complex, or it was missing something? I decided to try and set up the CloudFront distribution manually, using the AWS console. Manually add both origin, set up the behaviors, and deploy.&lt;/p&gt;
+
+&lt;p&gt;Nope, same issue.&lt;/p&gt;
+
+&lt;p&gt;There must be a reason.&lt;/p&gt;
+
+&lt;p&gt;Maybe I can look at the CloudFront logs again? There are so many fields. Maybe I missed something? Maybe if I cross my eyes just right it will dawn on me?&lt;/p&gt;
+
+&lt;p&gt;And oh yes, dawn on me it did. The stupid, obvious little thing that I missed. Let me highlight it for you:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/cf-logs-2.png&quot; alt=&quot;CloudFront Logs showing a capitalization error on my PUT requests&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Do you see it? The GET request is being sent to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/comments/foo/bar&lt;/code&gt;, but the PUT request is being sent to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/Comments/foo/bar&lt;/code&gt;. Capital C. FML 😩&lt;/p&gt;
+
+&lt;p&gt;So CloudFront was directing our PUT request to the S3 origin, which of course didn’t have the PUT method enabled, and returned a 403.&lt;/p&gt;
+
+&lt;p&gt;Fun fact, because my API gateway was set to proxy all traffic to my lambda, it didn’t care about the capitalization. But CloudFront does.&lt;/p&gt;
+
+&lt;p&gt;AWS explicitly call this out in their &lt;a href=&quot;https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/distribution-web-values-specify.html#DownloadDistValuesPathPattern&quot;&gt;documentation&lt;/a&gt;:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/cf-path-patterns.png&quot; alt=&quot;A screenshot of the link above&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;And the best part? Not only I &lt;em&gt;knew&lt;/em&gt; about this, I must have read that page at least 15 times while debugging this.&lt;/p&gt;
+
+&lt;h3 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h3&gt;
+
+&lt;p&gt;Anyway, to make a long story short, I fixed my frontend code to PUT to the right path, everything started working as expected 🎉&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;I hope you enjoyed this little story. I certainly learned a lot about CloudFront, API Gateway, and Lambda while debugging this. My desk has a fresh head-shaped indentation, but &lt;em&gt;c’est la vie&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;Oh, and the comment system is not ready yet 😅, so feel free to discuss this on HN, or Reddit 😅&lt;/p&gt;
+</description>
+				<pubDate>Sat, 29 Jun 2024 00:00:00 +0000</pubDate>
+				<link>https://codemade.net/blog/the-case-of-the-unhappy-cloudfront/</link>
+				<guid isPermaLink="true">https://codemade.net/blog/the-case-of-the-unhappy-cloudfront/</guid>
+			</item>
+		
+			<item>
+				<title>The case of the mysteriously disappearing window</title>
+				
+                <description>&lt;p&gt;One small annoyance I contend with everyday is links opening in the “wrong” browser. See, I use different browsers for different purposes.&lt;/p&gt;
+
+&lt;p&gt;Chrome is the browser I use for all my work stuff, partially because I prefer its Dev tools and also because most SaaS apps I use for work tend to work better with it. Firefox however is my preferred browser and has the advantage of not being built by an advertisement company, so I tend to do all my personal browsing there. I also use Edge for Netflix because why not.&lt;/p&gt;
+
+&lt;p&gt;So I spent a few hours hacking together &lt;a href=&quot;/roundabout&quot;&gt;Roundabout&lt;/a&gt;, a simple app that registers itself as a web browser and allows you to pick the browser you’d like to open your link in.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/hero-roundabout.png&quot; alt=&quot;Roundabout screenshot&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Upon testing, everything looked good: I could click a link in a non-browser application like Telegram Desktop or WhatsApp desktop, and Roundabout would pop up asking me if I’d prefer Chrome or Firefox.&lt;/p&gt;
+
+&lt;h3 id=&quot;except-for-slack&quot;&gt;…except for Slack&lt;/h3&gt;
+
+&lt;p&gt;As it turned out, clicking a link from Slack would… do nothing?&lt;/p&gt;
+
+&lt;p&gt;I started with the usual debugging techniques: add some logs, test again. Build fails. Wait, why? A quick glance at &lt;a href=&quot;https://learn.microsoft.com/en-us/sysinternals/downloads/process-explorer&quot;&gt;Process Explorer&lt;/a&gt; revealed the issue: Roundabout was starting, but somehow it got stuck and wasn’t showing the main window. After terminating all the stuck instances, I was able to test again, this time with logs.&lt;/p&gt;
+
+&lt;p&gt;The logs looked OK, but just stopped after showing the main form 🤔&lt;/p&gt;
+
+&lt;p&gt;Next it was time to investigate &lt;em&gt;how&lt;/em&gt; exactly Slack starts a web browser.
+A few minutes of sleuthing with &lt;a href=&quot;https://learn.microsoft.com/en-us/sysinternals/downloads/procmon&quot;&gt;Process Monitor&lt;/a&gt; got me my answer: when opening links Slack runs a new command, in the form of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;RunDll32.exe URL.dll,FileProtocolHandler {the URL}&lt;/code&gt;; interesting 🤔.&lt;/p&gt;
+
+&lt;p&gt;If you never crossed paths with it, RunDll32 is perhaps one of the most interesting applications in Windows. It allows one to invoke functions that are defined in Dll files, simply by calling &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;rundll32 {the dll},{the function} {any parameters}&lt;/code&gt;. In this case, we’re executing the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;FileProtocolHandler&lt;/code&gt; function that is defined in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;URL.dll&lt;/code&gt;, and passing our URL to it.&lt;/p&gt;
+
+&lt;p&gt;So what happens if I just run that command from a command prompt?&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/rundll32.png&quot; alt=&quot;A command prompt showing that we executed Rundll32, with a Roundabout window open in front of it&quot; /&gt;&lt;br /&gt;Hmmm, it works as expected…&lt;/p&gt;
+
+&lt;p&gt;I began to suspect that there was some sort of problem actually showing the form, when starting from Slack. What would happen if I added a MessageBox just before showing the form? Interestingly, the message box showed just fine, and then the main form also showed up fine 🤔&lt;/p&gt;
+
+&lt;p&gt;Perhaps the issue is just that Roundabout shows up too quickly? I added a 1 second pause just before starting and… nothing, the main window wouldn’t show again. I’m kinda relieved because I really didn’t want to add a huge pause before something happens for the user 😌&lt;/p&gt;
+
+&lt;p&gt;Okay, so it looks like Slack “swallows” the first proper window we create. I wonder what happens if we temporarily create an empty window and immediately close it before showing the main window?&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/roundabout_slack_works.png&quot; alt=&quot;A Roundabout window, open in front of a Slack conversation&quot; /&gt;&lt;br /&gt;🎉It works!&lt;/p&gt;
+
+&lt;p&gt;At this point, it’s been a few hours debugging this on and off, and a hacky workaround sounds like the perfect solution…&lt;/p&gt;
+
+&lt;p&gt;🧹 Time to clean up the code a bit, and hide this monstrosity behind a helper function.&lt;/p&gt;
+
+&lt;p&gt;It would be also good to only do this when starting from Slack, otherwise users would see an empty window flash on screen. Unfortunately there’s no good way to find out what is your “parent” program, but the user likely clicked on the link with their mouse, so finding the right window based on the pointer coordinates should suffice.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/LBognanni/Roundabout/blob/1b8c675c81628b163bb860fc651c19fb9289c04d/src/Roundabout/Program.cs#L68-L88&quot;&gt;Here is the admittedly horrible code that does this&lt;/a&gt;!&lt;/p&gt;
+
+&lt;h3 id=&quot;fin&quot;&gt;Fin.&lt;/h3&gt;
+
+&lt;p&gt;In unraveling the mystery of Slack links not cooperating with Roundabout, we’ve delved into unexpected corners of Windows application development. With the code tweaks and insights gained, Roundabout now seamlessly handles links from various applications, including Slack.&lt;/p&gt;
+
+&lt;p&gt;As with any solution, there’s always room for improvement. Considerations for future versions include refining the code further, and perhaps adpoting this workaround for other apps I missed this time.&lt;/p&gt;
+
+&lt;p&gt;If you do find one such case of an app “swallowing” Roundabout, please do &lt;a href=&quot;https://github.com/LBognanni/Roundabout/issues&quot;&gt;open an issue on Github&lt;/a&gt;!&lt;/p&gt;
+</description>
+				<pubDate>Sat, 16 Dec 2023 00:00:00 +0000</pubDate>
+				<link>https://codemade.net/blog/the-case-of-the-disappearing-window/</link>
+				<guid isPermaLink="true">https://codemade.net/blog/the-case-of-the-disappearing-window/</guid>
+			</item>
+		
+			<item>
+				<title>How to draw a conic gradient with System.Drawing in gdiPlus</title>
+				
+                <description>&lt;p&gt;Recently, I have been working on adding support for conic gradient (or conical gradients, as some say) to &lt;a href=&quot;/clock&quot;&gt;Clock&lt;/a&gt;. Now, Clock uses GdiPlus, or the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;System.Drawing&lt;/code&gt; namespace in C# to do all of its drawing. My aim was to replicate the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;conic-gradient()&lt;/code&gt; &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/CSS/conic-gradient()&quot;&gt;CSS function&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Imagine my surprise when searching online for “gdiplus conic gradient” yielded few and very old results. Ok, maybe you’re not very surprised because all the cool kids are now writing Electron apps and mid-2000s &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;System.Drawing&lt;/code&gt; has been relegated to history 😄&lt;/p&gt;
+
+&lt;p&gt;Like any other methods of filling a shape, we’re going to need a type of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Brush&lt;/code&gt; to do it. The one we’re going to use for conic gradients is the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PathGradientBrush&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;What’s interesting about &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PathGradientBrush&lt;/code&gt; is that it can be used in many ways. &lt;a href=&quot;https://www.c-sharpcorner.com/uploadfile/puranindia/783/&quot;&gt;This article from C# Corner&lt;/a&gt; goes over a few, but crucially the one that’s missing is a proper conic gradient. 
+After a lot of searching, I finally stumbled on &lt;a href=&quot;https://web.archive.org/web/20140906083853/http://bobpowell.net/pgb.aspx&quot;&gt;this article&lt;/a&gt;(the original website is now offline!) and noticed this image and code snippet:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://web.archive.org/web/20140906083853im_/http://bobpowell.net/images/pgb.ht2.jpg&quot; alt=&quot;&amp;quot;Many vertices, few colors&amp;quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-csharp highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  &lt;span class=&quot;n&quot;&gt;GraphicsPath&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;GraphicsPath&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;pth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;AddEllipse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ClientRectangle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  
+  &lt;span class=&quot;n&quot;&gt;PathGradientBrush&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pgb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;PathGradientBrush&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;pgb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SurroundColors&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]{&lt;/span&gt;
+                    &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Red&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                    &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Orange&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                    &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Yellow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                    &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Green&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                    &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Blue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                    &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Indigo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                    &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Violet&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;pgb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;CenterColor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Gray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Graphics&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;FillRectangle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pgb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ClientRectangle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;It’s not a “real” conic gradient, but close. What’s interesting in that example is that it’s setting a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;SurroundColors&lt;/code&gt; property, but, because a circle in gdi+ has many vertices, only a tiny portion of the whole is occupied by a gradient. Of course the next step to try was using a polygon with the same number of vertices as the number of colors and check the result:&lt;/p&gt;
+
+&lt;div class=&quot;language-csharp highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;using&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pth&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;GraphicsPath&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;colors&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]{&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Red&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Orange&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Yellow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Green&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Blue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Indigo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Violet&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rect&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Rectangle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+&lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;polyPoints&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;List&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Point&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;();&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;double&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;colors&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;++)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;polyPoints&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;Add&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Point&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sz&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;Cos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PI&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;double&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;double&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)),&lt;/span&gt; 
+    &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sz&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;Sin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PI&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;double&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;double&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;pth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;AddPolygon&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;polyPoints&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;ToArray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;PathGradientBrush&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pgb&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;PathGradientBrush&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;pgb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SurroundColors&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;colors&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;g&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;FillRectangle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pgb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/poly-gradient-white.png&quot; alt=&quot;close but no dice&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;It’s close, but where does the white come from? Well if you look closely at the circle example from the article above, there’s a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;CenterColor&lt;/code&gt; property that is set to Gray there. When you don’t specify it, instead of there being no center color, a white shade is used instead. Setting CenterColor to transparent renders the filling itself transparent so that’s no good either.&lt;/p&gt;
+
+&lt;p&gt;But! &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PathGradientBrush&lt;/code&gt; has a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Blend&lt;/code&gt; property that allows us to control the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;CenterColor&lt;/code&gt;’s opacity from the center to the border of the shape. We can just set it to fully opaque at both ends to get our gradient:&lt;/p&gt;
+
+&lt;div class=&quot;language-csharp highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;pgb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Blend&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Blend&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Factors&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Positions&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;float&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1f&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/poly-gradient-ok.png&quot; alt=&quot;success!&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Isn’t that something! Now to make it really look like the kind of conic gradient we get in css, we have to make it so the last and the first color don’t blend into each other. We can do this by creating a polygon that has one less vertex, where the last Point is repeated. We also need to specify the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;CenterPoint&lt;/code&gt; property, otherwise Gdi+ will auto-calculate it as being slightly off-center:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/poly-gradient-conic.png&quot; alt=&quot;fully conic&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;One last thing! You might have noticed that, while we’re using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;FillRectangle&lt;/code&gt; to paint our gradient, we’re not really filling &lt;em&gt;all of it&lt;/em&gt;, but we’re drawing a polygon. This is easily fixed by using a suitably large radius for our polygon.&lt;/p&gt;
+
+&lt;p&gt;If you’re interested to see what I ended up with, the &lt;a href=&quot;https://github.com/LBognanni/CodeMadeClock/blob/master/src/CodeMade.ScriptedGraphics/ConicGradient.cs&quot;&gt;full source code&lt;/a&gt; is open source as part of Clock 😊&lt;/p&gt;
+</description>
+				<pubDate>Mon, 24 May 2021 00:00:00 +0000</pubDate>
+				<link>https://codemade.net/blog/conic-gradient/</link>
+				<guid isPermaLink="true">https://codemade.net/blog/conic-gradient/</guid>
+			</item>
+		
+			<item>
+				<title>Fix Windows restarting after sleep or hybernate: the complete 2020 guide</title>
+				
+                <description>&lt;p&gt;So your computer starts on its own after you put it to sleep or even after you turn it off. Maybe it does so immediately or maybe it waits for a few minutes or hours. But you feel like you can’t trust it anymore: there’s few things more unsettling than being woken up by the bright light of your screen in the middle of the night. Well here is my comprehensive list of things to check (and to turn off!) to prevent this from happening again.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;First off, open an admin Powershell terminal.&lt;/strong&gt; You can do so by right-clicking the start menu button and selecting &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Windows PowerShell (Admin)&lt;/code&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;1-check-why-the-system-restarted&quot;&gt;1: Check why the system restarted&lt;/h2&gt;
+
+&lt;p&gt;The first thing to do when diagnosing the problem is to use the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;powercfg /lastwake&lt;/code&gt; command to find out what prompted the system to restart.
+If a hardware device was responsible for restarting windows, you should see it here.&lt;/p&gt;
+
+&lt;p&gt;Sometimes, however, things are more nebulous and you get something like:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;❯ powercfg /lastwake
+Wake History Count - 1
+Wake History [0]
+  Wake Source Count - 0
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;In this case, follow the next steps to make double sure that nothing can wake up your pc.&lt;/p&gt;
+
+&lt;h2 id=&quot;2-disable-wake-timers&quot;&gt;2: Disable wake timers&lt;/h2&gt;
+
+&lt;p&gt;This is fairly straightforward and should really be all you need.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Open the Start menu and type &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Edit power plan&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Choose &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Change advanced power settings&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Navigate to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Sleep&lt;/code&gt; -&amp;gt; &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Allow wake timers&lt;/code&gt; and select &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Disable&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Press OK and close&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/poweroptions.png&quot; alt=&quot;Power options dialog, disable windows wake timers&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;In theory&lt;/em&gt;, the above steps should be enough to stop any device from waking up your computer. In practice, you’ll probably have to explicitly disable more stuff:&lt;/p&gt;
+
+&lt;h2 id=&quot;3-disable-any-peripherals-that-can-wake-up-your-computer&quot;&gt;3: Disable any peripherals that can wake up your computer&lt;/h2&gt;
+
+&lt;p&gt;The main peripherals to take into account here are keyboards, mice and network adapters. The network adapter can be set to wake up your computer whenever it receives any data (a very bad idea!) or when it receives a special “wake up” packet.&lt;/p&gt;
+
+&lt;p&gt;You can check which devices can wake up your pc with the command: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;powercfg /devicequery wake_armed&lt;/code&gt;. You’ll see something like:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;❯ powercfg /devicequery wake_armed
+HID-compliant mouse (006)
+HID Keyboard Device (006)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now comes the fun part. Open the Device manager by right-clicking the Windows button and selecting &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Device Manager&lt;/code&gt; and, one by one, open the property pages for the devices listed above. In the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Power management&lt;/code&gt; tab, you’ll find a flag that you want to disable: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Allow this device to wake the computer&lt;/code&gt;. Do so for each device. For your network card, you can optionally set it so that only a “magic packet” can wake up the computer. If you don’t know what a magic packet is, it’s safe to disable it 😅&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/badkeyboard.png&quot; alt=&quot;Power options for a keyboard in Windows device manager&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;4-find-out-if-any-scheduled-tasks-are-waking-up-your-computer&quot;&gt;4: Find out if any scheduled tasks are waking up your computer&lt;/h2&gt;
+
+&lt;p&gt;If the above steps didn’t work, it’s time to bring out the big guns. And by big guns I mean this powershell command: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Get-ScheduledTask | where {$_.settings.waketorun}&lt;/code&gt;. It will list all the scheduled tasks that are allowed to wake up your computer in order to perform some maintenance, or more likely to install updates:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;❯ Get-ScheduledTask | where {$_.settings.waketorun}
+
+TaskPath                                       TaskName                          State
+--------                                       --------                          -----
+\Microsoft\Windows\.NET Framework\             .NET Framework NGEN v4.0.30319... Disabled
+\Microsoft\Windows\.NET Framework\             .NET Framework NGEN v4.0.30319... Disabled
+\Microsoft\Windows\InstallService\             WakeUpAndContinueUpdates          Disabled
+\Microsoft\Windows\InstallService\             WakeUpAndScanForUpdates           Disabled
+\Microsoft\Windows\SharedPC\                   Account Cleanup                   Disabled
+\Microsoft\Windows\UpdateAssistant\            UpdateAssistantWakeupRun          Disabled
+\Microsoft\Windows\UpdateOrchestrator\         Backup Scan                       Ready
+\Microsoft\Windows\UpdateOrchestrator\         Reboot                            Ready
+\Microsoft\Windows\UpdateOrchestrator\         Reboot_AC                         Disabled
+\Microsoft\Windows\UpdateOrchestrator\         Universal Orchestrator Start      Ready
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;In my case, the “Backup Scan” task above was the culprit, so I disabled it. You could disable it by opening the Windows task scheduler, but sometimes the UI won’t allow you to disable one of the “system” scheduled tasks like the ones related to Windows Update. But a simple powershell command can take care of it:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;❯ Disable-ScheduledTask  &quot;\Microsoft\Windows\UpdateOrchestrator\Backup Scan&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Check again with the previous command, and it will be disabled:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;❯ Get-ScheduledTask | where {$_.settings.waketorun}
+
+TaskPath                                       TaskName                          State
+--------                                       --------                          -----
+\Microsoft\Windows\.NET Framework\             .NET Framework NGEN v4.0.30319... Disabled
+\Microsoft\Windows\.NET Framework\             .NET Framework NGEN v4.0.30319... Disabled
+\Microsoft\Windows\InstallService\             WakeUpAndContinueUpdates          Disabled
+\Microsoft\Windows\InstallService\             WakeUpAndScanForUpdates           Disabled
+\Microsoft\Windows\SharedPC\                   Account Cleanup                   Disabled
+\Microsoft\Windows\UpdateAssistant\            UpdateAssistantWakeupRun          Disabled
+\Microsoft\Windows\UpdateOrchestrator\         Backup Scan                       Disabled
+\Microsoft\Windows\UpdateOrchestrator\         Reboot                            Ready
+\Microsoft\Windows\UpdateOrchestrator\         Reboot_AC                         Disabled
+\Microsoft\Windows\UpdateOrchestrator\         Universal Orchestrator Start      Ready
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now hopefully you can set your device to sleep mode and have some well deserved, uninterrupted sleep yourself! 😁&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;small&gt;&lt;em&gt;The feature image above was taken by &lt;a href=&quot;https://unsplash.com/@cbpsc1&quot;&gt;Clint Patterson&lt;/a&gt;&lt;/em&gt;&lt;/small&gt;&lt;/p&gt;
+</description>
+				<pubDate>Sun, 25 Oct 2020 00:00:00 +0000</pubDate>
+				<link>https://codemade.net/blog/windows-restarts-itself-guide/</link>
+				<guid isPermaLink="true">https://codemade.net/blog/windows-restarts-itself-guide/</guid>
+			</item>
+		
+			<item>
+				<title>How to combine Docker and VSCode to reach development nirvana</title>
+				
+                <description>&lt;p&gt;One of the best features in VS Code, and my personal favourite is called &lt;a href=&quot;https://code.visualstudio.com/docs/remote/containers&quot;&gt;Remote Containers&lt;/a&gt;. 
+What it does is open the folder you’re working on &lt;em&gt;inside&lt;/em&gt; a container and then connect to it, so that you can, for example, run your jekyll site on windows without having to install ruby system-wide. Because all the development is done inside the container, you don’t have to worry about having multiple versions of node or python cluttering your machine.&lt;/p&gt;
+
+&lt;p&gt;This is especially useful if your main OS is Windows, as getting set up with some languages is notoriously tougher there.&lt;/p&gt;
+
+&lt;p&gt;Working in a devcontainer has also the advantage that all the settings can be committed into source control, so you can share the exact same development environment with the rest of your team. No more 15-step procedure to follow to set up the local dev environment!&lt;/p&gt;
+
+&lt;p&gt;Getting started is really simple:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Install the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Remote - Containers&lt;/code&gt; extension&lt;/li&gt;
+  &lt;li&gt;Press F1 to open the command palette&lt;/li&gt;
+  &lt;li&gt;Run “Open folder in container” command&lt;/li&gt;
+  &lt;li&gt;Select “From a predefined container definition”&lt;/li&gt;
+  &lt;li&gt;Select the most appropriate container image.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;This will create:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;A &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.devcontainer&lt;/code&gt; folder in your project, containing:&lt;/li&gt;
+  &lt;li&gt;A &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;dockerfile&lt;/code&gt; for the development container&lt;/li&gt;
+  &lt;li&gt;A file named &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;devcontainer.json&lt;/code&gt; that is mostly used to define any ports that should be forwarded to the host&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;You can now open the integrated terminal and type commands directly in your container!&lt;/p&gt;
+
+&lt;h2 id=&quot;an-example-this-website&quot;&gt;An example: this website&lt;/h2&gt;
+
+&lt;p&gt;I love the simplicity that comes with static site generators, and &lt;a href=&quot;https://jekyllrb.com&quot;&gt;jekyll&lt;/a&gt; is by far the most popular choice. Using a development container setup allows me to edit and test any change on all my computers, without having to install ruby, bundler or any of jekyll’s dependencies.&lt;/p&gt;
+
+&lt;p&gt;This is the dockerfile I use for my jekyll devcontainer. It’s a slightly modified version based on the official Microsoft one from some time ago; I had to add a line to install &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;zlib1g-dev&lt;/code&gt; otherwise it wouldn’t work 😅.&lt;/p&gt;
+
+&lt;p&gt;{% gist LBognanni/ed91a3b29089b85a23e67bbdafaa10c2  %}&lt;/p&gt;
+
+&lt;p&gt;Now, when I open the repository in Visual studio code, I just have to run &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;bundle exec jekyll serve&lt;/code&gt; in the integrated terminal to run it. The container exposes port 4000 so I can just open http://localhost:4000 in my browser and preview the changes.
+What’s more, if port 4000 is already used by another program, when clicking on the localhost link in the terminal, VS Code will transparently open the site on a different port!&lt;/p&gt;
+
+&lt;p&gt;Found this useful? Want to add something? &lt;a href=&quot;https://twitter.com/lorisdev&quot;&gt;Reach out on twitter&lt;/a&gt;!&lt;/p&gt;
+</description>
+				<pubDate>Sat, 10 Oct 2020 00:00:00 +0000</pubDate>
+				<link>https://codemade.net/blog/devcontainers/</link>
+				<guid isPermaLink="true">https://codemade.net/blog/devcontainers/</guid>
+			</item>
+		
+	</channel>
+</rss>
