@@ -1,0 +1,9 @@
+<div class="block-buttons">
+  {% for action in actions %}
+    <a href="{{ action.url }}" 
+      {% if action.new_window %}target="_blank" rel="noopener"{% endif %} 
+      class="button{% if action.primary %} button-primary{% endif %}">
+      {{ action.label }}
+    </a>
+  {% endfor %}
+</div>

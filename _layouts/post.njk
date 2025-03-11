@@ -7,23 +7,25 @@ layout: body
 
     <article class="post post-full">
       <header class="post-header">
-        <h1 class="post-title">{{ page.title }}</h1>
+        <h1 class="post-title">{{ title }}</h1>
       </header><!-- .post-header -->
-      {% assign image_is_not_empty = page.image | is_not_empty %}
-      {% if image_is_not_empty %}
+      {% if image | isNotEmpty %}
       <div class="post-thumbnail">
-        <img src="{{ page.image | relative_url }}" alt="{{ page.title }}" />
+        <img src="{{ image | relativeUrl }}" alt="{{ title }}" />
       </div><!-- .post-thumbnail -->
       {% endif %}
-      {% assign subtitle_is_not_empty = page.subtitle | is_not_empty %}
-      {% if subtitle_is_not_empty %}
+      {% if subtitle | isNotEmpty %}
       <div class="post-subtitle">
-        {{ page.subtitle }}
+        {{ subtitle }}
       </div><!-- .post-subtitle -->
       {% endif %}
       <div class="post-content">
-        {{ content }}
+        {{ content | safe }}
       </div><!-- .post-content -->
+      
+      {% set post = page %}
+      {% set date_type = 'long' %}
+      {% include "blog_post_footer.njk" %}
     </article><!-- .post -->
 
   </div><!-- .inner-medium -->

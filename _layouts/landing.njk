@@ -2,20 +2,18 @@
 layout: body
 ---
 
-{% for section in page.sections %}
-  
-  {% assign component = section.type | append: ".html" %}
-  {% include {{ component }} section=section site=site %}
+{% for section in sections %}
+  {% set component = section.type + ".njk" %}
+  {% include component %}
 {% endfor %}
 
-{% assign content = content | strip_newlines %}
-{% if content != "" %}
+{% if content | trim != "" %}
 <div class="outer">
   <div class="inner-medium">
 
     <article class="post post-full">
       <div class="post-content">
-        {{ content }}
+        {{ content | safe }}
       </div><!-- .post-content -->
     </article>
     

@@ -1,0 +1,10 @@
+<footer class="post-meta">
+    Posted on
+    <time class="published" datetime="{{ post.date }}">
+    {% if date_type == 'short' %}
+        {{ post.date | formatDate('short') }}
+    {% else %}
+        {{ post.date | formatDate('long') }}
+    {% endif %}
+    </time>
+</footer>

@@ -3,9 +3,9 @@ layout: base
 ---
 
 <div id="page" class="site palette-{{ site.palette }}">
-  {% include header.html %}
+  {% include "header.njk" %}
   <main id="content" class="site-content">
-    {{ content }}
+    {{ content | safe }}
   </main><!-- .site-content -->
-  {% include footer.html %}
+  {% include "footer.njk" %}
 </div><!-- .site -->

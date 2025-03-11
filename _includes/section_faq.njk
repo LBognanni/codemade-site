@@ -1,20 +1,16 @@
-{% assign section = include.section %}
 <section id="{{ section.section_id }}" class="block faq-block bg-{{ section.background }} outer">
   <div class="inner-small">
     <div class="block-header">
-      {% assign title_is_not_empty = section.title | is_not_empty %}
-      {% if title_is_not_empty %}
+      {% if section.title | isNotEmpty %}
       <h2 class="block-title">{{ section.title }}</h2>
       {% endif %}
-      {% assign subtitle_is_not_empty = section.subtitle | is_not_empty %}
-      {% if subtitle_is_not_empty %}
+      {% if section.subtitle | isNotEmpty %}
       <p class="block-subtitle">
         {{ section.subtitle }}
       </p>
       {% endif %}
     </div><!-- .block-header -->
-    {% assign faq_items_is_not_empty = section.faq_items | is_not_empty %}
-    {% if faq_items_is_not_empty %}
+    {% if section.faq_items | isNotEmpty %}
     <dl class="faq-accordion">
       {% for faqitem in section.faq_items %}
       <dt class="accordion-header">
@@ -25,7 +21,7 @@
       </dt>
       <dd class="accordion-panel">
         <div class="accordion-content">
-          {{ faqitem.answer | markdownify }}
+          {{ faqitem.answer | markdownify | safe }}
         </div>
       </dd>
       {% endfor %}
