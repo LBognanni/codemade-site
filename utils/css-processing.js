@@ -1,4 +1,4 @@
-import sass from 'sass';
+import * as sass from 'sass'
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';

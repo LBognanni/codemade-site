@@ -10,7 +10,7 @@
           </a>
         </p><!-- .site-logo -->
         {% endif %}
-        {% if page.layout == 'landing' or page.layout == 'blog' %}
+        {% if layout == 'landing' or layout == 'blog' %}
         <h1 class="site-title"><a href="{{ '/' | relativeUrl }}">{{ site.header.title }}</a></h1>
         {% else %}
         <p class="site-title"><a href="{{ '/' | relativeUrl }}">{{ site.header.title }}</a></p>
@@ -24,7 +24,7 @@
               class="icon-close" aria-hidden="true"></span></button>
           <ul class="menu">
             {% for action in site.header.nav_links %}
-              {% set pageUrl = page.url | trim('/' ) %}
+              {% set pageUrl = url | trim('/' ) %}
               {% set actionUrl = action.url | trim('/' ) %}
               <li class="menu-item{% if pageUrl == actionUrl %} current-menu-item{% endif %}{% if action.primary | isNotEmpty %} menu-button{% endif %}">
                 <a href="{{ action.url | relativeUrl }}"

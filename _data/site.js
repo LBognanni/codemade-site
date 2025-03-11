@@ -39,7 +39,7 @@ export default {
         url: "/blog"
       }
     ],
-    has_social: true,
+    has_social: false,
     social_title: "Social",
     social_links: [
       {
@@ -56,13 +56,6 @@ export default {
     has_subscribe: false,
     subscribe_title: "Subscribe",
     subscribe_content: "Stay up to date with our latest developments.",
-    content: "Content &copy; Loris Bognanni. All rights reserved. Theme: ",
-    links: [
-      {
-        label: "Azimuth by Stackbit",
-        url: "https://www.stackbit.com",
-        new_window: true
-      }
-    ]
+    content: "Content &copy; [Loris Bognanni](https://loris.codes). All rights reserved. Theme: [Azimuth by Stackbit](https://www.stackbit.com)."
   }
 };

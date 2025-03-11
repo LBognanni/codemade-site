@@ -65,7 +65,7 @@
 
   <div class="site-info outer">
     <div class="inner">
-      {{ site.footer.content | safe }}
+      {{ site.footer.content | markdownify | safe }}
       &nbsp;
       {% for action in site.footer.links %}
         {% include "action-link.njk" %}
