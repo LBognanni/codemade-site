@@ -69,7 +69,7 @@ export default function(eleventyConfig) {
   
   eleventyConfig.addFilter("formatDate", function(dateObj, format) {
     if (format === 'short') {
-      return DateTime.fromJSDate(dateObj).toFormat('LLLL d, yyyy');
+      return dateObj.toString();
     } else {
       return DateTime.fromJSDate(dateObj).toFormat('cccc, LLLL d, yyyy');
     }
