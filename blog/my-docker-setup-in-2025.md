@@ -1,6 +1,7 @@
 ---
 title: How I deploy my web apps in 2025
 author: _data/authors/loris-bognanni.yaml
+keywords: docker, docker swarm, web development, software development, devops, deployment, architecture
 excerpt: >-
   An overview of how I use Docker and Docker Swarm to manage my personal projects in 2025.
 date: '2025-03-15'

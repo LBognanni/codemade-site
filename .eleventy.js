@@ -59,12 +59,17 @@ export default function(eleventyConfig) {
     return url?.startsWith('/') ? url : '/' + url;
   });
   
-  eleventyConfig.addFilter("absoluteUrl", function(url, base) {
-    const baseUrl = base || 'https://codemade.net';
+  eleventyConfig.addFilter("toAbsoluteUrl", function(url) {
+    if(!url)
+      return "";
+
+    const baseUrl = 'https://codemade.net';
     if (url?.startsWith('http')) {
       return url;
     }
-    return baseUrl + (url?.startsWith('/') ? url : '/' + url);
+    
+    const result = baseUrl + (url?.startsWith('/') ? url : '/' + url);
+    return result;
   });
   
   eleventyConfig.addFilter("formatDate", function(dateObj, format) {

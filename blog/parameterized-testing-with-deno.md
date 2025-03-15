@@ -1,5 +1,6 @@
 ---
 title: Running parameterized tests in Deno
+keywords: deno, testing, unit tests, parameterized tests, typescript, javascript, software development, testcase, test case, test runner, test suite, test framework, test function, deno testing, deno test
 author: _data/authors/loris-bognanni.yaml
 excerpt: >-
   A quick guide to running parameterized tests in Deno.

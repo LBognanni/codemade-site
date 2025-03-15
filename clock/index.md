@@ -1,5 +1,6 @@
 ---
 title: Analog and digital clock for Windows 10 and 11 - CodeMade Clock
+image: images/hero-clocks.png
 sections:
   - section_id: features
     type: section_content

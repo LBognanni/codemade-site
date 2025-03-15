@@ -1,5 +1,9 @@
 ---
 title: Home
+image: images/hero.png
+keywords: free software, software development, open source, clock, wayd
+excerpt: >-
+  Free Software and articles on software development
 sections:
   - section_id: hero
     type: section_hero
