@@ -73,6 +73,9 @@ export default function(eleventyConfig) {
   });
   
   eleventyConfig.addFilter("formatDate", function(dateObj, format) {
+    if (!dateObj) {
+      return '';
+    }
     if (format === 'short') {
       return dateObj.toString();
     } else {
