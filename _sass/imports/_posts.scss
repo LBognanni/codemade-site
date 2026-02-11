@@ -107,6 +107,16 @@
     display: block;
     margin: 0;
     position: relative;
+    img {
+      -webkit-transition: transform .3s ease-in-out, background-color .3s ease-in-out;
+      transition: transform .3s ease-in-out, background-color .3s ease-in-out;
+    }
+
+    &:hover img {
+      -webkit-transform: scale(1.2);
+      transform: scale(1.2);
+      background-color: #fff;
+    }
     width: 100%;
 
     &:before {

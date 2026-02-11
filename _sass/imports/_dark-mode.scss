@@ -1,0 +1,342 @@
+/**
+ * Dark Mode
+ * ----------------------------------------------------------------------------
+ * Supports three modes:
+ * - body.light: Forces light mode
+ * - body.dark: Forces dark mode
+ * - No class: Follows system preference (prefers-color-scheme)
+ */
+
+// Light theme (default)
+:root {
+  --color-bg: #{_palette(bg)};
+  --color-bg-alt: #fff;
+  --color-primary: #{_palette(primary)};
+  --color-secondary: #{_palette(secondary)};
+  --color-meta: #{_palette(meta)};
+  --color-border: #{_palette(border)};
+  --color-mark: #fff493;
+  --color-code-bg: #2f2f2f;
+  --color-code-text: #eee;
+  --color-code-selection: #363636;
+  --color-shadow: rgba(#{red(_palette(primary))}, #{green(_palette(primary))}, #{blue(_palette(primary))}, 0.1);
+  --color-shadow-strong: rgba(#{red(_palette(primary))}, #{green(_palette(primary))}, #{blue(_palette(primary))}, 0.15);
+  --color-callout-bg: aliceblue;
+  --color-callout-border: lightblue;
+  --color-secondary-btn: #{_palette(accent)};
+  --color-footer-bg: #{_palette(secondary)};
+  --color-footer-text: #{_palette(meta)};
+  --color-footer-heading: #{_palette(border)};
+  --color-footer-divider: #{_palette(primary)};
+  --color-footer-hover: #{_palette(border)};
+  --color-inline-code: #000;
+  --color-inline-code-bg: #faf5ca;
+
+}
+
+// Dark theme colors
+@mixin dark-theme {
+  --color-bg: #1a1a2e;
+  --color-bg-alt: #16213e;
+  --color-primary: #e0e0e0;
+  --color-secondary: #f0f0f0;
+  --color-meta: #a0a0a0;
+  --color-border: #3a3a5a;
+  --color-mark: #5a4a00;
+  --color-code-bg: #0f0f1a;
+  --color-code-text: #e0e0e0;
+  --color-code-selection: #2a2a4a;
+  --color-shadow: rgba(0, 0, 0, 0.3);
+  --color-shadow-strong: rgba(0, 0, 0, 0.4);
+  --color-callout-bg: #1e2a3a;
+  --color-callout-border: #2a4a6a;
+  --color-secondary-btn: #d0e6ff;
+  --color-footer-bg: #0f0f20;
+  --color-footer-text: #a0a0a0;
+  --color-footer-heading: #c0c0c0;
+  --color-footer-divider: #3a3a5a;
+  --color-footer-hover: #c0c0c0;
+  --color-inline-code: #fff;
+  --color-inline-code-bg: #000;
+}
+
+// Force dark mode with .dark class
+body.dark {
+  @include dark-theme;
+}
+
+// System preference dark mode (when no explicit class)
+@media (prefers-color-scheme: dark) {
+  body:not(.light) {
+    @include dark-theme;
+  }
+}
+
+// Apply CSS variables to elements
+body {
+  background: var(--color-bg);
+  color: var(--color-primary);
+}
+
+a {
+  color: var(--color-primary);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-secondary);
+}
+
+hr {
+  background-color: var(--color-border);
+}
+
+pre {
+  background: var(--color-bg-alt);
+}
+
+blockquote {
+  color: var(--color-secondary);
+
+  small, cite {
+    color: var(--color-meta);
+  }
+}
+
+mark, ins {
+  background: var(--color-mark);
+  color: var(--color-primary);
+}
+
+caption {
+  color: var(--color-meta);
+}
+
+th, td {
+  border-bottom-color: var(--color-border);
+}
+
+th {
+  color: var(--color-secondary);
+}
+
+label {
+  color: var(--color-secondary);
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="tel"],
+input[type="search"],
+input[type="url"],
+select,
+textarea {
+  background: var(--color-bg-alt);
+  border-color: var(--color-border);
+  color: var(--color-primary);
+}
+
+.button.secondary {
+  color: var(--color-secondary-btn);
+}
+
+.button.white {
+  background: var(--color-bg-alt);
+  color: var(--color-primary);
+  box-shadow: 0 20px 30px 0 var(--color-shadow);
+}
+
+// Logo inversion for dark mode (header only)
+body.dark .site-header .site-logo img {
+  filter: invert(1);
+}
+
+@media (prefers-color-scheme: dark) {
+  body:not(.light) .site-header .site-logo img {
+    filter: invert(1);
+  }
+}
+
+// Header
+.site-header {
+  background: var(--color-bg-alt);
+  color: var(--color-secondary);
+}
+
+.site-title {
+  color: var(--color-secondary);
+}
+
+.site-navigation {
+  .menu-item.current-menu-item {
+    color: var(--color-meta);
+  }
+
+  a:not(.button):hover,
+  a:not(.button):focus {
+    color: var(--color-meta);
+  }
+}
+
+@supports (position: sticky) or (position: -webkit-sticky) {
+  @media only screen and (min-width: 801px) {
+    .site-header {
+      background: var(--color-bg-alt);
+    }
+
+    .has--scrolled .site-header {
+      box-shadow: 0 1px 4px 0 var(--color-shadow);
+    }
+  }
+}
+
+@media only screen and (max-width: 800px) {
+  .site-navigation {
+    background: var(--color-bg-alt);
+
+    .menu-item:not(.menu-button) {
+      border-bottom-color: var(--color-border);
+    }
+
+    .menu-item:not(.menu-button):first-child {
+      border-top-color: var(--color-border);
+    }
+  }
+}
+
+// Footer
+#colophon {
+  background: var(--color-footer-bg);
+  color: var(--color-footer-text);
+
+  a:hover,
+  a:focus {
+    color: var(--color-footer-hover);
+  }
+}
+
+.widget-title {
+  color: var(--color-footer-heading);
+}
+
+.site-info {
+  border-top-color: var(--color-footer-divider);
+}
+
+// Posts
+.post-subtitle {
+  border-bottom-color: var(--color-border);
+}
+
+.post-meta {
+  color: var(--color-meta);
+}
+
+.post-feed {
+  .post-card-inside {
+    background: var(--color-bg-alt);
+    border-color: var(--color-border);
+    box-shadow: 0 3px 10px 0 var(--color-shadow);
+  }
+}
+
+.pagination .page-number {
+  color: var(--color-meta);
+}
+
+// Sections
+.review-inside {
+  background: var(--color-bg-alt);
+  border-color: var(--color-border);
+  box-shadow: 0 3px 10px 0 var(--color-shadow);
+}
+
+.review-footer .review-author {
+  color: var(--color-secondary);
+}
+
+.plan-inside {
+  background: var(--color-bg-alt);
+  border-color: var(--color-border);
+  box-shadow: 0 3px 10px 0 var(--color-shadow);
+}
+
+.plan-name {
+  color: var(--color-primary);
+}
+
+.plan-price {
+  color: var(--color-secondary);
+}
+
+.accordion-header {
+  background: var(--color-bg-alt);
+  box-shadow: 0 3px 10px 0 var(--color-shadow);
+
+  .accordion-trigger {
+    border-color: var(--color-border);
+    color: var(--color-secondary);
+  }
+}
+
+.accordion-panel.-ba-is-active {
+  box-shadow: 0 3px 10px 0 var(--color-shadow);
+}
+
+.accordion-content {
+  background: var(--color-bg-alt);
+  border-color: var(--color-border);
+  color: var(--color-primary);
+}
+
+.block {
+  &.bg-white {
+    background: var(--color-bg-alt);
+
+    .post-card-inside,
+    .review-inside,
+    .plan-inside {
+      box-shadow: 0 3px 10px 0 var(--color-shadow-strong);
+    }
+  }
+}
+
+.contact-block:only-child .block-subtitle {
+  border-bottom-color: var(--color-border);
+}
+
+// Code blocks
+code[class*="language-"],
+pre[class*="language-"] {
+  color: var(--color-code-text);
+  background: var(--color-code-bg);
+}
+
+code[class*="language-"]::-moz-selection,
+pre[class*="language-"]::-moz-selection,
+code[class*="language-"] ::-moz-selection,
+pre[class*="language-"] ::-moz-selection {
+  background: var(--color-code-selection);
+}
+
+code[class*="language-"]::selection,
+pre[class*="language-"]::selection,
+code[class*="language-"] ::selection,
+pre[class*="language-"] ::selection {
+  background: var(--color-code-selection);
+}
+
+// Callout
+.callout {
+  border-color: var(--color-callout-border);
+  background-color: var(--color-callout-bg);
+}
+
+
+
+p > code {
+  background: var(--color-inline-code-bg);
+  color: var(--color-inline-code);
+  padding: 2px .5ex;
+  font-size: 0.9em;
+}

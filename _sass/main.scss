@@ -33,11 +33,12 @@ $palette: (
 @import "imports/palettes";
 @import "imports/banner";
 @import "imports/code";
+@import "imports/dark-mode";
+@import "imports/switch";
 
 
 .callout {
   border: 1px solid lightblue;
-  background-color: aliceblue;
   padding: 1rex;
   margin-bottom: 2rem;
   font-size: 105%;

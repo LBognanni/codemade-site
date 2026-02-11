@@ -34,13 +34,41 @@
         <meta  name="twitter:url" content= "{{ page.url | toAbsoluteUrl }}" />
         
         
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var darkMode = localStorage.getItem("dark-mode");
+        if (darkMode === null) {
+            darkMode = window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "true"
+            : "false";
+        }
+        if (darkMode === "true") {
+            document.getElementsByTagName("body")[0].className = "dark";
+            document.querySelector("input.theme-switch").checked = true;
+        } else {
+            document.getElementsByTagName("body")[0].className = "light";
+            document.querySelector("input.theme-switch").checked = false;
+        }
+
+        document
+        .querySelector("input.theme-switch")
+        .addEventListener("change", function (event) {
+            var input = event.target;
+            if (input.checked) {
+            document.getElementsByTagName("body")[0].className = "dark";
+            localStorage.setItem("dark-mode", "true");
+            } else {
+            document.getElementsByTagName("body")[0].className = "light";
+            localStorage.setItem("dark-mode", "false");
+            }
+        });
+    });
+
+</script>
     </head>
     <body>
         {{ content | safe }}
         <!-- Scripts -->
-        <script src="{{ '/js/plugins.js' | relativeUrl }}"></script>
-        <script src="{{ '/js/init.js' | relativeUrl }}"></script>
-        <script src="{{ '/js/main.js' | relativeUrl }}"></script>
         <script>
         window.cmParams = { tenant: "codemade" };
         </script>

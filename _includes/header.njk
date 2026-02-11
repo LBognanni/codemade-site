@@ -23,6 +23,13 @@
           <button id="menu-close" class="menu-toggle"><span class="screen-reader-text">Open Menu</span><span
               class="icon-close" aria-hidden="true"></span></button>
           <ul class="menu">
+            <li class="menu-item">
+              <input
+                class="theme-switch"
+                type="checkbox"
+                role="switch"
+              />
+            </li>
             {% for action in site.header.nav_links %}
               {% set pageUrl = url | trim('/' ) %}
               {% set actionUrl = action.url | trim('/' ) %}
