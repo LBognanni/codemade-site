@@ -22,7 +22,7 @@ sections:
       * 🍺 Free and [💝 open source](https://github.com/LBognanni/CodeMadeClock/)
 
     actions:
-      - label: 🔽 Download now
+      - label: 🔽 Download now (for Windows)
         primary: true
         url: https://github.com/LBognanni/CodeMadeClock/releases/latest/download/clock-setup.exe
       - label: 🌚 Midnight Express

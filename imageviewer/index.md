@@ -23,6 +23,6 @@ sections:
          
         Best of all, ImageViewer is 🤑 free and [❤ open source](https://github.com/LBognanni/ImageViewer/)
     actions:
-      - label: 🔽 Download now
+      - label: 🔽 Download now (for Windows)
         url: https://github.com/LBognanni/ImageViewer/releases/latest/download/ImageViewer_Setup.exe
 ---
