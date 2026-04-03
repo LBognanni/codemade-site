@@ -1,4 +1,7 @@
 <footer>
-  <span>© CodeMade — Loris Bognanni</span>
-  <span class="mono">~ built with care</span>
+  <span class="site-logo">
+    <a href="{{ '/' | relativeUrl }}"><img src="{{ site.footer.logo_img | relativeUrl }}" alt="Logo" /></a>
+  </span>
+  <span>{{ site.footer.content | markdownify | safe }}</span>
+  <span class="mono">~ {{ site.footer.tagline }}</span>
 </footer>

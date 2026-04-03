@@ -19,7 +19,7 @@ sections:
   - section_id: software
     type: section_features
     background: gray
-    title: Free Software
+    title: Things I built
     subtitle: >-
       A selection of free software I developed during the years
     features:
@@ -54,6 +54,6 @@ sections:
   - section_id: recent-posts
     type: section_posts
     background: white
-    title: Latest Posts
+    title: Things I wrote
 layout: landing
 ---
