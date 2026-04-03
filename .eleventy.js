@@ -78,7 +78,7 @@ export default function(eleventyConfig) {
       return '';
     }
     if (format === 'short') {
-      return dateObj.toString();
+      return DateTime.fromJSDate(dateObj).toFormat('LLLL d, yyyy');
     } else {
       return DateTime.fromJSDate(dateObj).toFormat('cccc, LLLL d, yyyy');
     }
