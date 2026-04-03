@@ -1,0 +1,35 @@
+/* Hero / inline buttons */
+.btn {
+  font-family: var(--font-body); font-weight: 500; font-size: 0.88rem;
+  padding: 0.65rem 1.3rem; border-radius: 10px; border: none; cursor: pointer;
+  transition: all 0.25s ease; display: inline-flex; align-items: center; gap: 0.35rem;
+}
+.btn-warm { background: var(--accent); color: var(--bg); }
+.btn-warm:hover {
+  box-shadow: 0 0 30px var(--accent-glow), 0 6px 16px rgba(0,0,0,0.4);
+  transform: translateY(-2px);
+}
+.btn-dim { background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border); }
+.btn-dim:hover { border-color: var(--border-bright); color: var(--text); transform: translateY(-2px); }
+
+/* Product section CTA buttons */
+.block-buttons {
+  display: flex; gap: 0.65rem; flex-wrap: wrap; margin-top: 1.5rem;
+}
+.button {
+  font-family: var(--font-body); font-weight: 500; font-size: 0.88rem;
+  padding: 0.65rem 1.3rem; border-radius: 10px; border: none; cursor: pointer;
+  transition: all 0.25s ease; display: inline-flex; align-items: center; gap: 0.35rem;
+  text-decoration: none; line-height: 1;
+}
+.button.primary { background: var(--accent); color: var(--bg); }
+.button.primary:hover {
+  box-shadow: 0 0 30px var(--accent-glow), 0 6px 16px rgba(0,0,0,0.4);
+  transform: translateY(-2px);
+}
+.button.secondary {
+  background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border);
+}
+.button.secondary:hover {
+  border-color: var(--border-bright); color: var(--text); transform: translateY(-2px);
+}
