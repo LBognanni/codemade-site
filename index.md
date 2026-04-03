@@ -28,33 +28,6 @@ sections:
         actions:
           - label: Learn More
             url: /clock
-      - title: CodeMade Image Viewer
-        icon: 🖼️
-        image: images/hero-imageviewer.png
-        tags: [windows]
-        content: >-
-          A fast and private image viewer.
-        actions:
-          - label: Learn More
-            url: /imageviewer
-      - title: Roundabout
-        icon: 🔀
-        image: /images/hero-roundabout.png
-        tags: [windows]
-        content: >-
-          An easy to use browser selector
-        actions:
-          - label: Learn More
-            url: /roundabout
-      - title: WAYD
-        icon: 📊
-        image: images/hero-wayd.png
-        tags: [windows]
-        content: >-
-          Understand how you spend your time when at the computer. Perfect for freelancers!
-        actions:
-          - label: Learn More
-            url: https://www.gljakal.com/wayd
       - title: FastTab
         icon: ⚡
         image: images/fasttab-hero.jpg
@@ -73,6 +46,15 @@ sections:
         actions:
           - label: Learn More
             url: https://email-webhook.com
+      - title: WAYD
+        icon: 📊
+        image: images/hero-wayd.png
+        tags: [windows]
+        content: >-
+          Understand how you spend your time when at the computer. Perfect for freelancers!
+        actions:
+          - label: Learn More
+            url: https://www.gljakal.com/wayd
       - title: hnws.app
         icon: 📰
         tags: [web]
@@ -91,6 +73,24 @@ sections:
         actions:
           - label: Open
             url: https://github.com/LBognanni/localzei
+      - title: CodeMade Image Viewer
+        icon: 🖼️
+        image: images/hero-imageviewer.png
+        tags: [windows]
+        content: >-
+          A fast and private image viewer.
+        actions:
+          - label: Learn More
+            url: /imageviewer
+      - title: Roundabout
+        icon: 🔀
+        image: /images/hero-roundabout.png
+        tags: [windows]
+        content: >-
+          An easy to use browser selector
+        actions:
+          - label: Learn More
+            url: /roundabout
   - section_id: recent-posts
     type: section_posts
     background: white

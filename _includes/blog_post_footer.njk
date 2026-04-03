@@ -1,5 +1,5 @@
-<footer class="post-meta">
-    Posted on
+<div class="post-meta">
+    Loris Bognanni &middot;
     <time class="published" datetime="{{ post.date }}">
     {% if date_type == 'short' %}
         {{ post.date | formatDate('short') }}
@@ -7,4 +7,4 @@
         {{ post.date | formatDate('long') }}
     {% endif %}
     </time>
-</footer>
+</div>

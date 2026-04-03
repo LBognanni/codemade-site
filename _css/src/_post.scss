@@ -1,72 +1,135 @@
 .post-page {
-  max-width: 720px; margin: 0 auto; padding: 3rem 2rem 5rem;
-  position: relative; z-index: 10;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 3rem 2rem 5rem;
+  position: relative;
+  z-index: 10;
 }
-.post-page-header { margin-bottom: 2.5rem; }
+.post-page-header {
+  margin-bottom: 2.5rem;
+}
 .post-page-thumb {
-  border-radius: var(--radius); overflow: hidden;
-  margin-bottom: 2rem; border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 2rem;
+  border: 1px solid var(--border);
 }
-.post-page-thumb img { width: 100%; height: 320px; object-fit: cover; display: block; }
+.post-page-thumb img {
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+  display: block;
+}
 .post-meta {
-  font-family: var(--font-mono); font-size: 0.72rem;
-  color: var(--accent); margin-bottom: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--accent);
+  margin-bottom: 1rem;
 }
 .post-page-title {
   font-size: clamp(1.8rem, 4vw, 2.5rem);
-  font-weight: 700; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 0.75rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-bottom: 0.75rem;
 }
 .post-page-subtitle {
-  font-size: 1.05rem; color: var(--text-muted); font-weight: 300;
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  font-weight: 300;
 }
 
-.post-page-content { color: var(--text); }
+.post-page-content {
+  color: var(--text);
+}
 .post-page-content h2 {
-  font-size: 1.45rem; font-weight: 600; letter-spacing: -0.03em; margin: 2.5rem 0 1rem;
+  font-size: 1.45rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  margin: 2.5rem 0 1rem;
 }
 .post-page-content h3 {
-  font-size: 1.2rem; font-weight: 600; letter-spacing: -0.02em; margin: 2rem 0 0.75rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 2rem 0 0.75rem;
 }
 .post-page-content h4 {
-  font-size: 1rem; font-weight: 600; margin: 1.5rem 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.5rem;
 }
 .post-page-content p {
-  font-size: 0.97rem; line-height: 1.8; margin-bottom: 1.25rem; color: var(--text-muted);
+  font-size: 0.97rem;
+  line-height: 1.8;
+  margin-bottom: 1.25rem;
+  color: var(--text-muted);
 }
 .post-page-content a {
-  color: var(--accent); text-decoration: underline;
-  text-decoration-color: rgba(245, 158, 66, 0.4); text-underline-offset: 3px;
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: rgba(245, 158, 66, 0.4);
+  text-underline-offset: 3px;
 }
-.post-page-content a:hover { text-decoration-color: var(--accent); }
+.post-page-content a:hover {
+  text-decoration-color: var(--accent);
+}
 .post-page-content ul,
-.post-page-content ol { padding-left: 1.5rem; margin-bottom: 1.25rem; }
+.post-page-content ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1.25rem;
+}
 .post-page-content li {
-  font-size: 0.97rem; line-height: 1.75; color: var(--text-muted); margin-bottom: 0.25rem;
+  font-size: 0.97rem;
+  line-height: 1.75;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
 }
 .post-page-content blockquote {
   border-left: 3px solid var(--accent);
-  padding: 0.75rem 1.25rem; margin: 1.5rem 0;
-  background: var(--bg-card); border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 0.75rem 1.25rem;
+  margin: 1.5rem 0;
+  background: var(--bg-card);
+  border-radius: 0 var(--radius) var(--radius) 0;
 }
-.post-page-content blockquote p { margin-bottom: 0; }
+.post-page-content blockquote p {
+  margin-bottom: 0;
+}
 .post-page-content pre {
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: 12px; padding: 1.25rem 1.5rem;
-  overflow-x: auto; margin: 1.5rem 0;
-  font-family: var(--font-mono); font-size: 0.82rem; line-height: 1.6;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.6;
 }
 .post-page-content code {
-  font-family: var(--font-mono); font-size: 0.82rem;
-  background: var(--bg-card); border: 1px solid var(--border);
-  padding: 0.15rem 0.4rem; border-radius: 5px; color: var(--accent-mint);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 0.15rem 0.4rem;
+  border-radius: 5px;
+  color: var(--accent-mint);
 }
 .post-page-content pre code {
-  background: none; border: none; padding: 0; color: var(--text);
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text);
 }
 .post-page-content img {
-  max-width: 100%; border-radius: var(--radius);
-  border: 1px solid var(--border); margin: 1rem 0; display: block;
+  max-width: 100%;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin: 1rem 0;
+  display: block;
 }
 .post-page-content hr {
-  border: none; border-top: 1px solid var(--border); margin: 2.5rem 0;
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2.5rem 0;
 }
