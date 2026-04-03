@@ -7,8 +7,8 @@
   {% if section.title | isNotEmpty %}
   <h1>{{ section.title | safe }}</h1>
   {% endif %}
-  {% if section.content | isNotEmpty %}
-  <p>{{ section.content }}</p>
+  {% if (section.content or site.tagline) | isNotEmpty %}
+    {{ section.content or (site.tagline | markdownify | safe) }}
   {% endif %}
   {% if section.actions | isNotEmpty %}
   <div class="hero-ctas">

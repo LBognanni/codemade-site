@@ -3,12 +3,26 @@
   <div class="section-label">{{ section.title }}</div>
   {% endif %}
   {% if section.features | isNotEmpty %}
+  {% set allTags = [] %}
+  {% for feature in section.features %}
+    {% for tag in feature.tags %}
+      {% if tag not in allTags %}{% set allTags = allTags.concat([tag]) %}{% endif %}
+    {% endfor %}
+  {% endfor %}
+  {% if allTags.length > 0 %}
+  <div class="filter-bar">
+    <span class="filter-tag active" data-filter="all">All</span>
+    {% for tag in allTags %}
+    <span class="filter-tag" data-filter="{{ tag }}">{{ tag | capitalize }}</span>
+    {% endfor %}
+  </div>
+  {% endif %}
   <div class="sw-grid">
     {% for feature in section.features %}
     {% if feature.actions | isNotEmpty %}
-    <a href="{{ feature.actions[0].url | relativeUrl }}" class="sw-card">
+    <a href="{{ feature.actions[0].url | relativeUrl }}" class="sw-card" data-tags="{{ feature.tags | join(',') }}">
     {% else %}
-    <div class="sw-card">
+    <div class="sw-card" data-tags="{{ feature.tags | join(',') }}">
     {% endif %}
       {% if feature.image | isNotEmpty %}
       <div class="sw-img">

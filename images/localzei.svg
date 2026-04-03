@@ -1,0 +1,8 @@
+<svg width="64" height="100" viewBox="0 0 64 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g stroke="white" stroke-opacity="0.8">
+    <rect x="4" y="4" width="56" height="92" rx="12" stroke="var(--text-dim)" stroke-width="1.5" fill="none" />
+    <rect x="20" y="8" width="24" height="4" rx="2" fill="var(--border)" /><text x="32" y="56" text-anchor="middle"
+      font-family="Sora, sans-serif" font-size="9" font-weight="600" fill="var(--color2)">LZ</text>
+    <circle cx="32" cy="88" r="4" stroke="var(--text-dim)" stroke-width="1" fill="none" />
+  </g>
+</svg>

@@ -9,12 +9,12 @@
         <link rel="alternate" type="application/atom+xml" href="/atom.xml">
         <link rel="icon" href="/favicon.png" />
 
-        <meta name="description" content="{{ (subtitle or excerpt) }}" />
+        <meta name="description" content="{{ subtitle or excerpt or site.tagline }}" />
         <meta name="keywords" content="{{ keywords }}" />
         <meta name="author" content="Loris Bognanni" />
 
         <meta property="og:title" content="{{ title }}" />
-        <meta property="og:description" content="{{ (subtitle or excerpt) }}" />
+        <meta property="og:description" content="{{ subtitle or excerpt or site.tagline }}" />
         <meta property="og:image" content="{{ image | toAbsoluteUrl }}" />
         <meta property="og:url" content="{{ page.url | toAbsoluteUrl }}" />
         <meta property="og:type" content="website" />
@@ -27,7 +27,7 @@
         <meta name="twitter:site" content="codemade.net" />
         <meta name="twitter:creator" content="@lorisdev" />
         <meta name="twitter:title" content="{{ title }}" />
-        <meta name="twitter:description" content="{{ subtitle or excerpt }}" />
+        <meta name="twitter:description" content="{{ subtitle or excerpt or site.tagline }}" />
         <meta name="twitter:image" content="{{ image | toAbsoluteUrl }}" />
         <meta name="twitter:url" content="{{ page.url | toAbsoluteUrl }}" />
     </head>

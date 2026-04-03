@@ -3,15 +3,12 @@ export default {
   url: "https://codemade.net",
   baseurl: "",
   palette: "blue",
+  tagline: "Software that is free, open, and personal. Made for [me](https://loris.codes), but shared with you.",
   header: {
     title: "CodeMade",
     logo_img: "images/logo-blur.svg",
     has_nav: true,
     nav_links: [
-      {
-        label: "Home",
-        url: "/"
-      },
       {
         label: "Clock",
         url: "/clock"

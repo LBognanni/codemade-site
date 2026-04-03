@@ -25,6 +25,11 @@ layout: base
     tag.addEventListener('click', () => {
       document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
       tag.classList.add('active');
+      const filter = tag.dataset.filter;
+      document.querySelectorAll('.sw-card').forEach(card => {
+        const tags = (card.dataset.tags || '').split(',');
+        card.style.display = (filter === 'all' || tags.includes(filter)) ? '' : 'none';
+      });
     });
   });
 </script>
