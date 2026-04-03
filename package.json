@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "npx @11ty/eleventy",
+    "build": "NODE_ENV=production npx @11ty/eleventy",
     "start": "npx @11ty/eleventy --serve",
     "debug": "DEBUG=* npx @11ty/eleventy",
     "clean": "rm -rf _site"

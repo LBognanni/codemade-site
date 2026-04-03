@@ -11,7 +11,7 @@ export default function processCss() {
   const outputFile = path.join(__dirname, '../_css/style.css');
 
   const result = sass.compile(inputFile, {
-    style: 'compressed',
+    style: process.env.NODE_ENV === 'production' ? 'compressed' : 'expanded',
     silenceDeprecations: ['import'],
     quietDeps: true,
   });

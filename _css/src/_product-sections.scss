@@ -1,50 +1,105 @@
 /* Structural containers used by product page section templates */
 .outer {
   padding: 4rem 2rem;
-  position: relative; z-index: 10;
+  position: relative;
+  z-index: 10;
 }
-.inner        { max-width: 1120px; margin: 0 auto; }
-.inner-medium { max-width: 750px;  margin: 0 auto; }
-.inner-small  { max-width: 580px;  margin: 0 auto; }
+.inner {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+.inner-medium {
+  max-width: 750px;
+  margin: 0 auto;
+}
+.inner-small {
+  max-width: 580px;
+  margin: 0 auto;
+}
 
 /* Subtle alternating backgrounds */
-.block.bg-gray  { background: var(--bg-elevated); }
-.block.bg-white { background: var(--bg-card); }
+.block.bg-gray {
+  background: var(--bg-elevated);
+}
+.block.bg-white {
+  background: var(--bg-card);
+}
 
 /* Section header */
-.block-header { text-align: center; margin-bottom: 2.5rem; }
+.block-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
 .block-title {
   font-size: clamp(1.4rem, 3vw, 2rem);
-  font-weight: 700; letter-spacing: -0.03em; margin-bottom: 0.5rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.5rem;
 }
-.block-subtitle { color: var(--text-muted); font-size: 1rem; font-weight: 300; }
+.block-subtitle {
+  color: var(--text-muted);
+  font-size: 1rem;
+  font-weight: 300;
+}
 
 /* Two-column content layout — stacked on mobile, side-by-side on desktop */
 .text-block .grid,
 .hero-block .grid {
-  display: flex; flex-direction: column; gap: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
 }
 .block-preview img {
-  width: 100%; border-radius: var(--radius); border: 1px solid var(--border); display: block;
+  width: 100%;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  display: block;
+  background-color: white;
 }
 .block-copy {
-  color: var(--text-muted); font-size: 0.95rem; line-height: 1.8;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.8;
 }
-.block-copy p          { margin-bottom: 1rem; }
+.block-copy p {
+  margin-bottom: 1rem;
+}
 .block-copy ul,
-.block-copy ol         { padding-left: 1.5rem; margin-bottom: 1rem; }
-.block-copy li         { margin-bottom: 0.35rem; }
-.block-copy strong     { color: var(--text); font-weight: 600; }
-.block-copy a          { color: var(--accent); text-decoration: underline; text-decoration-color: rgba(245,158,66,0.4); }
-.block-copy a:hover    { text-decoration-color: var(--accent); }
+.block-copy ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+.block-copy li {
+  margin-bottom: 0.35rem;
+}
+.block-copy strong {
+  color: var(--text);
+  font-weight: 600;
+}
+.block-copy a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: rgba(245, 158, 66, 0.4);
+}
+.block-copy a:hover {
+  text-decoration-color: var(--accent);
+}
 
 @media (min-width: 801px) {
   .text-block .grid,
   .hero-block .grid {
-    flex-direction: row-reverse; align-items: center; gap: 5rem;
+    flex-direction: row-reverse;
+    align-items: center;
+    gap: 5rem;
   }
-  .block-preview { flex: 7; min-width: 0; }
-  .block-content { flex: 5; min-width: 0; }
+  .block-preview {
+    flex: 7;
+    min-width: 0;
+  }
+  .block-content {
+    flex: 5;
+    min-width: 0;
+  }
 }
 
 /* Gallery */
@@ -54,46 +109,87 @@
   gap: 1rem;
 }
 .post-card-inside {
-  border-radius: var(--radius); overflow: hidden;
-  background: var(--bg-img); border: 1px solid var(--border);
-  transition: border-color 0.25s, transform 0.25s;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--bg-img);
+  border: 1px solid var(--border);
+  transition:
+    border-color 0.25s,
+    transform 0.25s;
 }
 .post-card:hover .post-card-inside {
-  border-color: var(--border-bright); transform: translateY(-3px);
+  border-color: var(--border-bright);
+  transform: translateY(-3px);
 }
 .post-card-thumbnail {
-  display: block; aspect-ratio: 1 / 1; overflow: hidden;
+  display: block;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
 }
 .post-card-thumbnail img {
-  width: 100%; height: 100%; object-fit: contain;
-  padding: 1rem; transition: transform 0.3s ease;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 1rem;
+  transition: transform 0.3s ease;
 }
-.post-card-thumbnail:hover img { transform: scale(1.06); }
+.post-card-thumbnail:hover img {
+  transform: scale(1.06);
+}
 
 /* FAQ */
 details.faq-item {
-  border: 1px solid var(--border); border-radius: 12px;
-  margin-bottom: 0.65rem; overflow: hidden; transition: border-color 0.2s;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 0.65rem;
+  overflow: hidden;
+  transition: border-color 0.2s;
 }
-details.faq-item[open] { border-color: var(--border-bright); }
+details.faq-item[open] {
+  border-color: var(--border-bright);
+}
 details.faq-item summary {
-  list-style: none; cursor: pointer;
+  list-style: none;
+  cursor: pointer;
   padding: 1rem 1.25rem;
-  font-weight: 500; font-size: 0.95rem;
-  display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+  font-weight: 500;
+  font-size: 0.95rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
   user-select: none;
 }
-details.faq-item summary::-webkit-details-marker { display: none; }
-details.faq-item summary::after {
-  content: '+'; font-family: var(--font-mono); font-size: 1.1rem;
-  color: var(--accent); flex-shrink: 0; transition: transform 0.2s;
+details.faq-item summary::-webkit-details-marker {
+  display: none;
 }
-details.faq-item[open] summary::after { transform: rotate(45deg); }
+details.faq-item summary::after {
+  content: "+";
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  color: var(--accent);
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+details.faq-item[open] summary::after {
+  transform: rotate(45deg);
+}
 .faq-answer {
   padding: 0 1.25rem 1.25rem;
-  font-size: 0.88rem; color: var(--text-muted); line-height: 1.7;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.7;
 }
-.faq-answer p              { margin-bottom: 0.75rem; }
-.faq-answer p:last-child   { margin-bottom: 0; }
-.faq-answer a              { color: var(--accent); text-decoration: underline; }
-.faq-answer .button        { margin-top: 0.5rem; }
+.faq-answer p {
+  margin-bottom: 0.75rem;
+}
+.faq-answer p:last-child {
+  margin-bottom: 0;
+}
+.faq-answer a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+.faq-answer .button {
+  margin-top: 0.5rem;
+}
