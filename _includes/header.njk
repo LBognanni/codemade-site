@@ -1,51 +1,15 @@
-<header id="masthead" class="site-header outer">
-  <div class="inner">
-    <div class="site-header-inside">
-
-      <div class="site-branding">
-        {% if site.header.logo_img | isNotEmpty %}
-        <p class="site-logo">
-          <a href="{{ '/' | relativeUrl }}">
-            <img src="{{ site.header.logo_img | relativeUrl }}" alt="Logo" />
-          </a>
-        </p><!-- .site-logo -->
-        {% endif %}
-        {% if layout == 'landing' or layout == 'blog' %}
-        <h1 class="site-title"><a href="{{ '/' | relativeUrl }}">{{ site.header.title }}</a></h1>
-        {% else %}
-        <p class="site-title"><a href="{{ '/' | relativeUrl }}">{{ site.header.title }}</a></p>
-        {% endif %}
-      </div><!-- .site-branding -->
-
-      {% if site.header.nav_links and site.header.has_nav %}
-      <nav id="main-navigation" class="site-navigation" aria-label="Main Navigation">
-        <div class="site-nav-inside">
-          <button id="menu-close" class="menu-toggle"><span class="screen-reader-text">Open Menu</span><span
-              class="icon-close" aria-hidden="true"></span></button>
-          <ul class="menu">
-            <li class="menu-item">
-              <input
-                class="theme-switch"
-                type="checkbox"
-                role="switch"
-              />
-            </li>
-            {% for action in site.header.nav_links %}
-              {% set pageUrl = url | trim('/' ) %}
-              {% set actionUrl = action.url | trim('/' ) %}
-              <li class="menu-item{% if pageUrl == actionUrl %} current-menu-item{% endif %}{% if action.primary | isNotEmpty %} menu-button{% endif %}">
-                <a href="{{ action.url | relativeUrl }}"
-                   {% if action.new_window | isNotEmpty %}target="_blank" rel="noopener"{% endif %}
-                   {% if action.primary | isNotEmpty %}class="button"{% endif %}>{{ action.label }}</a>
-              </li>
-            {% endfor %}
-          </ul><!-- .menu -->
-        </div><!-- .site-nav-inside -->
-      </nav><!-- .site-navigation -->
-      <button id="menu-open" class="menu-toggle"><span class="screen-reader-text">Close Menu</span><span class="icon-menu"
-          aria-hidden="true"></span></button>
-      {% endif %}
-
-    </div><!-- .site-header-inside -->
-  </div><!-- .inner -->
-</header><!-- .site-header -->
+<nav>
+  <a href="{{ '/' | relativeUrl }}" class="logo">
+    <img src="/images/logo-blur-white.svg" />
+  </a>
+  {% if site.header.nav_links and site.header.has_nav %}
+  <ul>
+    {% for action in site.header.nav_links %}
+    <li>
+      <a href="{{ action.url | relativeUrl }}"
+        {% if action.new_window | isNotEmpty %}target="_blank" rel="noopener"{% endif %}>{{ action.label }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</nav>

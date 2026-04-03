@@ -33,6 +33,7 @@ export default function(eleventyConfig) {
   eleventyConfig.addPassthroughCopy("images");
   eleventyConfig.addPassthroughCopy("assets/js");
   eleventyConfig.addPassthroughCopy("assets/css/*.css");
+  eleventyConfig.addPassthroughCopy("css");
   eleventyConfig.addPassthroughCopy("{,!(_site)!(_site2)/**/}*.png");
   eleventyConfig.addPassthroughCopy("*.png");
   eleventyConfig.addPassthroughCopy("*.jpg");

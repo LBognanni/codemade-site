@@ -1,41 +1,41 @@
-<section id="{{ section.section_id }}" class="block features-block bg-{{ section.background }} outer">
-  <div class="block-header inner-small">
-    {% if section.title | isNotEmpty %}
-    <h2 class="block-title">{{ section.title }}</h2>
-    {% endif %}
-    {% if section.subtitle | isNotEmpty %}
-    <p class="block-subtitle">
-      {{ section.subtitle }}
-    </p>
-    {% endif %}
-  </div><!-- .block-header -->
-  {% if section.features | isNotEmpty %}
-  <div class="inner">
-    {% for feature in section.features %}
-    <div class="block-item">
-      <div class="grid">
-        {% if feature.image | isNotEmpty %}
-        <div class="cell block-preview">
-          <img src="{{ feature.image | relativeUrl }}" alt="{{ feature.title }}" />
-        </div><!-- .block-preview -->
-        {% endif %}
-        <div class="cell block-content">
-          <h3 class="block-title underline">{{ feature.title }}</h3>
-          <div class="block-copy">
-            {{ feature.content | markdownify | safe }}
-          </div>
-          {% if feature.actions | isNotEmpty %}
-            <p class="block-buttons">
-              {% if feature.actions | isNotEmpty %}
-                {% set actions = feature.actions %}
-                {% include "cta_buttons.njk" %}
-              {% endif %}
-            </p>
-          {% endif %}
-        </div><!-- .block-content -->
-      </div><!-- .grid -->
-    </div><!-- .block-item -->
-    {% endfor %}
-    </div><!-- .inner -->
+<section id="{{ section.section_id }}" class="software">
+  {% if section.title | isNotEmpty %}
+  <div class="section-label">{{ section.title }}</div>
   {% endif %}
-</section><!-- .block -->
+  {% if section.features | isNotEmpty %}
+  <div class="sw-grid">
+    {% for feature in section.features %}
+    {% if feature.actions | isNotEmpty %}
+    <a href="{{ feature.actions[0].url | relativeUrl }}" class="sw-card">
+    {% else %}
+    <div class="sw-card">
+    {% endif %}
+      {% if feature.image | isNotEmpty %}
+      <div class="sw-img">
+        <img src="{{ feature.image | relativeUrl }}" alt="{{ feature.title }}" />
+      </div>
+      {% endif %}
+      <div class="sw-body">
+        <div class="sw-title-row">
+          {% if feature.icon | isNotEmpty %}<span class="sw-icon">{{ feature.icon }}</span>{% endif %}
+          <h3>{{ feature.title }}</h3>
+        </div>
+        <p>{{ feature.content }}</p>
+        <div class="sw-footer">
+          <div class="sw-tags">
+            {% for tag in feature.tags %}
+            <span class="sw-tag tag-{{ tag }}">{{ tag }}</span>
+            {% endfor %}
+          </div>
+          <span class="sw-arrow">→</span>
+        </div>
+      </div>
+    {% if feature.actions | isNotEmpty %}
+    </a>
+    {% else %}
+    </div>
+    {% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>

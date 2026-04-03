@@ -1,31 +1,24 @@
 <section id="{{ section.section_id }}" class="block faq-block bg-{{ section.background }} outer">
   <div class="inner-small">
+    {% if section.title | isNotEmpty %}
     <div class="block-header">
-      {% if section.title | isNotEmpty %}
       <h2 class="block-title">{{ section.title }}</h2>
-      {% endif %}
       {% if section.subtitle | isNotEmpty %}
-      <p class="block-subtitle">
-        {{ section.subtitle }}
-      </p>
+      <p class="block-subtitle">{{ section.subtitle }}</p>
       {% endif %}
-    </div><!-- .block-header -->
+    </div>
+    {% endif %}
     {% if section.faq_items | isNotEmpty %}
-    <dl class="faq-accordion">
+    <div class="faq-accordion">
       {% for faqitem in section.faq_items %}
-      <dt class="accordion-header">
-        <button class="accordion-trigger">
-          <div class="accordion-title">{{ faqitem.question }}</div>
-          <div class="accordion-icon icon-plus"></div>
-        </button>
-      </dt>
-      <dd class="accordion-panel">
-        <div class="accordion-content">
+      <details class="faq-item">
+        <summary>{{ faqitem.question }}</summary>
+        <div class="faq-answer">
           {{ faqitem.answer | markdownify | safe }}
         </div>
-      </dd>
+      </details>
       {% endfor %}
-    </dl><!-- .faq-accordion -->
+    </div>
     {% endif %}
-  </div><!-- .inner-small -->
-</section><!-- .block -->
+  </div>
+</section>

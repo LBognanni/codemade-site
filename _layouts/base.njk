@@ -1,77 +1,41 @@
 <!doctype html>
 <html lang="en">
-    <head>    
+    <head>
         <title>{% if title | isNotEmpty %}{{ title }} - {% endif %}{{ site.title }}</title>
-        <meta charset="utf-8">
+        <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:400,400i,700,700i" rel="stylesheet">
-        <link rel="stylesheet" href="{{ '/assets/css/main.css' | relativeUrl }}">
+        <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="/css/ember.css">
         <link rel="alternate" type="application/atom+xml" href="/atom.xml">
         <link rel="icon" href="/favicon.png" />
 
+        <meta name="description" content="{{ (subtitle or excerpt) }}" />
+        <meta name="keywords" content="{{ keywords }}" />
+        <meta name="author" content="Loris Bognanni" />
 
+        <meta property="og:title" content="{{ title }}" />
+        <meta property="og:description" content="{{ (subtitle or excerpt) }}" />
+        <meta property="og:image" content="{{ image | toAbsoluteUrl }}" />
+        <meta property="og:url" content="{{ page.url | toAbsoluteUrl }}" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="codemade.net" />
+        <meta property="og:locale" content="en_US" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
 
-        <meta  name="description"  content="{{ (subtitle or excerpt) }}" />
-        <meta  name="keywords"  content="{{ keywords }}" />
-        <meta  name="author"  content="Loris Bognanni" />
-
-        <meta  property="og:title" content= "{{ title }}" />
-        <meta  property="og:description" content= "{{ (subtitle or excerpt) }}" />
-        <meta  property="og:image" content= "{{ image | toAbsoluteUrl }}" />
-        <meta  property="og:url" content= "{{ page.url | toAbsoluteUrl }}" />
-        <meta  property="og:type" content= "website" />
-        <meta  property="og:site_name" content= "codemade.net" />
-        <meta  property="og:locale" content= "en_US" />
-        <meta  property="og:image:width" content="1200" />
-        <meta  property="og:image:height" content="630" />
-        
-        <meta  name="twitter:card" content= "summary_large_image" />
-        <meta  name="twitter:site" content= "codemade.net" />
-        <meta  name="twitter:creator" content= "@lorisdev" />
-        <meta  name="twitter:title" content= "{{ title }}" />
-        <meta  name="twitter:description" content= "{{ subtitle or excerpt }}" />
-        <meta  name="twitter:image" content= "{{ image | toAbsoluteUrl }}" />
-        <meta  name="twitter:url" content= "{{ page.url | toAbsoluteUrl }}" />
-        
-        
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var darkMode = localStorage.getItem("dark-mode");
-        if (darkMode === null) {
-            darkMode = window.matchMedia("(prefers-color-scheme: dark)").matches
-            ? "true"
-            : "false";
-        }
-        if (darkMode === "true") {
-            document.getElementsByTagName("body")[0].className = "dark";
-            document.querySelector("input.theme-switch").checked = true;
-        } else {
-            document.getElementsByTagName("body")[0].className = "light";
-            document.querySelector("input.theme-switch").checked = false;
-        }
-
-        document
-        .querySelector("input.theme-switch")
-        .addEventListener("change", function (event) {
-            var input = event.target;
-            if (input.checked) {
-            document.getElementsByTagName("body")[0].className = "dark";
-            localStorage.setItem("dark-mode", "true");
-            } else {
-            document.getElementsByTagName("body")[0].className = "light";
-            localStorage.setItem("dark-mode", "false");
-            }
-        });
-    });
-
-</script>
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="codemade.net" />
+        <meta name="twitter:creator" content="@lorisdev" />
+        <meta name="twitter:title" content="{{ title }}" />
+        <meta name="twitter:description" content="{{ subtitle or excerpt }}" />
+        <meta name="twitter:image" content="{{ image | toAbsoluteUrl }}" />
+        <meta name="twitter:url" content="{{ page.url | toAbsoluteUrl }}" />
     </head>
     <body>
         {{ content | safe }}
-        <!-- Scripts -->
         <script>
         window.cmParams = { tenant: "codemade" };
         </script>
         <script defer src="https://stats.codemade.net/track.js"></script>
-    </body> 
+    </body>
 </html>

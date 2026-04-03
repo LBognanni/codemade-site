@@ -8,7 +8,7 @@ sections:
   - section_id: hero
     type: section_hero
     image: images/hero.png
-    title: 👋 Welcome to CodeMade
+    title: I build <span class="warm">Software</span> &<br>write about the <span class="warm">craft</span>.
     content: >-
       Free Software and articles on software development
     actions:

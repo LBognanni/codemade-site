@@ -8,15 +8,7 @@ layout: body
 {% endfor %}
 
 {% if content | trim != "" %}
-<div class="outer">
-  <div class="inner-medium">
-
-    <article class="post post-full">
-      <div class="post-content">
-        {{ content | safe }}
-      </div><!-- .post-content -->
-    </article>
-    
-  </div><!-- .inner-medium -->
-</div><!-- .outer-->
+<div class="page-content">
+  {{ content | safe }}
+</div>
 {% endif %}
