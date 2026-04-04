@@ -3,6 +3,7 @@ layout: body
 ---
 
 <section class="blog blog-listing">
+
   <div class="section-label">{{ title }}</div>
   <div class="blog-grid">
     {% for post in collections.posts | reverse %}
@@ -20,4 +21,11 @@ layout: body
     </a>
     {% endfor %}
   </div>
+
+  <hr />
+
+  <div class="post-page-content">
+    {{ content | safe }}
+  </div><!-- .post-page-content -->
+
 </section>
