@@ -53,6 +53,6 @@ export default {
     has_subscribe: false,
     subscribe_title: "Subscribe",
     subscribe_content: "Stay up to date with our latest developments.",
-    content: "Content &copy; [Loris Bognanni](https://loris.codes). All rights reserved."
+    content: "Content &copy; [Loris Bognanni](https://loris.codes). All rights reserved. &middot; [Privacy Policy](/privacy)"
   }
 };
