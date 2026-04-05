@@ -7,7 +7,7 @@ import { feedPlugin } from "@11ty/eleventy-plugin-rss";
 
 export default function(eleventyConfig) {
   // Process SASS when the site is being built
-  eleventyConfig.on('eleventy.after', processSass);
+  eleventyConfig.on('eleventy.before', processSass);
   eleventyConfig.addPlugin(syntaxHighlight);
 
   eleventyConfig.addPlugin(feedPlugin, {
