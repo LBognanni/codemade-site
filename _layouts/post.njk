@@ -20,4 +20,14 @@ layout: body
   <div class="post-page-content">
     {{ content | safe }}
   </div>
+  <div id="comments-container"></div>
+  <script>
+    window.COMMENTS_CONFIG = {
+      "theme": 'dark',
+      "tenant": 'codemade-net',
+      "slug": '{{ title | slug }}',
+      "containerId": 'comments-container'
+    }
+  </script>
+  <script src="https://comments.codemade.net/embed.js" async></script>
 </article>
