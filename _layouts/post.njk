@@ -25,7 +25,8 @@ layout: body
     window.COMMENTS_CONFIG = {
       "theme": 'dark',
       "tenant": 'codemade-net',
-      "slug": '{{ title | slug }}',
+      "title": '{{ title | dump }}',
+      "slug": '{{ page.fileSlug }}',
       "containerId": 'comments-container'
     }
   </script>
