@@ -96,7 +96,7 @@ sections:
     background: gray
     title: Vibelets
     subtitle: >-
-      Simple, self-contained, single-purpose web apps. All processing happens in your browser, and no data is sent to any server.
+      Simple, self-contained, single-purpose web apps. All processing happens in your browser.
     features:
       - title: JSON to YAML converter
         icon: 🔄
