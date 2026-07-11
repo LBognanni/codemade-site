@@ -1,0 +1,247 @@
+---
+layout: vibelet
+title: SVG → PNG Converter
+subtitle: >-
+  Drop an SVG, set a scale multiplier, get a PNG.
+keywords: svg to png, svg converter, image converter, vibelet
+about: >-
+  This SVG to PNG converter is free to use and completely private: your SVG file never leaves your
+  device. Everything happens locally in your browser using the Canvas API — no upload, no server,
+  no account required.
+
+
+  Use the scale multiplier to export crisp PNGs at any resolution, from small icons to
+  high-DPI assets for retina displays. It's a handy way to turn a vector logo or icon into a
+  raster image for places that don't accept SVG, like favicons, email signatures, or app store
+  listings.
+---
+{% raw %}
+<style>
+  .svg2png { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+  .svg2png input[type="file"] { display: none; }
+  .svg2png .controls {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .svg2png .controls label { font-weight: 600; font-size: 0.9rem; }
+  .svg2png .multiplier-group { display: flex; align-items: center; gap: 10px; }
+  .svg2png .multiplier-group input[type="number"] { width: 80px; }
+  .svg2png .multiplier-group input[type="range"] { width: 160px; }
+  .svg2png .filename {
+    color: var(--text-muted); font-size: 0.85rem;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 260px;
+  }
+  .svg2png .output {
+    display: none;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+  }
+  .svg2png .output.visible { display: block; }
+  .svg2png .output img {
+    max-width: 100%;
+    background:
+      linear-gradient(45deg, #2a2730 25%, transparent 25%),
+      linear-gradient(-45deg, #2a2730 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #2a2730 75%),
+      linear-gradient(-45deg, transparent 75%, #2a2730 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .svg2png .output .dims { margin: 12px 0 16px; color: var(--text-muted); font-size: 0.9rem; }
+</style>
+
+<div class="svg2png">
+
+  <div class="vdropzone" id="dropzone">
+    <div class="vdz-icon">🖼️</div>
+    <div class="vdz-main">Drag & drop an SVG here, or click to browse</div>
+    <div class="vdz-sub" id="dz-subtext">Only .svg files are accepted</div>
+    <input type="file" id="fileInput" accept=".svg,image/svg+xml">
+  </div>
+
+  <div class="verror" id="errorBox"></div>
+
+  <div class="controls">
+    <label for="multiplierNumber">Output size multiplier</label>
+    <div class="multiplier-group">
+      <input type="range" id="multiplierRange" min="0.1" max="10" step="0.1" value="1">
+      <input type="number" id="multiplierNumber" min="0.1" max="50" step="0.1" value="1">
+      <span>×</span>
+    </div>
+  </div>
+
+  <div class="output" id="output">
+    <img id="outputImg" alt="Converted PNG output">
+    <div class="dims" id="outputDims"></div>
+    <a class="vbtn vbtn-primary" id="downloadBtn" download="converted.png">Download PNG</a>
+  </div>
+
+</div>
+
+<script>
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+const dzSubtext = document.getElementById('dz-subtext');
+const errorBox = document.getElementById('errorBox');
+const output = document.getElementById('output');
+const outputImg = document.getElementById('outputImg');
+const outputDims = document.getElementById('outputDims');
+const downloadBtn = document.getElementById('downloadBtn');
+const multiplierRange = document.getElementById('multiplierRange');
+const multiplierNumber = document.getElementById('multiplierNumber');
+
+let currentSvgText = null;
+let currentFileName = 'converted';
+
+dropzone.addEventListener('click', () => fileInput.click());
+
+dropzone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  dropzone.classList.add('dragover');
+});
+
+dropzone.addEventListener('dragleave', () => {
+  dropzone.classList.remove('dragover');
+});
+
+dropzone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropzone.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) handleFile(file);
+});
+
+fileInput.addEventListener('change', () => {
+  const file = fileInput.files[0];
+  if (file) handleFile(file);
+});
+
+multiplierRange.addEventListener('input', () => {
+  multiplierNumber.value = multiplierRange.value;
+  if (currentSvgText) renderPng();
+});
+
+multiplierNumber.addEventListener('input', () => {
+  let val = parseFloat(multiplierNumber.value);
+  if (isNaN(val) || val <= 0) return;
+  if (val > parseFloat(multiplierRange.max)) {
+    multiplierRange.value = multiplierRange.max;
+  } else if (val < parseFloat(multiplierRange.min)) {
+    multiplierRange.value = multiplierRange.min;
+  } else {
+    multiplierRange.value = val;
+  }
+  if (currentSvgText) renderPng();
+});
+
+function showError(msg) {
+  errorBox.textContent = msg;
+  errorBox.classList.add('visible');
+}
+
+function clearError() {
+  errorBox.classList.remove('visible');
+  errorBox.textContent = '';
+}
+
+function handleFile(file) {
+  clearError();
+
+  const isSvg = file.type === 'image/svg+xml' || file.name.toLowerCase().endsWith('.svg');
+  if (!isSvg) {
+    showError('Please upload a valid .svg file.');
+    return;
+  }
+
+  currentFileName = file.name.replace(/\.svg$/i, '') || 'converted';
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    currentSvgText = e.target.result;
+    dzSubtext.textContent = `Loaded: ${file.name}`;
+    renderPng();
+  };
+  reader.onerror = () => showError('Could not read the file.');
+  reader.readAsText(file);
+}
+
+function renderPng() {
+  clearError();
+  const multiplier = parseFloat(multiplierNumber.value) || 1;
+
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(currentSvgText, 'image/svg+xml');
+  const svgEl = doc.documentElement;
+
+  if (svgEl.nodeName === 'parsererror' || !svgEl || svgEl.tagName.toLowerCase() !== 'svg') {
+    showError('That file does not look like a valid SVG.');
+    return;
+  }
+
+  let width, height;
+
+  const widthAttr = svgEl.getAttribute('width');
+  const heightAttr = svgEl.getAttribute('height');
+  const viewBox = svgEl.getAttribute('viewBox');
+
+  if (widthAttr && heightAttr && !widthAttr.includes('%') && !heightAttr.includes('%')) {
+    width = parseFloat(widthAttr);
+    height = parseFloat(heightAttr);
+  } else if (viewBox) {
+    const parts = viewBox.trim().split(/[\s,]+/).map(Number);
+    width = parts[2];
+    height = parts[3];
+  } else {
+    width = 300;
+    height = 150;
+  }
+
+  if (!width || !height) {
+    showError('Could not determine SVG dimensions.');
+    return;
+  }
+
+  const outWidth = Math.max(1, Math.round(width * multiplier));
+  const outHeight = Math.max(1, Math.round(height * multiplier));
+
+  const svgBlob = new Blob([currentSvgText], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(svgBlob);
+
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = outWidth;
+    canvas.height = outHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, outWidth, outHeight);
+    URL.revokeObjectURL(url);
+
+    canvas.toBlob((blob) => {
+      const pngUrl = URL.createObjectURL(blob);
+      outputImg.src = pngUrl;
+      outputDims.textContent = `${outWidth} × ${outHeight} px`;
+      downloadBtn.href = pngUrl;
+      downloadBtn.download = `${currentFileName}@${multiplier}x.png`;
+      output.classList.add('visible');
+    }, 'image/png');
+  };
+  img.onerror = () => {
+    URL.revokeObjectURL(url);
+    showError('Failed to render the SVG. It may contain unsupported features.');
+  };
+  img.src = url;
+}
+</script>
+{% endraw %}

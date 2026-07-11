@@ -1,0 +1,21 @@
+---
+layout: body
+---
+
+<div class="vibelet-page">
+  <a class="vibelet-back" href="{{ '/#vibelets' | relativeUrl }}">← Back to Vibelets</a>
+  {% if title | isNotEmpty %}
+  <h1>{{ title }}</h1>
+  {% endif %}
+  {% if subtitle | isNotEmpty %}
+  <p class="vibelet-subtitle">{{ subtitle }}</p>
+  {% endif %}
+  <div class="vibelet-app">
+    {{ content | safe }}
+  </div>
+  {% if about | isNotEmpty %}
+  <div class="vibelet-about">
+    {{ about | markdownify | safe }}
+  </div>
+  {% endif %}
+</div>

@@ -2,6 +2,7 @@
   {% if section.title | isNotEmpty %}
   <div class="section-label">{{ section.title }}</div>
   {% endif %}
+  {% if section.subtitle | isNotEmpty %}<p class="section-subtitle">{{ section.subtitle }}</p>{% endif %}
   {% if section.features | isNotEmpty %}
   {% set allTags = [] %}
   {% for feature in section.features %}

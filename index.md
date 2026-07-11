@@ -39,7 +39,7 @@ sections:
             url: https://github.com/LBognanni/fasttab
       - title: email-webhook
         icon: 📧
-        image: images/email-webhook.png
+        image: images/email-webhook-hero.jpg
         tags: [saas, web]
         content: >-
           Transform emails into API calls. Build email workflows with ease.
@@ -91,9 +91,42 @@ sections:
         actions:
           - label: Learn More
             url: /roundabout
+  - section_id: vibelets
+    type: section_features
+    background: gray
+    title: Vibelets
+    subtitle: >-
+      Simple, self-contained, single-purpose web apps. All processing happens in your browser, and no data is sent to any server.
+    features:
+      - title: JSON to YAML converter
+        icon: 🔄
+        tags: [web, vibelet]
+        content: >-
+          Convert JSON to YAML in your browser.
+        actions:
+          - label: Open
+            url: /vibelets/json-to-yaml
+      - title: Image to Base64 converter
+        icon: 🖼️
+        tags: [web, vibelet]
+        content: >-
+          Convert images to Base64 in your browser.
+        actions:
+          - label: Open
+            url: /vibelets/image-to-base64
+      - title: SVG to PNG converter
+        icon: 🖼️
+        tags: [web, vibelet]
+        content: >-
+          Convert SVG images to PNG in your browser.
+        actions:
+          - label: Open
+            url: /vibelets/svg-to-png
   - section_id: recent-posts
     type: section_posts
     background: white
     title: Things I wrote
+    subtitle: >-
+      A selection of my recent blog posts
 layout: landing
 ---

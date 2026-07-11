@@ -1,0 +1,143 @@
+---
+layout: vibelet
+title: Image → Base64 / Data URL
+subtitle: >-
+  Paste or drop an image to get its data URL.
+keywords: image to base64, data url converter, base64 encoder, vibelet
+about: >-
+  This image to Base64 / data URL converter is free and private. Your image is processed
+  entirely on your own machine — it's never uploaded anywhere, so it's safe to use even with
+  sensitive screenshots or private assets.
+
+
+  Paste an image straight from your clipboard, or drag and drop a file, to get an instant
+  `data:` URL you can paste into CSS, HTML, or JSON. SVGs are kept as readable text instead of
+  base64, which keeps the resulting data URL smaller and easier to edit by hand.
+---
+{% raw %}
+<style>
+  .img2b64 { padding: 24px; }
+  .img2b64 .preview-container { margin-top: 1.5rem; text-align: center; display: none; }
+  .img2b64 .preview-image {
+    max-width: 100%;
+    max-height: 400px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    margin-bottom: 1rem;
+  }
+  .img2b64 .data-url {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    word-break: break-all;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-align: left;
+  }
+</style>
+
+<div class="img2b64">
+  <div class="vdropzone" id="dropZone">
+    <div class="vdz-icon">📋</div>
+    <div class="vdz-main">Paste an image here (Ctrl+V or Cmd+V)</div>
+    <div class="vdz-sub">Or drag and drop a file</div>
+  </div>
+  <div class="preview-container" id="previewContainer">
+    <img class="preview-image" id="previewImage" alt="Preview">
+    <div class="data-url" id="dataUrl"></div>
+    <button class="vbtn vbtn-primary" id="copyButton">Copy Data URL</button>
+  </div>
+</div>
+
+<script>
+    const dropZone = document.getElementById('dropZone');
+    const previewContainer = document.getElementById('previewContainer');
+    const previewImage = document.getElementById('previewImage');
+    const dataUrlElement = document.getElementById('dataUrl');
+    const copyButton = document.getElementById('copyButton');
+
+    function encodeSvg(svgText) {
+        // Encode SVG text to be used in a data URL
+        return svgText
+            .replace(/'/g, '%27')
+            .replace(/\r/g, '')
+            .replace(/\n/g, '');
+    }
+
+    // Process image file and display as data URL
+    function processImageFile(file) {
+        if (file.type === 'image/svg+xml') {
+            // Handle SVG files without base64 encoding
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const svgText = e.target.result;
+                const dataUrl = 'data:image/svg+xml,' + encodeSvg(svgText);
+                previewImage.src = dataUrl;
+                dataUrlElement.textContent = dataUrl;
+                previewContainer.style.display = 'block';
+            };
+            reader.readAsText(file);
+        } else {
+            // Handle other image types with base64 encoding
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const dataUrl = e.target.result;
+                previewImage.src = dataUrl;
+                dataUrlElement.textContent = dataUrl;
+                previewContainer.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // Handle paste events
+    document.addEventListener('paste', (e) => {
+        const items = e.clipboardData.items;
+
+        for (let item of items) {
+            if (item.type.indexOf('image') !== -1) {
+                const blob = item.getAsFile();
+                processImageFile(blob);
+                break;
+            }
+        }
+    });
+
+    // Handle copy button click
+    copyButton.addEventListener('click', () => {
+        navigator.clipboard.writeText(dataUrlElement.textContent)
+            .then(() => {
+                copyButton.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyButton.textContent = 'Copy Data URL';
+                }, 2000);
+            })
+            .catch(err => {
+                console.error('Failed to copy:', err);
+            });
+    });
+
+    // Handle drag and drop
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0 && files[0].type.startsWith('image/')) {
+            processImageFile(files[0]);
+        }
+    });
+</script>
+{% endraw %}
