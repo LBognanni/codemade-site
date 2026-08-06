@@ -122,6 +122,14 @@ sections:
         actions:
           - label: Open
             url: /vibelets/svg-to-png
+      - title: Rent vs Buy — UK
+        icon: 🏠
+        tags: [web, vibelet]
+        content: >-
+          Compare renting vs buying over time, including UK stamp duty.
+        actions:
+          - label: Open
+            url: /vibelets/rent-vs-buy-uk
   - section_id: recent-posts
     type: section_posts
     background: white

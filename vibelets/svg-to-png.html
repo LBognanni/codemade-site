@@ -216,7 +216,14 @@ function renderPng() {
   const outWidth = Math.max(1, Math.round(width * multiplier));
   const outHeight = Math.max(1, Math.round(height * multiplier));
 
-  const svgBlob = new Blob([currentSvgText], { type: 'image/svg+xml;charset=utf-8' });
+  if (!viewBox) {
+    svgEl.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  }
+  svgEl.setAttribute('width', outWidth);
+  svgEl.setAttribute('height', outHeight);
+
+  const scaledSvgText = new XMLSerializer().serializeToString(svgEl);
+  const svgBlob = new Blob([scaledSvgText], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(svgBlob);
 
   const img = new Image();

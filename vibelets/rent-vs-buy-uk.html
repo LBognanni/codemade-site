@@ -1,0 +1,490 @@
+---
+layout: vibelet
+title: Rent vs Buy — UK
+subtitle: >-
+  A rough guide to whether buying or renting leaves you better off over a set period.
+keywords: rent vs buy calculator, UK stamp duty, mortgage calculator, vibelet
+about: >-
+  This rent vs buy calculator is free and private — it runs entirely in your browser, so none of
+  your financial details are ever uploaded or sent to a server.
+
+
+  It models the "invest the difference" approach: whichever option costs less in a given month,
+  the money saved is assumed to be invested, and both paths are compared as net worth after your
+  chosen number of years. It accounts for UK stamp duty (SDLT, LBTT or LTT depending on nation),
+  first-time buyer relief, LISA deposits, mortgage amortisation, house price growth, rent
+  inflation, and the running costs of ownership like maintenance, insurance, ground rent and
+  service charges. All figures are estimates, not financial advice.
+---
+{% raw %}
+<style>
+  .rvb { display: flex; flex-direction: column; }
+
+  .rvb fieldset {
+    border: none;
+    border-bottom: 1px solid var(--border);
+    margin: 0;
+    padding: 0 24px 20px;
+  }
+  .rvb legend {
+    display: block;
+    width: 100%;
+    font-weight: 600;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 28px 0 16px;
+    color: var(--text-muted);
+  }
+  .rvb .row { display: flex; flex-wrap: wrap; gap: 14px; }
+  .rvb .field { flex: 1 1 200px; margin-bottom: 12px; }
+  .rvb .field:last-child { margin-bottom: 0; }
+  .rvb label {
+    display: block; font-size: 0.82rem; margin-bottom: 5px; color: var(--text-muted);
+  }
+  .rvb input[type="number"], .rvb select {
+    width: 100%;
+  }
+  .rvb select {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+  }
+  .rvb input:focus, .rvb select:focus {
+    outline: none; border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .rvb .checkbox-field { display: flex; flex-direction: column; }
+  .rvb .checkbox-field .spacer-label { visibility: hidden; }
+  .rvb .checkbox-field .checkbox-row {
+    display: flex; align-items: center; gap: 8px; height: 39px;
+  }
+  .rvb .checkbox-field input { width: auto; accent-color: var(--accent); }
+  .rvb .checkbox-field label { margin: 0; color: var(--text); }
+  .rvb .hint { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; }
+
+  .rvb .live-mortgage {
+    margin-top: 6px; padding-top: 14px; border-top: 1px solid var(--border);
+    font-size: 0.92rem; color: var(--text-muted);
+  }
+  .rvb .live-mortgage .lm-main { margin-bottom: 8px; }
+  .rvb .live-mortgage strong { font-size: 1.2rem; color: var(--accent); }
+  .rvb .live-mortgage .lm-sub { font-size: 0.78rem; color: var(--text-muted); line-height: 1.6; }
+
+  .rvb details.assumptions {
+    border: none;
+    border-bottom: 1px solid var(--border);
+    padding: 24px 24px 20px;
+  }
+  .rvb details.assumptions summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+  }
+  .rvb details.assumptions[open] summary { margin-bottom: 4px; }
+  .rvb details.assumptions .row { margin-top: 14px; }
+
+  .rvb .actions { padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+  .rvb .actions > .vbtn { align-self: flex-start; }
+
+  #rvbResult:empty { display: none; }
+  #rvbResult { display: flex; flex-direction: column; gap: 14px; }
+
+  .rvb .verdict {
+    font-size: 1rem; font-weight: 600; padding: 14px 16px; border-radius: 10px;
+    border: 1px solid transparent;
+  }
+  .rvb .verdict.buy { background: rgba(93, 222, 180, 0.08); border-color: rgba(93, 222, 180, 0.3); color: var(--accent-mint); }
+  .rvb .verdict.rent { background: rgba(110, 168, 254, 0.08); border-color: rgba(110, 168, 254, 0.3); color: var(--accent-blue); }
+  .rvb .verdict.even { background: var(--bg-elevated); color: var(--text-muted); }
+
+  .rvb .warn {
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 10px 14px; border-radius: 10px; font-size: 0.86rem;
+  }
+
+  .rvb table {
+    width: 100%; border-collapse: collapse; font-size: 0.86rem;
+  }
+  .rvb th, .rvb td { text-align: left; padding: 7px 4px; border-bottom: 1px solid var(--border); color: var(--text-muted); }
+  .rvb td:last-child, .rvb th:last-child { text-align: right; color: var(--text); font-family: var(--font-mono); }
+  .rvb tr:last-child td { border-bottom: none; }
+  .rvb .group-head td {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em;
+    font-weight: 600; color: var(--text-muted);
+    padding-top: 18px;
+  }
+  .rvb .group-head:first-child td { padding-top: 0; }
+  .rvb tr td strong { color: var(--text); }
+
+  .rvb .disclaimer {
+    font-size: 0.78rem; color: var(--text-muted); line-height: 1.6;
+  }
+  .rvb td:has(span.pounds)::first-letter {
+    opacity: 0.5;
+  }
+</style>
+
+<div class="rvb">
+
+  <fieldset>
+    <legend>Your situation</legend>
+    <div class="row">
+      <div class="field">
+        <label for="nation">Where is the property?</label>
+        <select id="nation">
+          <option value="england">England or Northern Ireland (SDLT)</option>
+          <option value="scotland">Scotland (LBTT)</option>
+          <option value="wales">Wales (LTT)</option>
+        </select>
+      </div>
+      <div class="field checkbox-field">
+        <label class="spacer-label">First-time buyer</label>
+        <div class="checkbox-row">
+          <input type="checkbox" id="ftb" checked>
+          <label for="ftb">First-time buyer</label>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Buying</legend>
+    <div class="row">
+      <div class="field">
+        <label for="price">Property price (£)</label>
+        <input type="number" id="price" value="320000" min="0" step="1000">
+      </div>
+      <div class="field">
+        <label for="deposit">Cash deposit (£)</label>
+        <input type="number" id="deposit" value="40000" min="0" step="1000">
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label for="lisa">LISA balance (£)</label>
+        <input type="number" id="lisa" value="10000" min="0" step="500">
+        <div class="hint">Enter the current balance including any bonus already added. Used toward the deposit only if eligible.</div>
+      </div>
+      <div class="field">
+        <label for="rate">Mortgage rate (%)</label>
+        <input type="number" id="rate" value="4.5" min="0" step="0.1">
+      </div>
+      <div class="field">
+        <label for="term">Mortgage term (years)</label>
+        <input type="number" id="term" value="30" min="1" step="1">
+      </div>
+    </div>
+    <div id="liveMortgage" class="live-mortgage"></div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Renting</legend>
+    <div class="row">
+      <div class="field">
+        <label for="rent">Monthly rent (£)</label>
+        <input type="number" id="rent" value="1350" min="0" step="10">
+      </div>
+      <div class="field">
+        <label for="horizon">Years you expect to stay</label>
+        <input type="number" id="horizon" value="10" min="1" step="1">
+        <div class="hint">The single biggest factor. Short stays favour renting.</div>
+      </div>
+    </div>
+  </fieldset>
+
+  <details class="assumptions">
+    <summary>Assumptions (edit if you like)</summary>
+    <div class="row">
+      <div class="field">
+        <label for="invReturn">Investment return (%/yr)</label>
+        <input type="number" id="invReturn" value="5" min="0" step="0.1">
+        <div class="hint">What the renter earns investing money not tied up in a deposit.</div>
+      </div>
+      <div class="field">
+        <label for="houseGrowth">House price growth (%/yr)</label>
+        <input type="number" id="houseGrowth" value="3" min="-10" step="0.1">
+      </div>
+      <div class="field">
+        <label for="rentGrowth">Rent inflation (%/yr)</label>
+        <input type="number" id="rentGrowth" value="3" min="-10" step="0.1">
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label for="maint">Maintenance (% of value/yr)</label>
+        <input type="number" id="maint" value="1" min="0" step="0.1">
+      </div>
+      <div class="field">
+        <label for="insurance">Buildings insurance (£/yr)</label>
+        <input type="number" id="insurance" value="300" min="0" step="10">
+      </div>
+      <div class="field">
+        <label for="buyFees">Legal, survey &amp; mortgage fees (£)</label>
+        <input type="number" id="buyFees" value="2500" min="0" step="100">
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label for="groundRent">Ground rent (£/yr)</label>
+        <input type="number" id="groundRent" value="0" min="0" step="50">
+        <div class="hint">Leasehold only. 0 for freehold.</div>
+      </div>
+      <div class="field">
+        <label for="serviceCharge">Service charge (£/yr)</label>
+        <input type="number" id="serviceCharge" value="0" min="0" step="100">
+        <div class="hint">Leasehold flats / managed estates. 0 if none.</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label for="agentPct">Estate agent fee on sale (%)</label>
+        <input type="number" id="agentPct" value="1.5" min="0" step="0.1">
+      </div>
+      <div class="field">
+        <label for="legalSell">Legal fees on sale (£)</label>
+        <input type="number" id="legalSell" value="1500" min="0" step="100">
+      </div>
+    </div>
+  </details>
+
+  <div class="actions">
+    <button class="vbtn vbtn-primary" id="compareBtn">Compare</button>
+
+    <div id="rvbResult"></div>
+
+    <p class="disclaimer">
+      Tax bands used: SDLT (England &amp; NI) and LBTT (Scotland) as in force from 1 April 2025; Welsh LTT main-residential rates as of 2026.
+      Bands change at Budgets — verify current figures with
+      <a href="https://www.gov.uk/stamp-duty-land-tax">HMRC</a>,
+      <a href="https://revenue.scot/taxes/land-buildings-transaction-tax">Revenue Scotland</a> or the
+      <a href="https://www.gov.wales/land-transaction-tax-guide">Welsh Revenue Authority</a> before making an offer.
+      This tool is a simplified estimate and not financial advice.
+    </p>
+  </div>
+
+</div>
+
+<script>
+// ---- Stamp duty: banded ("slice") calculation ----
+// Each entry is [upper threshold of band, rate on the slice within it].
+function bandedTax(price, bands) {
+  let tax = 0, prev = 0;
+  for (const [threshold, rate] of bands) {
+    if (price <= prev) break;
+    const slice = Math.min(price, threshold) - prev;
+    tax += slice * rate;
+    prev = threshold;
+  }
+  return tax;
+}
+
+function stampDuty(price, nation, ftb) {
+  if (nation === "scotland") {
+    // LBTT. First-time buyers get a raised nil-rate band (£175k instead of £145k).
+    const start = ftb ? 175000 : 145000;
+    return bandedTax(price, [
+      [start, 0], [250000, 0.02], [325000, 0.05], [750000, 0.10], [Infinity, 0.12]
+    ]);
+  }
+  if (nation === "wales") {
+    // LTT main residential. Wales has no first-time buyer relief.
+    return bandedTax(price, [
+      [225000, 0], [400000, 0.06], [750000, 0.075], [1500000, 0.10], [Infinity, 0.12]
+    ]);
+  }
+  // England & NI (SDLT)
+  if (ftb && price <= 500000) {
+    // First-time buyer relief (only if price is £500k or less)
+    return bandedTax(price, [[300000, 0], [500000, 0.05]]);
+  }
+  return bandedTax(price, [
+    [125000, 0], [250000, 0.02], [925000, 0.05], [1500000, 0.10], [Infinity, 0.12]
+  ]);
+}
+
+const gbp = n => `<span class="pounds">£${Math.round(n).toLocaleString("en-GB")}</span>`;
+const num = id => parseFloat(document.getElementById(id).value) || 0;
+
+// Work out how much LISA is usable, the total deposit, the loan and the
+// monthly repayment from the buying inputs. Shared by the live read-out and
+// the full comparison so they can never disagree.
+function buyingBasics() {
+  const price = num("price");
+  const cashDeposit = num("deposit");
+  const lisa = num("lisa");
+  const ftb = document.getElementById("ftb").checked;
+  const rate = num("rate");
+  const term = num("term");
+
+  let lisaUsable = lisa, lisaWarning = "";
+  if (lisa > 0 && (!ftb || price > 450000)) {
+    lisaUsable = 0;
+    lisaWarning = !ftb
+      ? "A LISA can only be used for a first home, so its balance isn't counted toward the deposit here."
+      : "The property is over the £450,000 LISA cap, so the LISA can't be used for this purchase without a 25% penalty. It's excluded from the deposit.";
+  }
+
+  const totalDeposit = cashDeposit + lisaUsable;
+  const loan = Math.max(0, price - totalDeposit);
+
+  const mr = rate / 100 / 12;
+  const n = term * 12;
+  let payment = 0;
+  if (loan > 0 && n > 0) {
+    payment = mr > 0
+      ? loan * mr * Math.pow(1 + mr, n) / (Math.pow(1 + mr, n) - 1)
+      : loan / n;
+  }
+
+  return { price, cashDeposit, lisa, ftb, lisaUsable, lisaWarning, totalDeposit, loan, mr, payment };
+}
+
+// Live read-out under the buying section — updates as you type.
+function updateMortgage() {
+  const b = buyingBasics();
+  const el = document.getElementById("liveMortgage");
+  if (b.loan <= 0) {
+    el.innerHTML = `<span>No mortgage needed — your deposit covers the full price.</span>`;
+    return;
+  }
+  const ltv = b.price > 0 ? (b.loan / b.price) * 100 : 0;
+  el.innerHTML =
+    `<div class="lm-main">Estimated monthly mortgage: <strong>${gbp(b.payment)}</strong></div>` +
+    `<div class="lm-sub">Borrowing ${gbp(b.loan)} (${Math.round(ltv)}% LTV)` +
+    `${b.lisaUsable > 0 ? ", deposit includes " + gbp(b.lisaUsable) + " LISA" : ""}. ` +
+    `Repayment mortgage, capital &amp; interest.</div>`;
+}
+
+function calculate() {
+  updateMortgage();
+
+  // Shared buying figures (deposit, LISA handling, loan, monthly payment)
+  const b = buyingBasics();
+  const { price, lisaUsable, lisaWarning, totalDeposit, loan, mr, payment } = b;
+
+  const ftb = b.ftb;
+  const nation = document.getElementById("nation").value;
+  const rent0 = num("rent");
+  const horizon = num("horizon");
+  const invReturn = num("invReturn");
+  const houseGrowth = num("houseGrowth");
+  const rentGrowth = num("rentGrowth");
+  const maintPct = num("maint");
+  const insurance = num("insurance");
+  const groundRent = num("groundRent");
+  const serviceCharge = num("serviceCharge");
+  const buyFees = num("buyFees");
+  const agentPct = num("agentPct");
+  const legalSell = num("legalSell");
+
+  const sdlt = stampDuty(price, nation, ftb);
+
+  // ---- Invest-the-difference simulation, month by month ----
+  // Renter doesn't spend the deposit + upfront buying costs, so they invest it.
+  let renterPot = totalDeposit + buyFees + sdlt;
+  let buyerPot = 0;
+  let balance = loan;
+  let houseValue = price;
+  let rentMonthly = rent0;
+  const invM = invReturn / 100 / 12;
+  const houseM = houseGrowth / 100 / 12;
+  const rentM = rentGrowth / 100 / 12;
+
+  const months = Math.round(horizon * 12);
+  for (let m = 0; m < months; m++) {
+    const maintenanceM = (houseValue * maintPct / 100) / 12;
+    const insuranceM = insurance / 12;
+    const leaseholdM = (groundRent + serviceCharge) / 12;
+    const buyerCost = (balance > 0 ? payment : 0) + maintenanceM + insuranceM + leaseholdM;
+    const renterCost = rentMonthly;
+
+    const diff = buyerCost - renterCost;
+    if (diff > 0) renterPot += diff;   // buying costs more this month; renter invests the saving
+    else buyerPot += -diff;            // renting costs more; buyer invests the saving
+
+    // grow investment pots
+    renterPot *= (1 + invM);
+    buyerPot *= (1 + invM);
+
+    // reduce mortgage balance
+    if (balance > 0) {
+      const interest = balance * mr;
+      const principal = Math.min(balance, payment - interest);
+      balance -= principal;
+      if (balance < 0.01) balance = 0;
+    }
+
+    // grow house value and rent
+    houseValue *= (1 + houseM);
+    rentMonthly *= (1 + rentM);
+  }
+
+  // ---- Position at end of horizon ----
+  const sellingCosts = houseValue * agentPct / 100 + legalSell;
+  const equity = houseValue - balance - sellingCosts;
+  const buyerNetWorth = equity + buyerPot;
+  const renterNetWorth = renterPot;
+  const gap = buyerNetWorth - renterNetWorth;
+
+  // "roughly even" if within 2% of property price
+  const evenBand = price * 0.02;
+  let verdictClass, verdictText;
+  if (Math.abs(gap) <= evenBand) {
+    verdictClass = "even";
+    verdictText = `Over ${horizon} years it's roughly a wash — within about ${gbp(evenBand)} either way. Non-financial factors probably matter more than the money here.`;
+  } else if (gap > 0) {
+    verdictClass = "buy";
+    verdictText = `Over ${horizon} years, buying comes out ahead by about ${gbp(gap)}.`;
+  } else {
+    verdictClass = "rent";
+    verdictText = `Over ${horizon} years, renting and investing the difference comes out ahead by about ${gbp(-gap)}.`;
+  }
+
+  let html = `<div class="verdict ${verdictClass}">${verdictText}</div>`;
+  if (lisaWarning) html += `<div class="warn">${lisaWarning}</div>`;
+
+  html += `<table>
+    <tr class="group-head"><td>Upfront (buying)</td><td></td></tr>
+    <tr><td>Stamp duty</td><td>${gbp(sdlt)}</td></tr>
+    <tr><td>Deposit${lisaUsable > 0 ? " (incl. LISA " + gbp(lisaUsable) + ")" : ""}</td><td>${gbp(totalDeposit)}</td></tr>
+    <tr><td>Legal, survey &amp; mortgage fees</td><td>${gbp(buyFees)}</td></tr>
+    <tr><td>Mortgage loan</td><td>${gbp(loan)}</td></tr>
+    <tr><td>Monthly mortgage payment</td><td>${gbp(payment)}</td></tr>
+
+    <tr class="group-head"><td>After ${horizon} years — if you bought</td><td></td></tr>
+    <tr><td>Property value</td><td>${gbp(houseValue)}</td></tr>
+    <tr><td>Mortgage remaining</td><td>${gbp(balance)}</td></tr>
+    <tr><td>Selling costs</td><td>&minus;${gbp(sellingCosts)}</td></tr>
+    <tr><td>Equity after selling</td><td>${gbp(equity)}</td></tr>
+    <tr><td>Invested surplus</td><td>${gbp(buyerPot)}</td></tr>
+    <tr><td><strong>Net worth (buyer)</strong></td><td><strong>${gbp(buyerNetWorth)}</strong></td></tr>
+
+    <tr class="group-head"><td>After ${horizon} years — if you rented</td><td></td></tr>
+    <tr><td>Invested pot (deposit + costs + monthly savings, grown)</td><td>${gbp(renterPot)}</td></tr>
+    <tr><td><strong>Net worth (renter)</strong></td><td><strong>${gbp(renterNetWorth)}</strong></td></tr>
+  </table>`;
+
+  document.getElementById("rvbResult").innerHTML = html;
+}
+
+document.getElementById("compareBtn").addEventListener("click", calculate);
+
+// Update the live mortgage figure as the buying inputs change.
+["price", "deposit", "lisa", "rate", "term", "nation", "ftb"].forEach(id => {
+  const ev = (id === "nation" || id === "ftb") ? "change" : "input";
+  document.getElementById(id).addEventListener(ev, updateMortgage);
+});
+
+// run once on load with the default values
+calculate();
+</script>
+{% endraw %}
