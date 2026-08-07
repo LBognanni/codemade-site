@@ -8,5 +8,8 @@
   .sw-grid { grid-template-columns: 1fr; }
   .blog-grid { grid-template-columns: 1fr; }
   nav ul { gap: 0; }
+  nav { padding: 1.25rem 1.25rem; }
+  .nav-actions { gap: 0.35rem; }
+  .theme-control span { padding: 0.25rem 0.35rem; font-size: 0.58rem; }
   footer { flex-direction: column; gap: 0.75rem; text-align: center; }
 }

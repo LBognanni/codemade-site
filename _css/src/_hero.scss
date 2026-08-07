@@ -16,8 +16,8 @@
   height: 500px;
   background: radial-gradient(
     ellipse 70% 55% at 50% 50%,
-    rgba(245, 158, 66, 0.06) 0%,
-    rgba(232, 99, 122, 0.02) 50%,
+    var(--hero-warm) 0%,
+    var(--hero-rose) 50%,
     transparent 80%
   );
   pointer-events: none;

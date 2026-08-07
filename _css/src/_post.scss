@@ -133,3 +133,44 @@
   border-top: 1px solid var(--border);
   margin: 2.5rem 0;
 }
+
+.mermaid-expand {
+  display: block;
+  margin: -0.75rem 0 1.5rem auto;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-card);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+}
+.mermaid-expand:hover { border-color: var(--border-bright); color: var(--text); }
+.mermaid-expand:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.mermaid-dialog {
+  inset: 0;
+  width: min(1200px, calc(100vw - 2rem));
+  max-width: none;
+  max-height: calc(100vh - 2rem);
+  margin: auto;
+  padding: 1rem;
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+}
+.mermaid-dialog::backdrop { background: rgba(0, 0, 0, 0.7); }
+.mermaid-dialog-header { display: flex; justify-content: flex-end; margin-bottom: 0.75rem; }
+.mermaid-dialog-close {
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+}
+.mermaid-dialog-content { overflow: auto; max-height: calc(100vh - 7rem); }
+.mermaid-dialog-content svg { display: block; max-width: none; min-width: 100%; height: auto; }

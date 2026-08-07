@@ -7,5 +7,10 @@ footer {
   img {
     max-height: 40px;
   }
+  .logo-light { display: none; }
+}
+:root[data-theme='light'] footer {
+  .logo-dark { display: none; }
+  .logo-light { display: inline; }
 }
 footer .mono { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim); }

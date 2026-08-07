@@ -1,6 +1,9 @@
 <footer>
   <span class="site-logo">
-    <a href="{{ '/' | relativeUrl }}"><img src="{{ site.footer.logo_img | relativeUrl }}" alt="Logo" /></a>
+    <a href="{{ '/' | relativeUrl }}">
+      <img class="logo-dark" src="{{ site.footer.logo_img | relativeUrl }}" alt="CodeMade" />
+      <img class="logo-light" src="{{ site.header.logo_img | relativeUrl }}" alt="" />
+    </a>
   </span>
   <span>{{ site.footer.content | markdownify | safe }}</span>
   <span class="mono">~ {{ site.footer.tagline }}</span>

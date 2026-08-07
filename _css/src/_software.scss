@@ -21,12 +21,12 @@
 }
 .sw-card::after {
   content: ''; position: absolute; inset: 0; border-radius: var(--radius);
-  background: radial-gradient(400px circle at var(--mx, 50%) var(--my, 50%), rgba(245, 158, 66, 0.07) 0%, transparent 60%);
+  background: radial-gradient(400px circle at var(--mx, 50%) var(--my, 50%), var(--accent-soft) 0%, transparent 60%);
   opacity: 0; transition: opacity 0.4s ease; pointer-events: none; z-index: 2;
 }
 .sw-card:hover {
   border-color: var(--border-bright); transform: translateY(-4px);
-  box-shadow: 0 14px 44px rgba(0,0,0,0.35);
+  box-shadow: 0 14px 44px var(--shadow);
 }
 .sw-card:hover::after { opacity: 1; }
 

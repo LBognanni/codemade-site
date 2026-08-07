@@ -1,9 +1,22 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark" data-theme-preference="system">
     <head>
         <title>{% if title | isNotEmpty %}{{ title }} - {% endif %}{{ site.title }}</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <script>
+          (function () {
+            var key = 'codemade-theme';
+            var preference = 'system';
+            try {
+              var stored = localStorage.getItem(key);
+              if (stored === 'light' || stored === 'dark' || stored === 'system') preference = stored;
+            } catch (error) {}
+            var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.documentElement.dataset.themePreference = preference;
+            document.documentElement.dataset.theme = preference === 'system' ? (dark ? 'dark' : 'light') : preference;
+          }());
+        </script>
         <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="/css/style.css?v={{ css.version }}">
         <link rel="alternate" type="application/atom+xml" href="/atom.xml">

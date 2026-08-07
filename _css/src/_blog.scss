@@ -10,7 +10,7 @@
 }
 .blog-card:hover {
   border-color: var(--border-bright); transform: translateY(-4px);
-  box-shadow: 0 10px 32px rgba(0,0,0,0.3);
+  box-shadow: 0 10px 32px var(--shadow);
 }
 .blog-card-img { height: 150px; overflow: hidden; background: var(--bg-elevated); }
 .blog-card-img img {

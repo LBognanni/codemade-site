@@ -172,5 +172,3 @@ style VPS4 fill:#fff4,stroke-dasharray: 5, 5;
 Should one of my services become a runaway success, I can move it to its own VPS and scale independently, either by increasing VPS size or adding replicas to the swarm stack. For further growth, adding more VPSs to the same swarm would be the next step.
 
 But that's a problem for another day! 😎
-
-<script defer src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>

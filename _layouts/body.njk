@@ -34,4 +34,30 @@ layout: base
       });
     });
   });
+
+  (function () {
+    const key = 'codemade-theme';
+    const root = document.documentElement;
+    const controls = document.querySelectorAll('input[name="theme"]');
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const apply = preference => {
+      const theme = preference === 'system' ? (media.matches ? 'dark' : 'light') : preference;
+      const changed = root.dataset.theme !== theme;
+      root.dataset.themePreference = preference;
+      root.dataset.theme = theme;
+      if (window.COMMENTS_CONFIG) window.COMMENTS_CONFIG.theme = root.dataset.theme;
+      controls.forEach(control => { control.checked = control.value === preference; });
+      if (changed) window.dispatchEvent(new CustomEvent('codemade-themechange'));
+    };
+
+    apply(root.dataset.themePreference || 'system');
+    controls.forEach(control => control.addEventListener('change', () => {
+      if (!control.checked) return;
+      try { localStorage.setItem(key, control.value); } catch (error) {}
+      apply(control.value);
+    }));
+    media.addEventListener('change', () => {
+      if (root.dataset.themePreference === 'system') apply('system');
+    });
+  }());
 </script>

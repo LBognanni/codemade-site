@@ -1,7 +1,9 @@
 <nav>
   <a href="{{ '/' | relativeUrl }}" class="logo">
-    <img src="/images/logo-blur-white.svg" />
+    <img class="logo-dark" src="/images/logo-blur-white.svg" alt="CodeMade" />
+    <img class="logo-light" src="/images/logo-blur.svg" alt="" />
   </a>
+  <div class="nav-actions">
   {% if site.header.nav_links and site.header.has_nav %}
   <ul>
     {% for action in site.header.nav_links %}
@@ -12,4 +14,11 @@
     {% endfor %}
   </ul>
   {% endif %}
+    <fieldset class="theme-control">
+      <legend class="visually-hidden">Color theme</legend>
+      <label><input type="radio" name="theme" value="light"><span>Light</span></label>
+      <label><input type="radio" name="theme" value="dark"><span>Dark</span></label>
+      <label><input type="radio" name="theme" value="system"><span>System</span></label>
+    </fieldset>
+  </div>
 </nav>
