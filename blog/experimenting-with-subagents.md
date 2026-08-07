@@ -116,8 +116,3 @@ I made a lot of stupid mistakes during the experiment, and I'm sure that given w
 An unexpected advantage of this approach vs my usual "single agent" workflow has been letting the agents run on their own, while I do other things. The main agent's context never gets too big since it's only a coordinator, and the subagents are by nature ephemeral, so they don't accumulate context either. This means that I can let the system run for hours without worrying about it running out of context or entering the "dumb zone".
 
 And finally a rant: Once again, using my ChatGPT Plus subscription allowed me to go back to my darling OpenCode after being on Claude Code for a loong time. **OpenCode is such a superior developer experience**. I'm still mad at Anthropic for not allowing third party harnesses.
-
-
-
-
-<script defer src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
