@@ -1,5 +1,5 @@
 ---
-title: "Experimenting with subagents, or how I maxed out both my Claude and ChatsGPT accounts"
+title: "Experimenting with subagents: strict rules for token-minning"
 author: _data/authors/loris-bognanni.yaml
 excerpt: >-
   The promise is enticing: split your work so well that you can have small, cheap models do the work, and only use the big, expensive models for the important stuff. But is it really worth it?
@@ -11,40 +11,30 @@ tags:
   - ai coding
 ---
 
-It's now summer of 2026, and things have changed since a lot, and also not much, since [my February post about vibe coding a task switcher](/blog/building-for-one). 
+My latest foray into AI coding has been building a level editor for a yet unreleased 2.5D game that I'm working on.
 
-### When an unstoppable force meets an immovable object
-
-In that post, I concluded with the idea that now it's so much easier to build things, that I could hopefully start _finishing_ some of them as well.
-
-I should have foreseen this, but the obvious (in retrospective) reality is that it's now also much easier to _start_ new things, and so I am now in the same situation as before, where I have lots of unfinished projects that I will _definitely get to, someday_ 
-
----
-
-Anyway, my new unfinished project is a 2.5D platformer game that I started when I got bored of working on another game (do you see a pattern here?). Together with the game, I also had Claude build a level editor.
-
-**My experience improving the level editor is the focus of this post.**
-
-The first version was built over a couple of evenings, reusing a lot of the rendering code from the game itself, and it was pretty good. Because this was not the actual game code, and the stakes were lower, I more or less vibe coded it completely. Claude chose the architecture, the UI stack, and even the theme. I did so in the "traditional" way: writing a plan, then implementing it one milestone at a time.
+The first version was built over a couple of evenings, reusing a lot of the rendering code from the game itself, and it was pretty good! Given the low stakes, I more or less vibe coded it completely. Claude chose the architecture, the UI stack, and even the theme. I only provided the structure: writing a plan, then implementing it one milestone at a time.
 
 ### A small editor grows up
 
 ![the level editor in all its glory](/images/kp-editor.png)
 
-Over time, the editor started acquiring more and more features, what started as more of a "level viewer" was now becoming a complex level builder. As a result, the UI was starting to grow in complexity. 
+Over time, the editor started acquiring more and more features, and what started as more of a "level viewer" was now becoming a complex level builder. As a result, the UI was starting to grow in complexity. 
 
-The problems started subtly. Sometimes Claude would add a button to the UI and forget to give it a CSS class. Adding a new feature would take a lot of tokens. Some features were duplicated in weird ways, like having two "hide scenery" buttons, one in the main toolbar, and one in the "path editing" view.
+The problems started subtly. Sometimes Claude would add a button to the UI and forget to give it any sort of styling. Some features were duplicated in weird ways, like having two "hide scenery" buttons, one in the main toolbar, and one in the "path editing" view. And then adding new features started taking a bit too long, and using a bit too many tool calls and tokens.
 
 I figured that it was time to take a peek under the hood to see how Claude was dealing with all this complexity, and oh my. 
 1000s lines files, `document.getElementById` everywhere, and a lot of duplicated code.
 
-As I was expecting to start adding even more features, I decided that now would be a good time to refactor the editor code, move away from plain HTML, and pivot to (p)react, which has the advantage of being so ubiquitous that it's a pillar of the training data of all LLMs (as Claude would say, it's _load bearing_ 😩). My hope is that splitting the UI up in discrete components would increase reuse and make it easier for the AI to navigate the code base.
+As I was planning to add even more features, I decided that now would be a good time to refactor the editor code, move away from plain HTML, and pivot to (p)react, which has the advantage of being so ubiquitous that it's a pillar of the training data of all LLMs (as Claude would say, it's _load bearing_ 😩). My hope being that splitting the UI into discrete components would increase reuse and make it easier for the AI to navigate the code base.
 
 ### The subagent idea
 
-If you're on tech twitter for any amount of time, "subagents" are already a thing of the past. The cool kids are now doing "loops" and "graphs". The cool kids also have infinite budgets and work at the companies that sell tokens. I only have a "Pro" Claude subscription for personal use, meaning that each token spent needs to earn its keep. 
+If you're on tech twitter for any amount of time, "subagents" are already a thing of the past. The cool kids are now doing "loops" or even "graphs". 
 
-In my previous post, my experience with subagents was 
+The cool kids also have infinite budgets and work for the token factories. I only have a "Pro" Claude subscription for personal use, meaning that each token needs to earn its keep. 
+
+In my [previous post on the matter](/blog/building-for-one), my experience with subagents was 
 
 >I found that the multi-agent system was exceptional at consuming tokens, while producing the same results that I could have achieved with a single agent.
 
@@ -57,35 +47,77 @@ To keep things as simple as possible, but not simpler, my process looks like:
 
 Now the work can start. This is how I set up the work:
 - I interact with the main agent, which only does lifecycle management and progress tracking
-- A "coder" subagent is tasked with writing the change documented
+- A "coder" subagent is tasked with writing the change 
 - A "reviewer" subagent reviews the change and gives it a thumbs up or down.
 - The main agent sends the reviewer's feedback back to the coder and the cycle repeats until the change is approved.
 - Once the change is approved, the main agent updates the plan, commits everything to git and moves on to the next milestone.
 
+<pre class="mermaid">
+flowchart TD
+
+subgraph Prework
+    main_plan[Planning session: generate plan file]
+    phase_plan[Phase planning session: generate phase plan file]
+end
+
+subgraph Work
+    main_agent[Main agent: lifecycle management and progress tracking]
+    coder[Coder subagent: write the change]
+    reviewer[Reviewer subagent: review the change]
+end
+
+main_plan --> phase_plan
+
+main_agent -- implement change --> coder
+coder -- report progress --> main_agent
+main_agent -- review change --> reviewer
+reviewer -- report feedback --> main_agent
+
+</pre>
+
 ### The devil is in the details, and the details are mad expensive
 
-Here are some of the things I learned while doing this, after exhausting my hourly and then weekly Claude quotas and buying a ChatGPT Plus subscription to keep going. Rated by monetary value:
+Here are some of the things I learned while doing this:
 
-- Inevitably, you'll exhaust the 5 hours Claude limit. If you wait more than 60 minutes to continue, you'll be faced with a tough choice: continue where you left off, or start a new session. Your session is cached for an hour, after that, you'll have to reprocess all the context from scratch, a [dramatically more expensive process](https://x.com/quxiaoyin/status/2085408811104534754). This is where instructing the main agent to keep track of where the work is pays dividends.
+- Inevitably, you'll exhaust the 5 hours Claude limit. If you wait more than 60 minutes to continue, you'll be faced with a tough choice: continue where you left off, or start a new session. 
 
-- Have the main agent feed the subagents with exactly the context they need to do the job. We shouldn't ask the subagents to go read the plan files, or all of the codebase. They should have this information already distilled and passed to them in the prompt. This is alone is the #1 time and token saver.
+    Your session is cached for an hour, after that, you'll have to reprocess all the context from scratch, a [dramatically more expensive process](https://x.com/quxiaoyin/status/2085408811104534754). 
+    
+    This is where instructing the main agent to keep track of where the work is, in the plan file, pays dividends. Now it's possible to start a new session, or even change the model, and continue where you left off without paying through the nose for context reprocessing.
 
-- Do not let the reviewer run tests, linting, or any other automated checks. We don't want to waste tokens on tool calls that the coder will already have done. The reviewer is specifically instructed to only look at the code and do nothing else.
+- Have the main agent feed the subagents with **exactly the context they need** to do the job. 
 
-- A weaker model is perfectly fine for coding. I settled with Sonnet/Terra at medium effort for the best combination of price, speed and quality.
+  The subagent should not have to go read the plan files, or all of the codebase. It should have this information already distilled and passed to them in the prompt.
 
-- I want the reviewer to be a strong model, but I don't want it to go crazy. The bang for the buck here are **Opus or Sol** at **Low** reasoning effort.
+- **Do not let the reviewer run tests, linting, or any other automated checks**. We don't want to waste tokens on tool calls that the coder will already have done. The reviewer is specifically instructed to only look at the code and do nothing else.
 
-- Especially for this type of software, Claude will want to do some semi-manual browser testing. This is a **very very bad idea**. Automated testing is the way to go; the moment your agent has to look at screenshots or write custom throwaway test scripts, you are wasting tokens.
+- A weaker model is perfectly fine for coding. I settled on Sonnet/Terra at medium effort for the best combination of price, speed, and quality.
 
-- At the time of writing, Twitter is abuzz with **Luna at Max effort** for coding, because it's cheap and the benchmarks show it can do impressive thigns at extreme reasoning levels. In my experience, it does write the code, but it takes a REALLY, REALLY long time to do it. The reviewer keeps any issue in check, but the coder is so slow that it's only an option if you're token poor and time rich, and are extremely patient.
+- I want the reviewer to be a strong model, but I don't want it to go crazy. The best bang for the buck here is **Opus or Sol** at **Low** reasoning effort.
 
-- Once again, using my ChatGPT Plus subscription allowed me to go back to my darling OpenCode after being on Claude Code for a loong time. OpenCode is such a superior developer experience. I'm still mad at Anthropic for not allowing third party harnesses.
+- Especially for this type of software, Claude will want to do some semi-manual browser testing. This is a **very very bad idea**. 
 
+    Automated testing is the way to go; the moment your agent has to look at screenshots or write custom throwaway test scripts, you are wasting tokens.
+
+- At the time of writing, Twitter is abuzz with **Luna at Max effort** for coding, because it's cheap and the benchmarks show it can do impressive thigns at extreme reasoning levels. 
+    
+    In my experience, it does write the code, but it takes a REALLY, REALLY long time to do it. The reviewer keeps any issue in check, but the coder is so slow that it's only an option if you're token poor and time rich, and are extremely patient.
+
+    I'm also not completely sold on the economics of this approach. At this reasoning level, Luna will overthink, use too many tool calls, and generally waste tokens, even if they're of the cheaper kind.
 
 
 ### Overall, mission accomplished?
 
-I started with the goal of stretching my 20£/mo Claude subscription as far as possible, and ended up buying a ChatGPT Plus subscription to keep going. I'm going to be positive here and say _maybe, probably_.
+The migration from vanilla JS to preact is now complete, and the editor is now a much more maintainable codebase. The UI is now componentized, and the code is much more readable and easier to navigate, especially for me. 
 
-The biggest advantage of this approach vs my usual "single agent" workflow is that I can let it run on its own, while I do other things. The main agent's context never gets too big since it's only a coordinator, and the subagents are by nature ephemeral, so they don't accumulate context either. This means that I can let the system run for hours without worrying about it running out of context or entering the "dumb zone".
+On the economics, I started with the goal of stretching my 20£/mo Claude subscription as far as possible, and ended up buying a ChatGPT Plus subscription to keep going. I'm going to be positive here and say _maybe, probably_. 
+I made a lot of stupid mistakes during the experiment, and I'm sure that given what I know now, I could have done it all on a single subscription.
+
+An unexpected advantage of this approach vs my usual "single agent" workflow has been letting the agents run on their own, while I do other things. The main agent's context never gets too big since it's only a coordinator, and the subagents are by nature ephemeral, so they don't accumulate context either. This means that I can let the system run for hours without worrying about it running out of context or entering the "dumb zone".
+
+And finally a rant: Once again, using my ChatGPT Plus subscription allowed me to go back to my darling OpenCode after being on Claude Code for a loong time. **OpenCode is such a superior developer experience**. I'm still mad at Anthropic for not allowing third party harnesses.
+
+
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
