@@ -7,14 +7,14 @@
         <script>
           (function () {
             var key = 'codemade-theme';
-            var preference = 'system';
+            var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var preference = dark ? 'dark' : 'light';
             try {
               var stored = localStorage.getItem(key);
-              if (stored === 'light' || stored === 'dark' || stored === 'system') preference = stored;
+              if (stored === 'light' || stored === 'dark') preference = stored;
             } catch (error) {}
-            var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
             document.documentElement.dataset.themePreference = preference;
-            document.documentElement.dataset.theme = preference === 'system' ? (dark ? 'dark' : 'light') : preference;
+            document.documentElement.dataset.theme = preference;
           }());
         </script>
         <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -50,5 +50,6 @@
         window.cmParams = { tenant: "codemade" };
         </script>
         <script defer src="https://stats.codemade.net/track.js"></script>
+        <script defer src="/assets/js/app.js"></script>
     </body>
 </html>

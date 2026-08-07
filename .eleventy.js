@@ -1,13 +1,16 @@
 import { DateTime } from 'luxon';
 import processSass from './utils/css-processing.js';
+import processJavaScript from './utils/js-processing.js';
 import markdown from 'markdown-it';
 import syntaxHighlight from "@11ty/eleventy-plugin-syntaxhighlight";
 import { feedPlugin } from "@11ty/eleventy-plugin-rss";
 
 
 export default function(eleventyConfig) {
-  // Process SASS when the site is being built
+  // Build the site assets before Eleventy copies them to the output directory.
   eleventyConfig.on('eleventy.before', processSass);
+  eleventyConfig.on('eleventy.before', processJavaScript);
+  eleventyConfig.ignores.add('tests/**');
   eleventyConfig.addPlugin(syntaxHighlight);
 
   eleventyConfig.addPlugin(feedPlugin, {
@@ -31,7 +34,7 @@ export default function(eleventyConfig) {
   
   // Pass through files
   eleventyConfig.addPassthroughCopy("images");
-  eleventyConfig.addPassthroughCopy("assets/js");
+  eleventyConfig.addPassthroughCopy("assets/js/app.js");
   eleventyConfig.addPassthroughCopy("assets/css/*.css");
   eleventyConfig.addPassthroughCopy({ "_css/style.css": "css/style.css" });
   eleventyConfig.addPassthroughCopy("{,!(_site)!(_site2)/**/}*.png");
