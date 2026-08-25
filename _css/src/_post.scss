@@ -59,7 +59,7 @@
   font-weight: 600;
   margin: 1.5rem 0 0.5rem;
 }
-.post-page-content p {
+.post-page-content p:not(pre.mermaid p) {
   font-size: 0.97rem;
   line-height: 1.8;
   margin-bottom: 1.25rem;

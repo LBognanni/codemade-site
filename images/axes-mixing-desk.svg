@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 400" font-family="Menlo, Consolas, monospace">
+  <title>Four axes of subagent cost optimization</title>
+  <rect x="0" y="0" width="760" height="400" fill="#ffffff"/>
+
+  <!-- legend -->
+  <circle cx="40" cy="374" r="5" fill="#2e9e6b"/>
+  <text x="52" y="378" font-size="12" fill="#333333">coder preset</text>
+  <circle cx="170" cy="374" r="5" fill="#3b6fd6"/>
+  <text x="182" y="378" font-size="12" fill="#333333">reviewer preset</text>
+
+  <!-- ============ Fader 1: Model class ============ -->
+  <g>
+    <text x="100" y="55" font-size="13" font-weight="bold" fill="#111111" text-anchor="middle">MODEL CLASS</text>
+    <!-- sweet spot zone -->
+    <rect x="93" y="80" width="14" height="140" fill="#2e9e6b" opacity="0.16"/>
+    <rect x="93" y="80" width="14" height="240" fill="none" stroke="#999999" stroke-width="1.5" rx="7"/>
+    <!-- ticks -->
+    <line x1="107" y1="300" x2="118" y2="300" stroke="#bbbbbb" stroke-width="1"/>
+    <text x="122" y="304" font-size="11" fill="#666666">Haiku/Luna</text>
+    <line x1="107" y1="200" x2="118" y2="200" stroke="#bbbbbb" stroke-width="1"/>
+    <text x="122" y="204" font-size="11" fill="#666666">Sonnet/Terra</text>
+    <line x1="107" y1="100" x2="118" y2="100" stroke="#bbbbbb" stroke-width="1"/>
+    <text x="122" y="104" font-size="11" fill="#666666">Opus/Sol</text>
+    <!-- coder marker at Sonnet (y=200) -->
+    <path d="M 93 200 L 84 195 L 84 205 Z" fill="#2e9e6b"/>
+    <!-- reviewer marker at Opus (y=100) -->
+    <path d="M 93 100 L 84 95 L 84 105 Z" fill="#3b6fd6"/>
+    <text x="100" y="340" font-size="11" fill="#999999" text-anchor="middle">cheap</text>
+    <text x="100" y="70" font-size="11" fill="#999999" text-anchor="middle">expensive</text>
+  </g>
+
+  <!-- ============ Fader 2: Reasoning effort ============ -->
+  <g>
+    <text x="260" y="55" font-size="13" font-weight="bold" fill="#111111" text-anchor="middle">REASONING EFFORT</text>
+    <!-- overkill zone: top band = max -->
+    <rect x="253" y="80" width="14" height="60" fill="#e0637a" opacity="0.22"/>
+    <!-- sweet spot: low-medium -->
+    <rect x="253" y="200" width="14" height="120" fill="#2e9e6b" opacity="0.16"/>
+    <rect x="253" y="80" width="14" height="240" fill="none" stroke="#999999" stroke-width="1.5" rx="7"/>
+    <line x1="267" y1="300" x2="278" y2="300" stroke="#bbbbbb" stroke-width="1"/>
+    <text x="282" y="304" font-size="11" fill="#666666">low</text>
+    <line x1="267" y1="240" x2="278" y2="240" stroke="#bbbbbb" stroke-width="1"/>
+    <text x="282" y="244" font-size="11" fill="#666666">medium</text>
+    <line x1="267" y1="160" x2="278" y2="160" stroke="#bbbbbb" stroke-width="1"/>
+    <text x="282" y="164" font-size="11" fill="#666666">high</text>
+    <line x1="267" y1="90" x2="278" y2="90" stroke="#bbbbbb" stroke-width="1"/>
+    <text x="282" y="94" font-size="11" fill="#666666">max</text>
+    <!-- coder marker at medium (y=240) -->
+    <path d="M 253 240 L 244 235 L 244 245 Z" fill="#2e9e6b"/>
+    <!-- reviewer marker at low (y=300) -->
+    <path d="M 253 300 L 244 295 L 244 305 Z" fill="#3b6fd6"/>
+  </g>
+
+  <!-- ============ Fader 3: Working context size ============ -->
+  <g>
+    <text x="420" y="55" font-size="13" font-weight="bold" fill="#111111" text-anchor="middle">WORKING CONTEXT</text>
+    <rect x="413" y="80" width="14" height="60" fill="#e0637a" opacity="0.22"/>
+    <rect x="413" y="180" width="14" height="140" fill="#2e9e6b" opacity="0.16"/>
+    <rect x="413" y="80" width="14" height="240" fill="none" stroke="#999999" stroke-width="1.5" rx="7"/>
+    <line x1="427" y1="300" x2="438" y2="300" stroke="#bbbbbb" stroke-width="1"/>
+    <text x="442" y="304" font-size="11" fill="#666666">diff + brief</text>
+    <line x1="427" y1="200" x2="438" y2="200" stroke="#bbbbbb" stroke-width="1"/>
+    <text x="442" y="204" font-size="11" fill="#666666">focused</text>
+    <line x1="427" y1="100" x2="438" y2="100" stroke="#bbbbbb" stroke-width="1"/>
+    <text x="442" y="104" font-size="11" fill="#666666">everything</text>
+    <!-- coder marker at focused (y=200) -->
+    <path d="M 413 200 L 404 195 L 404 205 Z" fill="#2e9e6b"/>
+    <!-- reviewer marker at diff only (y=300) -->
+    <path d="M 413 300 L 404 295 L 404 305 Z" fill="#3b6fd6"/>
+  </g>
+
+  <!-- ============ Fader 4: Initial context ============ -->
+  <g>
+    <text x="580" y="55" font-size="13" font-weight="bold" fill="#111111" text-anchor="middle">INITIAL CONTEXT</text>
+    <!-- almost entirely a waste zone -->
+    <rect x="573" y="80" width="14" height="200" fill="#e0637a" opacity="0.18"/>
+    <rect x="573" y="280" width="14" height="40" fill="#2e9e6b" opacity="0.16"/>
+    <rect x="573" y="80" width="14" height="240" fill="none" stroke="#999999" stroke-width="1.5" rx="7"/>
+    <line x1="587" y1="300" x2="598" y2="300" stroke="#bbbbbb" stroke-width="1"/>
+    <text x="602" y="304" font-size="11" fill="#666666">read agents.md</text>
+    <line x1="587" y1="220" x2="598" y2="220" stroke="#bbbbbb" stroke-width="1"/>
+    <text x="602" y="224" font-size="11" fill="#666666">read phase plan</text>
+    <line x1="587" y1="100" x2="598" y2="100" stroke="#bbbbbb" stroke-width="1"/>
+    <text x="602" y="104" font-size="11" fill="#666666">read the repo</text>
+    <!-- both presets at "none" -->
+    <path d="M 573 296 L 564 291 L 564 297 Z" fill="#2e9e6b"/>
+    <path d="M 573 304 L 564 305 L 564 311 Z" fill="#3b6fd6"/>
+    <g transform="translate(0, 160)">
+      <!-- fan-out glyph: one node branching to three -->
+      <g transform="translate(700,180)" stroke="#b23a3a" stroke-width="1.3" fill="none">
+        <circle cx="0" cy="0" r="4" fill="#b23a3a" stroke="none"/>
+        <line x1="0" y1="0" x2="26" y2="-20"/>
+        <line x1="0" y1="0" x2="26" y2="0"/>
+        <line x1="0" y1="0" x2="26" y2="20"/>
+        <circle cx="26" cy="-20" r="3" fill="#b23a3a" stroke="none"/>
+        <circle cx="26" cy="0" r="3" fill="#b23a3a" stroke="none"/>
+        <circle cx="26" cy="20" r="3" fill="#b23a3a" stroke="none"/>
+      </g>
+      <text x="700" y="215" font-size="10.5" fill="#b23a3a" text-anchor="middle">x every</text>
+      <text x="700" y="228" font-size="10.5" fill="#b23a3a" text-anchor="middle">subagent</text>
+    </g>
+  </g>
+</svg>

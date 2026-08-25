@@ -1,0 +1,851 @@
+---
+layout: vibelet
+title: Git Branch Visualizer
+subtitle: >-
+  Turn your local Git history into an interactive branch graph.
+keywords: git branch visualizer, git graph, git log visualizer, git branches, vibelet
+about: >-
+  This Git branch visualizer runs entirely in your browser. Generate the compact log output with
+  the command above, paste it here, and inspect branches, merge commits, tags, and the commits
+  between them without sharing your repository history with a server.
+
+
+  The graph reduces linear stretches of unlabelled commits into clickable fragments, so complex
+  histories stay readable while every commit remains available to inspect.
+---
+{% raw %}
+<style>
+  .gbv {
+    --gbv-bg: var(--bg);
+    --gbv-panel: var(--bg-card);
+    --gbv-panel-2: var(--bg-elevated);
+    --gbv-line: var(--border);
+    --gbv-text: var(--text);
+    --gbv-text-dim: var(--text-muted);
+    --gbv-accent: var(--accent);
+    --accent-2: #f5a962;
+    --danger: #e5738b;
+    --gbv-mono: var(--font-mono);
+    --gbv-sans: var(--font-body);
+  }
+  .gbv * { box-sizing: border-box; }
+  .gbv {
+    color: var(--gbv-text);
+    font-family: var(--gbv-sans);
+  }
+  .gbv .gbv-app {
+    display:flex;
+    flex-direction:column;
+    min-height: 580px;
+  }
+  .gbv .gbv-toolbar {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--gbv-line);
+    display:flex;
+    align-items:center;
+    gap:14px;
+    flex-shrink:0;
+    background: var(--gbv-panel-2);
+  }
+  .gbv .gbv-toolbar h2{
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--gbv-text);
+    margin:0;
+  }
+  .gbv .gbv-toolbar .sub{
+    font-size: 12px;
+    color: var(--gbv-text-dim);
+    font-family: var(--gbv-mono);
+  }
+  .gbv .gbv-toolbar .spacer{ flex:1; }
+  .gbv .gbv-toolbar button{
+    background: transparent;
+    color: var(--gbv-text-dim);
+    border: 1px solid var(--gbv-line);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: var(--gbv-sans);
+  }
+  .gbv .gbv-toolbar button:hover{ color: var(--gbv-text); border-color: var(--gbv-accent); }
+
+  #intro{
+    padding: 26px 20px;
+    max-width: 860px;
+    margin: 0 auto;
+    width: 100%;
+    overflow-y:auto;
+  }
+  #intro p{ color: var(--gbv-text-dim); line-height:1.6; font-size: 13.5px; }
+  #intro code, #intro .cmd{
+    font-family: var(--gbv-mono);
+    font-size: 12.5px;
+  }
+  .cmd-box{
+    background: var(--gbv-panel);
+    border: 1px solid var(--gbv-line);
+    border-radius: 8px;
+    padding: 14px 16px;
+    color: var(--gbv-accent);
+    font-family: var(--gbv-mono);
+    font-size: 12.5px;
+    overflow-x:auto;
+    white-space: pre;
+    margin: 10px 0 20px;
+    position:relative;
+  }
+  .cmd-box .copy{
+    position:absolute; top:8px; right:8px;
+    background: var(--gbv-panel-2);
+    border:1px solid var(--gbv-line);
+    color: var(--gbv-text-dim);
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius:4px;
+    cursor:pointer;
+    font-family: var(--gbv-sans);
+  }
+  .cmd-box .copy:hover{ color: var(--gbv-text); }
+  .gbv textarea{
+    width:100%;
+    height: 220px;
+    background: var(--gbv-panel);
+    color: var(--gbv-text);
+    border: 1px solid var(--gbv-line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-family: var(--gbv-mono);
+    font-size: 12px;
+    line-height:1.5;
+    resize: vertical;
+    outline: none;
+  }
+  .gbv textarea:focus{ border-color: var(--gbv-accent); }
+  .row{ display:flex; gap:10px; align-items:center; margin-top: 12px; }
+  .btn-primary{
+    background: var(--gbv-accent);
+    color: #06231f;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor:pointer;
+    font-family: var(--gbv-sans);
+  }
+  .btn-primary:hover{ filter: brightness(1.08); }
+  .btn-ghost{
+    background: transparent;
+    color: var(--gbv-text-dim);
+    border: 1px solid var(--gbv-line);
+    padding: 9px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor:pointer;
+    font-family: var(--gbv-sans);
+  }
+  .btn-ghost:hover{ color: var(--gbv-text); border-color: var(--gbv-text-dim); }
+  #error{
+    color: var(--danger);
+    font-family: var(--gbv-mono);
+    font-size: 12px;
+    margin-top: 10px;
+    white-space: pre-wrap;
+  }
+
+  #workspace{
+    flex:1;
+    display:none;
+    overflow:hidden;
+  }
+  #workspace.active{ display:flex; }
+  #graph-wrap{
+    flex:1;
+    overflow:auto;
+    position:relative;
+    background:
+      radial-gradient(circle at 1px 1px, #1a2030 1px, transparent 1px) 0 0 / 22px 22px,
+       var(--gbv-bg);
+  }
+  #graph-wrap svg{ display:block; }
+
+  .gbv .node-circle{
+    stroke-width: 2;
+    cursor: pointer;
+    transition: r 0.12s ease;
+  }
+  .gbv .node-circle:hover{ r: 9; }
+  .gbv .node-label{
+    font-family: var(--gbv-mono);
+    font-size: 11px;
+    fill: var(--gbv-text);
+    pointer-events:none;
+  }
+  .gbv .node-ref{
+    font-family: var(--gbv-sans);
+    font-size: 11px;
+    font-weight: 600;
+    pointer-events:none;
+  }
+  .gbv .edge-path{
+    fill:none;
+    stroke-width: 3;
+    cursor: pointer;
+    opacity: 0.75;
+  }
+  .gbv .edge-path:hover{ opacity: 1; stroke-width: 4.5; }
+  .gbv .edge-path.selected{ opacity: 1; stroke-width: 5; filter: drop-shadow(0 0 4px currentColor); }
+  .gbv .edge-hit{
+    fill:none;
+    stroke: transparent;
+    stroke-width: 16;
+    cursor:pointer;
+  }
+  .gbv .node-circle.selected{ stroke: #fff; stroke-width:3; }
+
+  #panel{
+    width: 360px;
+    flex-shrink:0;
+    background: var(--gbv-panel);
+    border-left: 1px solid var(--gbv-line);
+    overflow-y:auto;
+    padding: 18px 18px 40px;
+  }
+  #panel h2{
+    font-size: 13px;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color: var(--gbv-accent);
+    margin: 0 0 4px;
+  }
+  #panel .panel-sub{
+    font-size: 11.5px;
+    color: var(--gbv-text-dim);
+    font-family: var(--gbv-mono);
+    margin-bottom: 16px;
+    word-break: break-all;
+  }
+  .empty-hint{
+    color: var(--gbv-text-dim);
+    font-size: 13px;
+    line-height:1.6;
+    margin-top: 40px;
+  }
+  .commit-card{
+    background: var(--gbv-panel-2);
+    border: 1px solid var(--gbv-line);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+  }
+  .commit-card .hash{
+    font-family: var(--gbv-mono);
+    font-size: 11px;
+    color: var(--accent-2);
+  }
+  .commit-card .subject{
+    font-size: 13px;
+    margin: 6px 0 6px;
+    color: var(--gbv-text);
+    line-height:1.4;
+  }
+  .commit-card .meta{
+    font-size: 11px;
+    color: var(--gbv-text-dim);
+    font-family: var(--gbv-mono);
+  }
+  .frag-empty{
+    color: var(--gbv-text-dim);
+    font-size: 12.5px;
+    font-style: italic;
+    padding: 10px 0;
+  }
+  .legend-row{
+    display:flex; align-items:center; gap:8px;
+    font-size: 11.5px; color: var(--gbv-text-dim);
+    margin-bottom: 6px;
+  }
+  .legend-swatch{ width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+  #panel-legend{
+    border-bottom: 1px solid var(--gbv-line);
+    padding-bottom: 14px;
+    margin-bottom: 14px;
+  }
+  #panel-legend .legend-title{
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gbv-text-dim);
+    margin-bottom: 8px;
+  }
+  #panel-legend .legend-swatch{ width:9px; height:9px; }
+  #panel-legend .legend-row{ margin-bottom:5px; }
+  .gbv .node-ref-inferred{
+    font-family: var(--gbv-sans);
+    font-style: italic;
+    font-size: 10px;
+    opacity: 0.65;
+    pointer-events:none;
+  }
+  .gbv .edge-label{
+    font-family: var(--gbv-sans);
+    font-size: 10px;
+    font-style: italic;
+    opacity: 0.55;
+    pointer-events:none;
+  }
+  @media (max-width: 720px) {
+    .gbv .gbv-app { min-height: 0; }
+    #workspace.active { flex-direction: column; }
+    #graph-wrap { min-height: 420px; }
+    #panel { width: 100%; border-left: 0; border-top: 1px solid var(--gbv-line); max-height: 360px; }
+    #intro { padding: 20px 16px; }
+    .gbv .gbv-toolbar { padding: 12px 16px; }
+  }
+</style>
+<div class="gbv">
+<div class="gbv-app">
+  <div class="gbv-toolbar">
+    <h2>Graph workspace</h2>
+    <span class="sub" id="header-stats"></span>
+    <div class="spacer"></div>
+    <button id="btn-back" style="display:none;">&larr; New input</button>
+  </div>
+
+  <div id="intro">
+    <p>Run this in your repo, then paste the output below. It grabs every reachable commit, its parents, and any ref (branch/tag/HEAD) pointing at it &mdash; that's all this needs.</p>
+    <div class="cmd-box"><button class="copy" id="copy-cmd">Copy</button><span id="cmd-text">git log --all --topo-order --date=iso-strict --pretty=format:"%H%x1f%P%x1f%D%x1f%an%x1f%ad%x1f%s"</span></div>
+    <textarea id="input" placeholder="Paste git log output here..."></textarea>
+    <div class="row">
+      <button class="btn-primary" id="btn-render">Render graph</button>
+      <button class="btn-ghost" id="btn-example">Load example</button>
+    </div>
+    <div id="error"></div>
+    <p style="margin-top:22px;">How this simplifies things: only <strong>fragments</strong> are drawn &mdash; runs of commits with exactly one parent and one child, and no ref on them. Anywhere a commit is a root, a merge, a branch point (2+ children), or has a ref/tag/HEAD, it becomes a small node. Click a node for that single commit; click a connecting line for every commit along that fragment.</p>
+  </div>
+
+  <div id="workspace">
+    <div id="graph-wrap"></div>
+    <div id="panel">
+      <div id="panel-legend"></div>
+      <div id="panel-detail">
+        <div class="empty-hint" id="panel-empty">Select a node or a fragment line in the graph to see commit details here.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  const US = "\x1f"; // unit separator field delimiter
+
+  const EXAMPLE_LOG = [
+    ["b1b1b10000000000000000000000000000000b","a3a3a30000000000000000000000000000000a","feature-b","Bea Brancher","2024-01-10T10:00:00-05:00","Add login retry logic"],
+    ["c1c1c10000000000000000000000000000000c","a1a1a10000000000000000000000000000000a","feature-c","Cass Coder","2024-01-08T09:00:00-05:00","Prototype alternate parser"],
+    ["a3a3a30000000000000000000000000000000a","a2a2a20000000000000000000000000000000a","feature-a","Ann Author","2024-01-09T14:00:00-05:00","Wire up new API client"],
+    ["a2a2a20000000000000000000000000000000a","a1a1a10000000000000000000000000000000a","","Ann Author","2024-01-07T14:00:00-05:00","Add request retries"],
+    ["a1a1a10000000000000000000000000000000a","2b2b2b0000000000000000000000000000000b","","Ann Author","2024-01-05T11:00:00-05:00","Scaffold feature module"],
+    ["2b2b2b0000000000000000000000000000000b","1a1a1a0000000000000000000000000000000a","HEAD -> main","Mo Maintainer","2024-01-03T08:00:00-05:00","Release 1.2.0"],
+    ["1a1a1a0000000000000000000000000000000a","","","Mo Maintainer","2024-01-01T08:00:00-05:00","Initial commit"]
+  ].map(r => r.join(US)).join("\n");
+
+  const els = {
+    input: document.getElementById("input"),
+    btnRender: document.getElementById("btn-render"),
+    btnExample: document.getElementById("btn-example"),
+    btnBack: document.getElementById("btn-back"),
+    error: document.getElementById("error"),
+    intro: document.getElementById("intro"),
+    workspace: document.getElementById("workspace"),
+    graphWrap: document.getElementById("graph-wrap"),
+    panel: document.getElementById("panel"),
+    panelEmpty: document.getElementById("panel-empty"),
+    headerStats: document.getElementById("header-stats"),
+    copyCmd: document.getElementById("copy-cmd"),
+    cmdText: document.getElementById("cmd-text"),
+  };
+
+  els.copyCmd.addEventListener("click", () => {
+    navigator.clipboard.writeText(els.cmdText.textContent).then(() => {
+      els.copyCmd.textContent = "Copied";
+      setTimeout(() => els.copyCmd.textContent = "Copy", 1200);
+    });
+  });
+
+  els.btnExample.addEventListener("click", () => {
+    els.input.value = EXAMPLE_LOG;
+  });
+
+  els.btnBack.addEventListener("click", () => {
+    els.workspace.classList.remove("active");
+    els.intro.style.display = "block";
+    els.btnBack.style.display = "none";
+    els.headerStats.textContent = "";
+  });
+
+  els.btnRender.addEventListener("click", () => {
+    els.error.textContent = "";
+    try {
+      const text = els.input.value.trim();
+      if (!text) { els.error.textContent = "Paste some git log output first."; return; }
+      const commits = parseLog(text);
+      if (commits.length === 0) { els.error.textContent = "Couldn't find any parsable commit lines. Check the format matches the command above."; return; }
+      const graph = buildGraph(commits);
+      renderGraph(graph);
+      els.intro.style.display = "none";
+      els.workspace.classList.add("active");
+      els.btnBack.style.display = "inline-block";
+      els.headerStats.textContent = commits.length + " commits parsed \u00b7 " + graph.nodes.length + " nodes \u00b7 " + graph.edges.length + " fragments";
+    } catch (e) {
+      console.error(e);
+      els.error.textContent = "Error: " + e.message;
+    }
+  });
+
+  // ---------- Parsing ----------
+  function parseLog(text) {
+    const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
+    const commits = [];
+    for (const line of lines) {
+      const parts = line.split(US);
+      if (parts.length < 6) continue; // skip unparsable / merge-continuation lines
+      const [hash, parentsRaw, refsRaw, author, date, ...subjectParts] = parts;
+      if (!/^[0-9a-f]{7,40}$/i.test(hash.trim())) continue;
+      const parents = parentsRaw.trim() ? parentsRaw.trim().split(/\s+/) : [];
+      const refs = parseRefs(refsRaw);
+      commits.push({
+        hash: hash.trim(),
+        parents,
+        refs,
+        author: author.trim(),
+        date: date.trim(),
+        subject: subjectParts.join(US).trim()
+      });
+    }
+    return commits;
+  }
+
+  function parseRefs(raw) {
+    if (!raw || !raw.trim()) return [];
+    return raw.split(",").map(r => r.trim()).filter(Boolean).map(r => {
+      r = r.replace(/^HEAD\s*->\s*/, "HEAD -> ");
+      return r.replace(/^tag:\s*/, "tag: ");
+    });
+  }
+
+  // ---------- Graph construction ----------
+  function buildGraph(commits) {
+    const commitMap = {};
+    commits.forEach(c => commitMap[c.hash] = c);
+
+    const children = {};
+    commits.forEach(c => {
+      c.parents.forEach(p => {
+        if (!children[p]) children[p] = [];
+        children[p].push(c.hash);
+      });
+    });
+
+    function isBoundary(hash) {
+      const c = commitMap[hash];
+      if (!c) return true; // external / unknown commit
+      if (c.parents.length !== 1) return true; // root or merge
+      const kids = children[hash] || [];
+      if (kids.length !== 1) return true; // branch point or tip/leaf
+      if (c.refs.length > 0) return true; // named ref
+      return false;
+    }
+
+    function traceFragment(startHash) {
+      let cur = startHash;
+      const collected = [];
+      while (true) {
+        const c = commitMap[cur];
+        if (!c) return { commits: collected, endHash: cur, external: true };
+        if (isBoundary(cur)) return { commits: collected, endHash: cur, external: false };
+        collected.push(cur);
+        cur = c.parents[0];
+      }
+    }
+
+    // boundary nodes in original (topo, newest-first) order
+    const boundaryOrder = commits.filter(c => isBoundary(c.hash));
+
+    const nodes = [];
+    const nodeByHash = {};
+    const edges = [];
+    const lanes = []; // lanes[i] = hash we expect next in that lane, or null
+
+    let row = 0;
+    boundaryOrder.forEach(c => {
+      const hash = c.hash;
+      let matching = [];
+      lanes.forEach((expected, i) => { if (expected === hash) matching.push(i); });
+      let lane;
+      if (matching.length > 0) {
+        lane = matching[0];
+        matching.slice(1).forEach(i => { lanes[i] = null; });
+      } else {
+        lane = lanes.findIndex(l => l === null || l === undefined);
+        if (lane === -1) lane = lanes.length;
+      }
+
+      const node = {
+        hash, lane, row,
+        refs: c.refs, branchLabel: pickLabel(c.refs), branchInferred: false,
+        author: c.author, date: c.date, subject: c.subject,
+        isRoot: c.parents.length === 0,
+        isMerge: c.parents.length > 1,
+        isLeaf: !(children[hash] && children[hash].length > 0)
+      };
+      nodes.push(node);
+      nodeByHash[hash] = node;
+      row++;
+
+      const parentEdges = c.parents.map(p => traceFragment(p));
+      if (parentEdges.length > 0) {
+        lanes[lane] = parentEdges[0].endHash;
+        for (let k = 1; k < parentEdges.length; k++) {
+          const eh = parentEdges[k].endHash;
+          if (!lanes.includes(eh)) {
+            let newLane = lanes.findIndex(l => l === null || l === undefined);
+            if (newLane === -1) newLane = lanes.length;
+            lanes[newLane] = eh;
+          }
+        }
+      } else {
+        lanes[lane] = null;
+      }
+
+      parentEdges.forEach((fe, idx) => {
+        edges.push({
+          id: "e" + edges.length,
+          fromHash: hash,
+          toHash: fe.endHash,
+          commits: fe.commits.map(h => commitMap[h]),
+          external: fe.external,
+          isPrimary: idx === 0
+        });
+      });
+    });
+
+    // handle any edge endpoints that never got a node (external / missing parent)
+    edges.forEach(e => {
+      if (!nodeByHash[e.toHash]) {
+        const node = {
+          hash: e.toHash, lane: nodeByHash[e.fromHash].lane, row: row,
+          refs: [], branchLabel: null, author: "", date: "", subject: "(external / not in log)",
+          isRoot: true, isMerge: false, isLeaf: true, isExternal: true
+        };
+        nodes.push(node);
+        nodeByHash[e.toHash] = node;
+        row++;
+      }
+    });
+
+    // Propagate branch names down the primary (first-parent) chain so commits
+    // that sit *before* any ref still carry the branch they belong to.
+    nodes.forEach(n => {
+      if (!n.branchLabel) return;
+      const primaryEdge = edges.find(e => e.fromHash === n.hash && e.isPrimary);
+      if (primaryEdge) {
+        const target = nodeByHash[primaryEdge.toHash];
+        if (target && !target.branchLabel) {
+          target.branchLabel = n.branchLabel;
+          target.branchInferred = true;
+        }
+      }
+    });
+    edges.forEach(e => {
+      const from = nodeByHash[e.fromHash];
+      e.branchLabel = from ? from.branchLabel : null;
+    });
+
+    return { nodes, edges, nodeByHash, laneCount: Math.max(1, lanes.length) };
+  }
+
+  function pickLabel(refs) {
+    if (!refs || refs.length === 0) return null;
+    const nonTag = refs.find(r => !r.toLowerCase().startsWith("tag:"));
+    const raw = nonTag || refs[0];
+    return raw.replace(/^HEAD\s*->\s*/, "").replace(/^tag:\s*/, "");
+  }
+
+  // ---------- Rendering ----------
+  const LANE_W = 130;
+  const ROW_H = 78;
+  const MARGIN_X = 60;
+  const MARGIN_Y = 40;
+  const PALETTE = ["#5eead4", "#f5a962", "#c792ea", "#7dc4e4", "#f07178", "#a6e22e", "#ffcb6b", "#82aaff"];
+
+  const NEUTRAL = "#5b6472";
+  function laneColor(lane) { return PALETTE[lane % PALETTE.length]; }
+  function branchColor(label) {
+    if (!label) return NEUTRAL;
+    let h = 0;
+    for (let i = 0; i < label.length; i++) h = (h * 31 + label.charCodeAt(i)) >>> 0;
+    return PALETTE[h % PALETTE.length];
+  }
+
+  function pos(node) {
+    return { x: MARGIN_X + node.lane * LANE_W, y: MARGIN_Y + node.row * ROW_H };
+  }
+
+  function short(hash) { return hash.slice(0, 7); }
+
+  function renderGraph(graph) {
+    const { nodes, edges, nodeByHash } = graph;
+    const maxLane = Math.max(...nodes.map(n => n.lane), 0);
+    const maxRow = Math.max(...nodes.map(n => n.row), 0);
+    const width = MARGIN_X * 2 + (maxLane + 1) * LANE_W;
+    const height = MARGIN_Y * 2 + (maxRow + 1) * ROW_H;
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("width", Math.max(width, 400));
+    svg.setAttribute("height", Math.max(height, 300));
+    svg.setAttribute("viewBox", "0 0 " + Math.max(width, 400) + " " + Math.max(height, 300));
+
+    const edgeLayer = document.createElementNS(svgNS, "g");
+    const nodeLayer = document.createElementNS(svgNS, "g");
+    svg.appendChild(edgeLayer);
+    svg.appendChild(nodeLayer);
+
+    let selectedEl = null;
+
+    edges.forEach(edge => {
+      const from = nodeByHash[edge.fromHash];
+      const to = nodeByHash[edge.toHash];
+      if (!from || !to) return;
+      const p1 = pos(from), p2 = pos(to);
+      const color = branchColor(edge.branchLabel);
+
+      let d;
+      if (p1.x === p2.x) {
+        d = `M ${p1.x} ${p1.y} L ${p2.x} ${p2.y}`;
+      } else {
+        const midY = (p1.y + p2.y) / 2;
+        d = `M ${p1.x} ${p1.y} C ${p1.x} ${midY}, ${p2.x} ${midY}, ${p2.x} ${p2.y}`;
+      }
+
+      const hit = document.createElementNS(svgNS, "path");
+      hit.setAttribute("d", d);
+      hit.setAttribute("class", "edge-hit");
+
+      const visible = document.createElementNS(svgNS, "path");
+      visible.setAttribute("d", d);
+      visible.setAttribute("class", "edge-path");
+      visible.setAttribute("stroke", color);
+      visible.style.color = color;
+      if (!edge.branchLabel) visible.setAttribute("stroke-dasharray", "3 4");
+
+      function select() {
+        if (selectedEl) selectedEl.classList.remove("selected");
+        visible.classList.add("selected");
+        selectedEl = visible;
+        showFragment(edge, from, to, color);
+      }
+      hit.addEventListener("click", select);
+      visible.addEventListener("click", select);
+
+      edgeLayer.appendChild(visible);
+      edgeLayer.appendChild(hit);
+
+      if (edge.branchLabel && edge.commits.length > 0) {
+        const label = document.createElementNS(svgNS, "text");
+        label.setAttribute("x", (p1.x + p2.x) / 2 + 10);
+        label.setAttribute("y", (p1.y + p2.y) / 2);
+        label.setAttribute("class", "edge-label");
+        label.setAttribute("fill", color);
+        label.textContent = edge.branchLabel;
+        edgeLayer.appendChild(label);
+      }
+    });
+
+    nodes.forEach(node => {
+      const p = pos(node);
+      const color = branchColor(node.branchLabel);
+      const g = document.createElementNS(svgNS, "g");
+
+      const circle = document.createElementNS(svgNS, "circle");
+      circle.setAttribute("cx", p.x);
+      circle.setAttribute("cy", p.y);
+      circle.setAttribute("r", node.isMerge || node.isRoot ? 8 : 6.5);
+      circle.setAttribute("class", "node-circle");
+      circle.setAttribute("fill", node.isExternal ? "#3a4152" : "#0b0e14");
+      circle.setAttribute("stroke", color);
+
+      circle.addEventListener("click", () => {
+        if (selectedEl) selectedEl.classList.remove("selected");
+        circle.classList.add("selected");
+        selectedEl = circle;
+        showCommit(node, color);
+      });
+
+      g.appendChild(circle);
+
+      let labelY = p.y - 6;
+      if (node.refs && node.refs.length) {
+        const refText = document.createElementNS(svgNS, "text");
+        refText.setAttribute("x", p.x + 12);
+        refText.setAttribute("y", labelY);
+        refText.setAttribute("class", "node-ref");
+        refText.setAttribute("fill", color);
+        refText.textContent = node.refs.join(", ");
+        g.appendChild(refText);
+        labelY += 12;
+      } else if (node.branchLabel) {
+        const inferredText = document.createElementNS(svgNS, "text");
+        inferredText.setAttribute("x", p.x + 12);
+        inferredText.setAttribute("y", labelY);
+        inferredText.setAttribute("class", "node-ref-inferred");
+        inferredText.setAttribute("fill", color);
+        inferredText.textContent = "(" + node.branchLabel + ")";
+        g.appendChild(inferredText);
+        labelY += 12;
+      }
+
+      const hashText = document.createElementNS(svgNS, "text");
+      hashText.setAttribute("x", p.x + 12);
+      hashText.setAttribute("y", labelY + 4);
+      hashText.setAttribute("class", "node-label");
+      hashText.textContent = node.isExternal ? "external" : short(node.hash);
+      g.appendChild(hashText);
+
+      nodeLayer.appendChild(g);
+    });
+
+    els.graphWrap.innerHTML = "";
+    els.graphWrap.appendChild(svg);
+    renderLegend(nodes);
+  }
+
+  function renderLegend(nodes) {
+    const labels = new Map();
+    nodes.forEach(n => {
+      if (!n.branchLabel || n.isExternal) return;
+      if (!labels.has(n.branchLabel)) labels.set(n.branchLabel, branchColor(n.branchLabel));
+    });
+    const el = document.getElementById("panel-legend");
+    if (labels.size === 0) { el.innerHTML = ""; return; }
+    let html = '<div class="legend-title">Branches</div>';
+    labels.forEach((color, name) => {
+      html += `<div class="legend-row"><span class="legend-swatch" style="background:${color}"></span>${escapeHtml(name)}</div>`;
+    });
+    html += `<div class="legend-row"><span class="legend-swatch" style="background:${NEUTRAL}"></span><em>unassigned / ambiguous</em></div>`;
+    el.innerHTML = html;
+  }
+
+  function showCommit(node, color) {
+    const panel = document.getElementById("panel-detail");
+    panel.innerHTML = "";
+    const h2 = document.createElement("h2");
+    h2.textContent = "Commit";
+    h2.style.color = color;
+    panel.appendChild(h2);
+
+    const sub = document.createElement("div");
+    sub.className = "panel-sub";
+    sub.textContent = node.isExternal ? node.hash + " (not present in the pasted log)" : node.hash;
+    panel.appendChild(sub);
+
+    if (node.refs && node.refs.length) {
+      const legend = document.createElement("div");
+      legend.className = "legend-row";
+      legend.innerHTML = `<span class="legend-swatch" style="background:${color}"></span> ${escapeHtml(node.refs.join(", "))}`;
+      panel.appendChild(legend);
+    } else if (node.branchLabel) {
+      const legend = document.createElement("div");
+      legend.className = "legend-row";
+      legend.innerHTML = `<span class="legend-swatch" style="background:${color}"></span> Inferred branch: <strong style="color:${color}">${escapeHtml(node.branchLabel)}</strong> (no ref here, carried over from history)`;
+      panel.appendChild(legend);
+    }
+
+    if (!node.isExternal) {
+      panel.appendChild(commitCard({ hash: node.hash, subject: node.subject, author: node.author, date: node.date }));
+      const tags = [];
+      if (node.isRoot) tags.push("root commit");
+      if (node.isMerge) tags.push("merge commit");
+      if (node.isLeaf) tags.push("branch tip / leaf");
+      if (!node.branchLabel) tags.push("not an ancestor of any ref \u2014 branch unknown");
+      if (tags.length) {
+        const t = document.createElement("div");
+        t.className = "frag-empty";
+        t.textContent = tags.join(" \u00b7 ");
+        panel.appendChild(t);
+      }
+    }
+  }
+
+  function showFragment(edge, from, to, color) {
+    const panel = document.getElementById("panel-detail");
+    panel.innerHTML = "";
+    const h2 = document.createElement("h2");
+    h2.textContent = "Fragment";
+    h2.style.color = color;
+    panel.appendChild(h2);
+
+    const sub = document.createElement("div");
+    sub.className = "panel-sub";
+    sub.textContent = short(from.hash) + (from.refs.length ? " (" + from.refs.join(", ") + ")" : "") +
+      "  \u2192  " + (edge.external ? edge.toHash + " (external)" : short(to.hash) + (to.refs && to.refs.length ? " (" + to.refs.join(", ") + ")" : ""));
+    panel.appendChild(sub);
+
+    const branchLine = document.createElement("div");
+    branchLine.className = "legend-row";
+    branchLine.innerHTML = `<span class="legend-swatch" style="background:${color}"></span> Branch: <strong style="color:${color}">${escapeHtml(edge.branchLabel || "unassigned / ambiguous")}</strong>`;
+    panel.appendChild(branchLine);
+
+    if (edge.commits.length === 0) {
+      const e = document.createElement("div");
+      e.className = "frag-empty";
+      e.textContent = "No intermediate commits \u2014 these two nodes connect directly.";
+      panel.appendChild(e);
+      return;
+    }
+
+    const count = document.createElement("div");
+    count.className = "legend-row";
+    count.textContent = edge.commits.length + " commit" + (edge.commits.length === 1 ? "" : "s") + " on this fragment";
+    panel.appendChild(count);
+
+    edge.commits.forEach(c => panel.appendChild(commitCard(c)));
+  }
+
+  function commitCard(c) {
+    const card = document.createElement("div");
+    card.className = "commit-card";
+    const hash = document.createElement("div");
+    hash.className = "hash";
+    hash.textContent = short(c.hash);
+    const subject = document.createElement("div");
+    subject.className = "subject";
+    subject.textContent = c.subject || "(no subject)";
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    meta.textContent = (c.author || "unknown") + "  \u00b7  " + formatDate(c.date);
+    card.appendChild(hash);
+    card.appendChild(subject);
+    card.appendChild(meta);
+    return card;
+  }
+
+  function formatDate(d) {
+    if (!d) return "";
+    const parsed = new Date(d);
+    if (isNaN(parsed.getTime())) return d;
+    return parsed.toISOString().slice(0, 16).replace("T", " ");
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+  }
+})();
+</script>
+</div>
+{% endraw %}

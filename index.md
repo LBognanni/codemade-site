@@ -130,6 +130,14 @@ sections:
         actions:
           - label: Open
             url: /vibelets/rent-vs-buy-uk
+      - title: Git Branch Visualizer
+        icon: 🌿
+        tags: [web, vibelet]
+        content: >-
+          Explore your Git history as an interactive branch graph, entirely in your browser.
+        actions:
+          - label: Open
+            url: /vibelets/git-branch-visualizer
   - section_id: recent-posts
     type: section_posts
     background: white
