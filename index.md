@@ -12,6 +12,12 @@ sections:
         url: '#software'
       - label: Blog
         url: /blog
+  - section_id: recent-posts
+    type: section_posts
+    background: white
+    title: Things I wrote
+    subtitle: >-
+      A selection of my recent blog posts
   - section_id: software
     type: section_features
     background: gray
@@ -138,11 +144,5 @@ sections:
         actions:
           - label: Open
             url: /vibelets/git-branch-visualizer
-  - section_id: recent-posts
-    type: section_posts
-    background: white
-    title: Things I wrote
-    subtitle: >-
-      A selection of my recent blog posts
 layout: landing
 ---
