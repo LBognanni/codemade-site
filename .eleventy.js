@@ -2,6 +2,7 @@ import { DateTime } from 'luxon';
 import processSass from './utils/css-processing.js';
 import processJavaScript from './utils/js-processing.js';
 import markdown from 'markdown-it';
+import markdownFigures from './utils/markdown-figures.js';
 import syntaxHighlight from "@11ty/eleventy-plugin-syntaxhighlight";
 import { feedPlugin } from "@11ty/eleventy-plugin-rss";
 
@@ -92,6 +93,8 @@ export default function(eleventyConfig) {
     breaks: true,
     linkify: true    
   });
+  md.use(markdownFigures);
+  eleventyConfig.setLibrary('md', md);
   
   eleventyConfig.addFilter("markdownify", function(content) {
     return md.render(content || '');

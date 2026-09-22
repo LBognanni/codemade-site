@@ -15,7 +15,7 @@ layout: post
 
 It's your working set companion, focused on staging and unstaging files, and viewing diffs.
 
-![A screenshot showing GitPane](/images/gitpane-ss.png)
+![A screenshot showing GitPane](/images/gitpane-ss.png "A screenshot showing GitPane")
 
 ### Why GitPane?
 
@@ -29,7 +29,7 @@ One of the better things VS Code does is handling the git working set. Its "Sour
 
 When you click a file, a full diff is opened in the editor, and that makes it really easy to see what's being worked on.
 
-![My three-pane VS Code layout as I'm writing this](/images/vscode-layout.jpg)
+![My three-pane VS Code layout as I'm writing this](/images/vscode-layout.jpg "My three-pane VS Code layout as I'm writing this")
 
 As AI coding has become more integrated in my workflows, I've settled into a three-pane configuration in VS Code: the "source control" pane on the left, the code editor in the middle and a coding agent on the right side. _(did you know that you can drag a terminal window and use it as a regular tab?)_
 
@@ -43,7 +43,7 @@ Herdr was the first multiplexer I tried that actually worked for me. Mostly beca
 
 The only thing I was missing was a good way to handle git in the terminal. I tried a few different terminal-based git UIs, but none of them really clicked with me. Most of them were trying to do everything that git can do, and I don't need that. Plus, I _really_ liked my VS Code workflow, and I wanted something that would replicate that in the terminal.
 
-![A screenshot showing GitPane running as part of a Herdr session, next to OpenCode](/images/gitpane-in-herdr.png)
+![A screenshot showing GitPane running as part of a Herdr session, next to OpenCode](/images/gitpane-in-herdr.png "A screenshot showing GitPane running as part of a Herdr session, next to OpenCode")
 
 ### GitPane fills that "sidebar to look at git diff and stage files" gap.
 

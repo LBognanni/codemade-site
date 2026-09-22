@@ -128,6 +128,19 @@
   margin: 1rem 0;
   display: block;
 }
+.post-page-content figure {
+  margin: 1.5rem 0;
+}
+.post-page-content figure img {
+  margin: 0;
+}
+.post-page-content figcaption {
+  margin-top: 0.5rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  text-align: center;
+}
 .post-page-content hr {
   border: none;
   border-top: 1px solid var(--border);
