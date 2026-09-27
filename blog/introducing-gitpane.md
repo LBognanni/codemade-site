@@ -9,6 +9,8 @@ image: images/gitpane.jpg
 layout: post
 ---
 
+> **Update (September 2026):** GitPane has been rewritten in Rust and renamed to **GitPlume**. [Read about the migration](/blog/gitplume-migrated-to-rust/) or grab it from [GitHub](https://github.com/lbognanni/gitplume). The instructions below refer to the original Python version.
+
 > I wanted VS Code’s Source Control sidebar in my terminal. So I built [GitPane](https://github.com/lbognanni/GitPane): a small terminal UI for reviewing diffs and staging changes.
 
 [GitPane](https://github.com/lbognanni/GitPane) is a simple terminal-based git UI, [built for an audience of one](/blog/building-for-one/). There are already many git UIs out there, but this one is mine. It's the ideal companion for your terminal multiplexer of choice, and because it's supposed to be used in a terminal pane, it skips some of the more complex features of other git UIs. 
