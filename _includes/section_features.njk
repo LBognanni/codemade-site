@@ -11,10 +11,15 @@
     {% endfor %}
   {% endfor %}
   {% if allTags.length > 0 %}
+  {# Filter labels for tags whose name doesn't survive `capitalize` #}
+  {% set tagLabels = {
+    macos: 'macOS', saas: 'SaaS',
+    image: 'Image tools', dev: 'Developer tools', life: 'Life tools'
+  } %}
   <div class="filter-bar">
     <span class="filter-tag active" data-filter="all">All</span>
     {% for tag in allTags %}
-    <span class="filter-tag" data-filter="{{ tag }}">{{ tag | capitalize }}</span>
+    <span class="filter-tag" data-filter="{{ tag }}">{{ tagLabels[tag] or (tag | capitalize) }}</span>
     {% endfor %}
   </div>
   {% endif %}

@@ -43,13 +43,13 @@ Once the plan was approved, the bulk of the rewrite took _an evening_, with a fe
 
 ## A new name: 🪶GitPlume
 
-While preparing the release, I found out that there's already a very similar project on GitHub called gitpane. Rather than confuse anyone, the Rust version ships under a new name: [**GitPlume**](https://github.com/lbognanni/gitplume/).
+While preparing the release, I found out that there's already a very similar project on GitHub called gitpane. Rather than confuse anyone, the Rust version ships under a new name: [**GitPlume**](https://gitplume.dev).
 
 ## GitPlume: now blazingly fast 🚀
 
 Rust delivered on its promise: the rewrite did make loading and rendering large diffs much faster. What surprised me was *how much faster the rest of the application is* now. Resizing panes, moving through tabs, scrolling lists of files and commits, and even the file browser are all much snappier. The application feels more responsive, and it is a joy to use.
 
-As an added bonus, installing [GitPlume](https://github.com/lbognanni/gitplume/) is now much easier: you don't need to have Python and `uv` installed, and a simple `curl | sh` command will download the right binary for your platform and install it in your path. You can also download the binaries directly from the [GitHub releases page](https://github.com/lbognanni/gitplume/releases).
+As an added bonus, installing [GitPlume](https://gitplume.dev) is now much easier: you don't need to have Python and `uv` installed, and a simple `curl | sh` command will download the right binary for your platform and install it in your path. You can also download the binaries directly from the [GitHub releases page](https://github.com/lbognanni/gitplume/releases).
 
 If you have the Python version installed, run `uv tool uninstall gitpane` to remove it, and then install GitPlume. The command is now `gitplume`.
 

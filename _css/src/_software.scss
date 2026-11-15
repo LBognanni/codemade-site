@@ -61,9 +61,14 @@
 }
 .tag-windows { color: var(--accent-blue); background: rgba(110, 168, 254, 0.1); }
 .tag-linux   { color: var(--accent-mint); background: rgba(93, 222, 180, 0.1); }
+.tag-macos   { color: var(--text-muted); background: color-mix(in srgb, var(--text-muted) 12%, transparent); }
 .tag-web     { color: var(--accent); background: var(--accent-soft); }
 .tag-android { color: var(--accent-mint); background: rgba(93, 222, 180, 0.1); }
 .tag-saas    { color: var(--accent-rose); background: rgba(232, 99, 122, 0.1); }
+/* Vibelet categories */
+.tag-image   { color: var(--accent-blue); background: rgba(110, 168, 254, 0.1); }
+.tag-dev     { color: var(--accent-mint); background: rgba(93, 222, 180, 0.1); }
+.tag-life    { color: var(--accent); background: var(--accent-soft); }
 .sw-arrow {
   font-family: var(--font-mono); font-size: 0.85rem;
   color: var(--text-dim); transition: all 0.3s ease;
