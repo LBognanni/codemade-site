@@ -144,5 +144,21 @@ sections:
         actions:
           - label: Open
             url: /vibelets/git-branch-visualizer
+      - title: Terraform State Viewer
+        icon: 🏗️
+        tags: [web, vibelet]
+        content: >-
+          Browse a Terraform state file and filter resources by account, type, module or tag.
+        actions:
+          - label: Open
+            url: /vibelets/terraform-state-viewer
+      - title: WebP Converter
+        icon: 🗜️
+        tags: [web, vibelet]
+        content: >-
+          Convert images to WebP and compare quality side by side before downloading.
+        actions:
+          - label: Open
+            url: /vibelets/webp-converter
 layout: landing
 ---

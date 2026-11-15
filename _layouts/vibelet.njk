@@ -2,14 +2,16 @@
 layout: body
 ---
 
-<div class="vibelet-page">
-  <a class="vibelet-back" href="{{ '/#vibelets' | relativeUrl }}">← Back to Vibelets</a>
-  {% if title | isNotEmpty %}
-  <h1>{{ title }}</h1>
-  {% endif %}
-  {% if subtitle | isNotEmpty %}
-  <p class="vibelet-subtitle">{{ subtitle }}</p>
-  {% endif %}
+<div class="vibelet-page{% if fullscreen %} vibelet-page--full{% endif %}">
+  <div class="vibelet-head">
+    <a class="vibelet-back" href="{{ '/#vibelets' | relativeUrl }}">← Back to Vibelets</a>
+    {% if title | isNotEmpty %}
+    <h1>{{ title }}</h1>
+    {% endif %}
+    {% if subtitle | isNotEmpty %}
+    <p class="vibelet-subtitle">{{ subtitle }}</p>
+    {% endif %}
+  </div>
   <div class="vibelet-app">
     {{ content | safe }}
   </div>
@@ -19,3 +21,19 @@ layout: body
   </div>
   {% endif %}
 </div>
+{% if fullscreen %}
+<script>
+  // Fullscreen vibelets fill the viewport below the nav; measure where the app starts.
+  (function () {
+    var app = document.querySelector('.vibelet-page--full .vibelet-app');
+    if (!app) return;
+    function measure() {
+      var top = app.getBoundingClientRect().top + window.scrollY;
+      app.style.setProperty('--vibelet-top', top + 'px');
+    }
+    measure();
+    window.addEventListener('resize', measure);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+  }());
+</script>
+{% endif %}
