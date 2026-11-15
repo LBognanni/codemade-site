@@ -233,6 +233,44 @@ function fmtIndex(k) {
   return typeof k === "number" ? `[${k}]` : `["${k}"]`;
 }
 
+// Many resources don't carry their account (S3 ARNs have none, many resources have no ARN
+// at all), so infer it from the resources that do. Each resource belongs to one provider
+// configuration, and a provider configuration talks to one account, so:
+//   1. use the account found in the resource's own attributes (ARN, owner_id, account_id)
+//   2. else the most common account among resources with the same provider + module
+//   3. else the most common account for the same provider. Raw state keeps provider aliases
+//      (aws.staging), so this is reliable there; `terraform show -json` drops them, so there
+//      we only trust it when that provider only ever saw one account
+//   4. else the only account in the whole state, if there is just one
+function resolveAccounts(items, providerHasAlias) {
+  const tally = (map, key, acct) => {
+    const m = map.get(key) || new Map();
+    m.set(acct, (m.get(acct) || 0) + 1);
+    map.set(key, m);
+  };
+  const top = (m) => m && [...m.entries()].sort((a, b) => b[1] - a[1])[0][0];
+  const byGroup = new Map(), byProvider = new Map(), found = new Set();
+
+  for (const it of items) {
+    const { account, region } = detectAccountRegion(it.attrs);
+    it.account = account; it.region = region;
+    if (!account) continue;
+    found.add(account);
+    tally(byGroup, it.provider + "|" + it.module, account);
+    tally(byProvider, it.provider, account);
+  }
+
+  for (const it of items) {
+    if (it.account) continue;
+    if (!/aws/.test(it.provider)) { it.account = "(not AWS)"; continue; }
+    const group = byGroup.get(it.provider + "|" + it.module);
+    const prov = byProvider.get(it.provider);
+    it.account = top(group)
+      || (prov && (providerHasAlias || prov.size === 1) ? top(prov) : null)
+      || (found.size === 1 ? [...found][0] : "unknown");
+  }
+}
+
 // Accepts raw state (v4) or `terraform show -json` output
 function normalize(json) {
   const out = [];
@@ -267,18 +305,8 @@ function normalize(json) {
     throw new Error("This doesn't look like a Terraform state (no \"resources\" array found).");
   }
 
-  // Resolve accounts
-  let callerAcct = null;
-  const found = new Set();
+  resolveAccounts(out, Array.isArray(json.resources));
   for (const it of out) {
-    const { account, region } = detectAccountRegion(it.attrs);
-    it.account = account; it.region = region;
-    if (account) found.add(account);
-    if (it.type === "aws_caller_identity" && ACCT_RE.test(it.attrs.account_id || "")) callerAcct = it.attrs.account_id;
-  }
-  const fallback = callerAcct || (found.size === 1 ? [...found][0] : "unknown");
-  for (const it of out) {
-    it.account = it.account || fallback;
     it.fname = friendlyName(it.attrs);
     it.tags = {};
     const tg = tagsOf(it.attrs) || {};
@@ -512,7 +540,7 @@ function renderRes(it) {
   const addr = document.createElement("div"); addr.className = "addr mono"; addr.textContent = it.address; main.append(addr);
 
   const chips = document.createElement("div"); chips.className = "chips";
-  chips.append(chip("account " + it.account, "acct"));
+  if (it.account !== "(not AWS)") chips.append(chip("account " + it.account, "acct"));
   chips.append(chip(it.module, "mod"));
   if (it.region) chips.append(chip(it.region));
   for (const k in tagFilters) if (tagFilters[k].size && it.tags[k] !== undefined) chips.append(chip(`${k}=${it.tags[k]}`, "tag"));
