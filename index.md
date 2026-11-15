@@ -45,6 +45,15 @@ sections:
         actions:
           - label: Learn More
             url: https://github.com/LBognanni/fasttab
+      - title: GitPlume
+        icon: 🪶
+        image: images/gitplume-on-rust.jpg
+        tags: [linux, macos]
+        content: >-
+          Review full-context diffs and stage your Git changes without leaving the terminal.
+        actions:
+          - label: Learn More
+            url: https://gitplume.dev
       - title: email-webhook
         icon: 📧
         image: images/email-webhook-hero.jpg
@@ -106,17 +115,9 @@ sections:
     subtitle: >-
       Simple, self-contained, single-purpose web apps. All processing happens in your browser.
     features:
-      - title: JSON to YAML converter
-        icon: 🔄
-        tags: [web, vibelet]
-        content: >-
-          Convert JSON to YAML in your browser.
-        actions:
-          - label: Open
-            url: /vibelets/json-to-yaml
       - title: Image to Base64 converter
         icon: 🖼️
-        tags: [web, vibelet]
+        tags: [image]
         content: >-
           Convert images to Base64 in your browser.
         actions:
@@ -124,23 +125,31 @@ sections:
             url: /vibelets/image-to-base64
       - title: SVG to PNG converter
         icon: 🖼️
-        tags: [web, vibelet]
+        tags: [image]
         content: >-
           Convert SVG images to PNG in your browser.
         actions:
           - label: Open
             url: /vibelets/svg-to-png
-      - title: Rent vs Buy — UK
-        icon: 🏠
-        tags: [web, vibelet]
+      - title: WebP Converter
+        icon: 🗜️
+        tags: [image]
         content: >-
-          Compare renting vs buying over time, including UK stamp duty.
+          Convert images to WebP and compare quality side by side before downloading.
         actions:
           - label: Open
-            url: /vibelets/rent-vs-buy-uk
+            url: /vibelets/webp-converter
+      - title: JSON to YAML converter
+        icon: 🔄
+        tags: [dev]
+        content: >-
+          Convert JSON to YAML in your browser.
+        actions:
+          - label: Open
+            url: /vibelets/json-to-yaml
       - title: Git Branch Visualizer
         icon: 🌿
-        tags: [web, vibelet]
+        tags: [dev]
         content: >-
           Explore your Git history as an interactive branch graph, entirely in your browser.
         actions:
@@ -148,19 +157,19 @@ sections:
             url: /vibelets/git-branch-visualizer
       - title: Terraform State Viewer
         icon: 🏗️
-        tags: [web, vibelet]
+        tags: [dev]
         content: >-
           Browse a Terraform state file and filter resources by account, type, module or tag.
         actions:
           - label: Open
             url: /vibelets/terraform-state-viewer
-      - title: WebP Converter
-        icon: 🗜️
-        tags: [web, vibelet]
+      - title: Rent vs Buy — UK
+        icon: 🏠
+        tags: [life]
         content: >-
-          Convert images to WebP and compare quality side by side before downloading.
+          Compare renting vs buying over time, including UK stamp duty.
         actions:
           - label: Open
-            url: /vibelets/webp-converter
+            url: /vibelets/rent-vs-buy-uk
 layout: landing
 ---
