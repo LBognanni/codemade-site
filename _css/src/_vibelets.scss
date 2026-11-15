@@ -28,6 +28,53 @@
 }
 .vibelet-about a:hover { text-decoration-color: var(--accent); }
 
+/* Fullscreen vibelets (front matter `fullscreen: true`): the app spans the full
+   width and fills the viewport below the nav; the about text sits below the fold. */
+.vibelet-page--full {
+  max-width: none;
+  padding: 0 1.25rem 4rem;
+  --vibelet-gap: 1.25rem;
+
+  .vibelet-head {
+    display: flex; align-items: baseline; gap: 1rem;
+    min-width: 0; margin-bottom: 0.9rem;
+  }
+  .vibelet-back { margin-bottom: 0; flex: none; }
+  h1 {
+    font-size: 1.15rem; letter-spacing: -0.02em; margin: 0; flex: none;
+  }
+  .vibelet-subtitle {
+    font-size: 0.88rem; margin: 0; max-width: none; min-width: 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .vibelet-app {
+    /* --vibelet-top is measured by the layout script; the fallback covers no-JS */
+    height: calc(100vh - var(--vibelet-top, 140px) - var(--vibelet-gap));
+    height: calc(100dvh - var(--vibelet-top, 140px) - var(--vibelet-gap));
+    min-height: 480px;
+  }
+  /* A fullscreen app can add `vibelet-compact` to its root while it has nothing to
+     show yet (e.g. an intro/load screen), so the about text stays visible. */
+  .vibelet-app:has(.vibelet-compact) { height: auto; min-height: 0; }
+  .vibelet-about { max-width: 1120px; margin: 3rem auto 0; padding: 0 0.75rem; }
+}
+
+/* The site nav spans the full width too, aligned with the app's edges */
+body:has(.vibelet-page--full) nav { max-width: none; padding-inline: 1.25rem; }
+
+@media (max-width: 820px) {
+  .vibelet-page--full {
+    padding: 0 1rem 3rem;
+    .vibelet-head { flex-wrap: wrap; gap: 0.35rem 1rem; }
+    .vibelet-back { width: 100%; }
+    .vibelet-subtitle { white-space: normal; }
+    /* Split views don't fit a phone: fall back to normal page flow */
+    .vibelet-app { height: auto; min-height: 0; }
+    .vibelet-about { padding: 0; }
+  }
+  body:has(.vibelet-page--full) nav { padding-inline: 1rem; }
+}
+
 /* Shared "app frame" for all vibelets */
 .vibelet-app {
   background: var(--bg-card);

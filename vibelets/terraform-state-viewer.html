@@ -1,0 +1,562 @@
+---
+layout: vibelet
+fullscreen: true
+title: Terraform State Viewer
+subtitle: >-
+  Browse and filter the resources in a Terraform state file.
+keywords: terraform state viewer, tfstate viewer, terraform show json, terraform resources, aws, vibelet
+about: >-
+  This Terraform state viewer is free and private — it runs entirely in your browser, so your
+  state file (and the secrets it often contains) is never uploaded or sent to a server.
+
+
+  Drop a `terraform.tfstate` file, or paste the output of `terraform show -json`, to get a
+  searchable list of every resource. Filter by AWS account, resource type, module or tag, with
+  live counts showing how many resources each filter would match, and expand any resource to
+  inspect or copy its full attributes.
+---
+{% raw %}
+<style>
+  .tfsv {
+    --tf-bg: var(--bg); --tf-panel: var(--bg-elevated); --tf-card: var(--bg-card); --tf-line: var(--border);
+    --tf-line-hi: var(--border-bright);
+    --tf-text: var(--text); --tf-muted: var(--text-muted); --tf-accent: var(--accent); --tf-accent-bg: var(--accent-soft);
+    --tf-ok: var(--accent-mint); --tf-warn: var(--accent-blue); --tf-err: var(--accent-rose);
+    --tf-mono: var(--font-mono);
+    height: 100%; display: flex; flex-direction: column;
+    background: var(--tf-bg); color: var(--tf-text);
+    font: 14px/1.45 var(--font-body);
+  }
+  .tfsv button { font: inherit; font-size: 13px; color: var(--tf-text); background: var(--tf-card); border: 1px solid var(--tf-line); border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+  .tfsv button:hover { border-color: var(--tf-accent); }
+  .tfsv button.primary { background: var(--tf-accent); color: var(--bg); border-color: var(--tf-accent); font-weight: 600; }
+  .tfsv button.primary:hover { box-shadow: 0 0 24px var(--accent-glow); }
+  .tfsv input[type=text], .tfsv input[type=search], .tfsv textarea { font: inherit; color: var(--tf-text); background: var(--tf-bg); border: 1px solid var(--tf-line); border-radius: 6px; padding: 7px 10px; width: 100%; }
+  .tfsv input:focus, .tfsv textarea:focus { outline: none; border-color: var(--tf-accent); }
+  .tfsv .mono { font-family: var(--tf-mono); }
+  .tfsv .hidden { display: none !important; }
+
+  .tfsv .tf-bar { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--tf-line); background: var(--tf-panel); min-height: 50px; }
+  .tfsv .tf-bar h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; margin: 0; font-weight: 600; color: var(--tf-muted); }
+  .tfsv .tf-bar .file { color: var(--tf-text); font-size: 12px; }
+  .tfsv .tf-bar .spacer { flex: 1; }
+
+  /* Load view */
+  .tfsv #loadView { flex: 1; overflow: auto; display: flex; justify-content: center; padding: 40px 20px; }
+  .tfsv .loadbox { width: min(760px, 100%); display: flex; flex-direction: column; gap: 16px; }
+  .tfsv .drop { border: 2px dashed var(--tf-line); border-radius: 12px; padding: 36px; text-align: center; color: var(--tf-muted); background: var(--tf-panel); transition: .15s; }
+  .tfsv .drop.over { border-color: var(--tf-accent); background: var(--tf-accent-bg); color: var(--tf-text); }
+  .tfsv .drop p { margin: 0 0 14px; }
+  .tfsv textarea { min-height: 180px; resize: vertical; font-family: var(--tf-mono); font-size: 12.5px; margin-top: 6px; white-space: pre; }
+  .tfsv .err { color: var(--tf-err); white-space: pre-wrap; }
+  .tfsv .err:empty { display: none; }
+  .tfsv .hint { color: var(--tf-muted); font-size: 12px; }
+
+  /* Main view */
+  .tfsv #mainView { flex: 1; display: flex; min-height: 0; }
+  .tfsv .tf-side { width: 300px; flex: none; border-right: 1px solid var(--tf-line); background: var(--tf-panel); overflow-y: auto; padding: 14px 14px 30px; }
+  .tfsv .tf-side h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--tf-muted); margin: 0; font-weight: 600; }
+  .tfsv .group { margin-bottom: 22px; }
+  .tfsv .ghead { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; }
+  .tfsv .ghead .links a { color: var(--tf-accent); font-size: 12px; cursor: pointer; margin-left: 8px; text-decoration: none; }
+  .tfsv .ghead .links a:hover { text-decoration: underline; }
+  .tfsv input.gsearch { margin-bottom: 6px; padding: 4px 8px; font-size: 12px; }
+  .tfsv .opts { max-height: 260px; overflow-y: auto; }
+  .tfsv .opt { display: flex; align-items: center; gap: 8px; padding: 3px 4px; border-radius: 4px; cursor: pointer; user-select: none; font-size: 13px; }
+  .tfsv .opt:hover { background: color-mix(in srgb, var(--tf-text) 5%, transparent); }
+  .tfsv .opt input { margin: 0; accent-color: var(--tf-accent); }
+  .tfsv .opt .lbl { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tfsv .opt .cnt { color: var(--tf-muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+  .tfsv .opt.zero .lbl, .tfsv .opt.zero .cnt { opacity: .4; }
+  .tfsv details.tag { margin-bottom: 4px; border: 1px solid var(--tf-line); border-radius: 6px; background: var(--tf-bg); font-size: 13px; }
+  .tfsv details.tag > summary { cursor: pointer; padding: 5px 8px; display: flex; gap: 8px; align-items: center; list-style: none; }
+  .tfsv details.tag > summary::-webkit-details-marker { display: none; }
+  .tfsv details.tag > summary::before { content: "▸"; color: var(--tf-muted); }
+  .tfsv details.tag[open] > summary::before { content: "▾"; }
+  .tfsv details.tag .k { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tfsv details.tag .sel { font-size: 11px; color: var(--bg); background: var(--tf-accent); border-radius: 999px; padding: 0 7px; }
+  .tfsv details.tag .body { padding: 4px 8px 8px; }
+  .tfsv .toggle { display: flex; align-items: center; gap: 8px; margin-bottom: 22px; cursor: pointer; font-size: 13px; }
+  .tfsv .toggle input { accent-color: var(--tf-accent); margin: 0; }
+
+  .tfsv .tf-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .tfsv .toolbar { display: flex; gap: 12px; align-items: center; padding: 12px 20px; border-bottom: 1px solid var(--tf-line); }
+  .tfsv .toolbar input { max-width: 420px; }
+  .tfsv .toolbar .count { color: var(--tf-muted); font-size: 13px; white-space: nowrap; }
+  .tfsv .toolbar .spacer { flex: 1; }
+  .tfsv #list { flex: 1; overflow-y: auto; padding: 16px 20px 40px; display: flex; flex-direction: column; gap: 8px; }
+  .tfsv .empty { color: var(--tf-muted); text-align: center; margin-top: 60px; }
+
+  .tfsv .res { background: var(--tf-card); border: 1px solid var(--tf-line); border-radius: 10px; flex: none; }
+  .tfsv .res:hover { border-color: var(--tf-line-hi); }
+  .tfsv .res .top { display: flex; gap: 12px; align-items: flex-start; padding: 10px 14px; cursor: pointer; }
+  .tfsv .res .main { flex: 1; min-width: 0; }
+  .tfsv .res .type { font-weight: 700; font-size: 13px; }
+  .tfsv .res .type .mode { font-weight: 400; font-size: 11px; color: var(--tf-warn); border: 1px solid var(--tf-warn); border-radius: 4px; padding: 0 5px; margin-left: 8px; }
+  .tfsv .res .name { color: var(--tf-text); margin-top: 1px; word-break: break-all; }
+  .tfsv .res .addr { color: var(--tf-muted); font-size: 11.5px; margin-top: 2px; word-break: break-all; }
+  .tfsv .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
+  .tfsv .chip { font-size: 11px; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--tf-line); color: var(--tf-muted); }
+  .tfsv .chip.acct { color: var(--tf-accent); border-color: color-mix(in srgb, var(--tf-accent) 35%, transparent); background: var(--tf-accent-bg); }
+  .tfsv .chip.mod { color: var(--tf-ok); border-color: color-mix(in srgb, var(--tf-ok) 35%, transparent); }
+  .tfsv .chip.tag { color: var(--tf-warn); border-color: color-mix(in srgb, var(--tf-warn) 35%, transparent); }
+  .tfsv .caret { color: var(--tf-muted); transition: transform .15s; margin-top: 2px; font-size: 11px; }
+  .tfsv .res.open .caret { transform: rotate(90deg); }
+  .tfsv .attrs { display: none; border-top: 1px solid var(--tf-line); padding: 10px 14px; background: var(--tf-bg); border-radius: 0 0 10px 10px; }
+  .tfsv .res.open .attrs { display: block; }
+  .tfsv .attrs pre { margin: 0; max-height: 420px; overflow: auto; font-size: 12px; color: var(--tf-text); background: transparent; white-space: pre-wrap; word-break: break-all; }
+  .tfsv .attrs .copy { float: right; font-size: 11px; padding: 2px 8px; }
+  .tfsv .more { align-self: center; margin-top: 8px; flex: none; }
+
+  @media (max-width: 820px) {
+    .tfsv #loadView { padding: 24px 16px; }
+    .tfsv #mainView { flex-direction: column; }
+    .tfsv .tf-side { width: auto; border-right: none; border-bottom: 1px solid var(--tf-line); max-height: 50vh; }
+    .tfsv .toolbar { flex-wrap: wrap; gap: 8px; padding: 12px 16px; }
+    .tfsv .toolbar input { max-width: none; flex: 1 1 100%; }
+    .tfsv .toolbar .count { flex: 1; }
+    .tfsv .toolbar .spacer { display: none; }
+    .tfsv .toolbar button { padding: 6px 10px; }
+    .tfsv #list { padding: 12px 16px 24px; }
+  }
+</style>
+<div class="tfsv vibelet-compact">
+<div class="tf-bar">
+  <h2>State</h2>
+  <span class="file mono" id="fileLabel"></span>
+  <span class="spacer"></span>
+  <button id="loadAnother" class="hidden">Load another state…</button>
+</div>
+
+<section id="loadView">
+  <div class="loadbox">
+    <div class="drop" id="drop">
+      <p><strong>Drop a <span class="mono">terraform.tfstate</span> here</strong></p>
+      <button class="primary" id="pick">Choose file…</button>
+      <input type="file" id="file" accept=".tfstate,.json,application/json" hidden>
+    </div>
+    <div>
+      <label class="hint" for="paste">…or paste the JSON (a state file, or the output of <span class="mono">terraform show -json</span>)</label>
+      <textarea id="paste" spellcheck="false" placeholder='{ "version": 4, "resources": [ ... ] }'></textarea>
+    </div>
+    <div><button id="parseBtn" class="primary">Show resources</button></div>
+    <div class="err" id="err"></div>
+    <div class="hint">Everything is parsed locally in your browser; nothing is uploaded.</div>
+  </div>
+</section>
+
+<section id="mainView" class="hidden">
+  <aside class="tf-side" id="sidebar"></aside>
+  <div class="tf-main">
+    <div class="toolbar">
+      <input type="search" id="q" placeholder="Search name, id, address, tags…">
+      <span class="count" id="count"></span>
+      <span class="spacer"></span>
+      <button id="expandAll">Expand all</button>
+      <button id="collapseAll">Collapse all</button>
+    </div>
+    <div id="list"></div>
+  </div>
+</section>
+
+<script>
+(() => {
+"use strict";
+const $ = (id) => document.getElementById(id);
+const root = document.querySelector(".tfsv");
+const PAGE = 150;
+
+let items = [];                 // normalized resource instances
+let filters = {};               // dim -> Set of selected values
+let showData = false;
+let tagFilters = {};            // tag key -> Set of selected values (empty = no filter)
+const tagOpen = new Set();
+const NONE = "\u0000none";
+let tagKeyQuery = "";
+let query = "";
+let shown = PAGE;
+const groupSearch = {};         // dim -> text
+
+const DIMS = [
+  { key: "account", title: "AWS Accounts" },
+  { key: "type",    title: "Resource Types" },
+  { key: "module",  title: "Modules" },
+];
+
+/* ---------- parsing ---------- */
+
+const ARN_RE = /^arn:aws[a-z-]*:[a-z0-9-]+:([a-z0-9-]*):(\d{12}):/;
+const ACCT_RE = /^\d{12}$/;
+
+function moduleOf(path) { return path && path.length ? path : "(root)"; }
+
+function friendlyName(a) {
+  if (!a) return "";
+  for (const k of ["bucket", "name", "function_name", "identifier", "cluster_identifier", "domain_name", "family", "id"]) {
+    if (typeof a[k] === "string" && a[k]) return a[k];
+  }
+  if (a.tags && typeof a.tags.Name === "string") return a.tags.Name;
+  return "";
+}
+
+function detectAccountRegion(a) {
+  let account = null, region = null;
+  if (!a || typeof a !== "object") return { account, region };
+  if (typeof a.arn === "string") {
+    const m = a.arn.match(ARN_RE);
+    if (m) { region = m[1] || null; account = m[2]; }
+  }
+  if (!account && typeof a.owner_id === "string" && ACCT_RE.test(a.owner_id)) account = a.owner_id;
+  if (!account && typeof a.account_id === "string" && ACCT_RE.test(a.account_id)) account = a.account_id;
+  if (!account) {
+    for (const v of Object.values(a)) {
+      if (typeof v === "string") {
+        const m = v.match(ARN_RE);
+        if (m) { account = m[2]; region = region || m[1] || null; break; }
+      }
+    }
+  }
+  if (!region) {
+    if (typeof a.region === "string") region = a.region;
+    else if (typeof a.availability_zone === "string") region = a.availability_zone.replace(/[a-z]$/, "");
+  }
+  return { account, region };
+}
+
+function tagsOf(a) {
+  const t = a && (a.tags_all || a.tags);
+  return t && typeof t === "object" ? t : null;
+}
+
+function fmtIndex(k) {
+  if (k === undefined || k === null) return "";
+  return typeof k === "number" ? `[${k}]` : `["${k}"]`;
+}
+
+// Accepts raw state (v4) or `terraform show -json` output
+function normalize(json) {
+  const out = [];
+  if (Array.isArray(json.resources)) {
+    for (const r of json.resources) {
+      const prov = (r.provider || "").replace(/^provider\[".*\/([^/"]+)"\]/, "provider.$1").replace(/^provider\["(.*)"\]/, "$1");
+      const instances = r.instances && r.instances.length ? r.instances : [{}];
+      for (const inst of instances) {
+        const mod = r.module || "";
+        const base = (mod ? mod + "." : "") + (r.mode === "data" ? "data." : "") + r.type + "." + r.name;
+        out.push({
+          address: base + fmtIndex(inst.index_key),
+          mode: r.mode, type: r.type, name: r.name, module: moduleOf(mod),
+          provider: prov, attrs: inst.attributes || {},
+          raw: { ...inst, module: mod || undefined, provider: r.provider },
+        });
+      }
+    }
+  } else if (json.values && json.values.root_module) {
+    const walk = (m) => {
+      for (const r of m.resources || []) {
+        const mod = (r.address.match(/^((?:module\.[^.]+(?:\[[^\]]*\])?\.)+)/) || [""])[0].replace(/\.$/, "");
+        out.push({
+          address: r.address, mode: r.mode, type: r.type, name: r.name, module: moduleOf(mod),
+          provider: r.provider_name || "", attrs: r.values || {}, raw: r,
+        });
+      }
+      for (const c of m.child_modules || []) walk(c);
+    };
+    walk(json.values.root_module);
+  } else {
+    throw new Error("This doesn't look like a Terraform state (no \"resources\" array found).");
+  }
+
+  // Resolve accounts
+  let callerAcct = null;
+  const found = new Set();
+  for (const it of out) {
+    const { account, region } = detectAccountRegion(it.attrs);
+    it.account = account; it.region = region;
+    if (account) found.add(account);
+    if (it.type === "aws_caller_identity" && ACCT_RE.test(it.attrs.account_id || "")) callerAcct = it.attrs.account_id;
+  }
+  const fallback = callerAcct || (found.size === 1 ? [...found][0] : "unknown");
+  for (const it of out) {
+    it.account = it.account || fallback;
+    it.fname = friendlyName(it.attrs);
+    it.tags = {};
+    const tg = tagsOf(it.attrs) || {};
+    for (const k of Object.keys(tg)) it.tags[k] = String(tg[k]);
+    it.search = (it.address + " " + it.fname + " " + (it.attrs.id || "") + " " + (it.attrs.arn || "") + " " +
+                 JSON.stringify(tagsOf(it.attrs) || "")).toLowerCase();
+  }
+  return out;
+}
+
+/* ---------- loading ---------- */
+
+function load(text, label) {
+  $("err").textContent = "";
+  let json;
+  try { json = JSON.parse(text); } catch (e) { $("err").textContent = "Invalid JSON: " + e.message; return; }
+  try { items = normalize(json); } catch (e) { $("err").textContent = e.message; return; }
+  if (!items.length) { $("err").textContent = "No resources found in this state."; return; }
+
+  filters = {};
+  for (const d of DIMS) filters[d.key] = new Set(items.map((i) => i[d.key]));
+  query = ""; $("q").value = ""; shown = PAGE; tagFilters = {}; tagOpen.clear(); tagKeyQuery = "";
+  for (const k in groupSearch) delete groupSearch[k];
+  $("fileLabel").textContent = label || "pasted JSON";
+  $("loadView").classList.add("hidden");
+  $("mainView").classList.remove("hidden");
+  $("loadAnother").classList.remove("hidden");
+  root.classList.remove("vibelet-compact");   // results: fill the viewport
+  renderSidebar();
+  renderList();
+}
+
+function readFile(f) {
+  const r = new FileReader();
+  r.onload = () => load(r.result, f.name);
+  r.readAsText(f);
+}
+
+$("pick").onclick = () => $("file").click();
+$("file").onchange = (e) => e.target.files[0] && readFile(e.target.files[0]);
+$("parseBtn").onclick = () => $("paste").value.trim() ? load($("paste").value) : ($("err").textContent = "Paste some JSON first.");
+$("loadAnother").onclick = () => {
+  $("mainView").classList.add("hidden"); $("loadView").classList.remove("hidden");
+  $("loadAnother").classList.add("hidden"); $("fileLabel").textContent = "";
+  root.classList.add("vibelet-compact");      // load screen: size to content
+};
+const drop = $("drop");
+["dragenter", "dragover"].forEach((ev) => document.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add("over"); }));
+["dragleave", "drop"].forEach((ev) => document.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove("over"); }));
+document.addEventListener("drop", (e) => { const f = e.dataTransfer.files[0]; if (f) readFile(f); });
+
+/* ---------- filtering ---------- */
+
+function matches(it, skipDim, skipTagKey) {
+  if (!showData && it.mode === "data") return false;
+  for (const d of DIMS) {
+    if (d.key === skipDim) continue;
+    if (!filters[d.key].has(it[d.key])) return false;
+  }
+  for (const k in tagFilters) {
+    const set = tagFilters[k];
+    if (!set.size || k === skipTagKey) continue;
+    const v = it.tags[k];
+    if (!set.has(v === undefined ? NONE : v)) return false;
+  }
+  if (query && !it.search.includes(query)) return false;
+  return true;
+}
+
+function renderSidebar() {
+  const sb = $("sidebar");
+  sb.textContent = "";
+
+  const tg = document.createElement("label");
+  tg.className = "toggle";
+  const cb = document.createElement("input"); cb.type = "checkbox"; cb.checked = showData;
+  cb.onchange = () => { showData = cb.checked; shown = PAGE; renderSidebar(); renderList(); };
+  const nData = items.filter((i) => i.mode === "data").length;
+  tg.append(cb, document.createTextNode(`Include data sources (${nData})`));
+  sb.append(tg);
+
+  for (const d of DIMS) {
+    // faceted counts: how many results you'd get for each option given the *other* filters
+    const counts = new Map();
+    const universe = new Map();
+    for (const it of items) {
+      if (!showData && it.mode === "data") continue;
+      universe.set(it[d.key], universe.get(it[d.key]) || 0);
+      if (matches(it, d.key)) counts.set(it[d.key], (counts.get(it[d.key]) || 0) + 1);
+    }
+    const values = [...universe.keys()].sort((a, b) => (counts.get(b) || 0) - (counts.get(a) || 0) || a.localeCompare(b));
+
+    const g = document.createElement("div"); g.className = "group";
+    const head = document.createElement("div"); head.className = "ghead";
+    const h = document.createElement("h2"); h.textContent = `${d.title} (${values.length})`;
+    const links = document.createElement("span"); links.className = "links";
+    const all = document.createElement("a"); all.textContent = "all";
+    const none = document.createElement("a"); none.textContent = "none";
+    all.onclick = () => { values.forEach((v) => filters[d.key].add(v)); refresh(); };
+    none.onclick = () => { values.forEach((v) => filters[d.key].delete(v)); refresh(); };
+    links.append(all, none); head.append(h, links); g.append(head);
+
+    let search;
+    if (values.length > 8) {
+      search = document.createElement("input"); search.type = "text"; search.className = "gsearch";
+      search.placeholder = "Filter list…"; search.value = groupSearch[d.key] || "";
+      g.append(search);
+    }
+    const opts = document.createElement("div"); opts.className = "opts"; g.append(opts);
+
+    const fill = () => {
+      opts.textContent = "";
+      const needle = (groupSearch[d.key] || "").toLowerCase();
+      for (const v of values) {
+        if (needle && !v.toLowerCase().includes(needle)) continue;
+        const c = counts.get(v) || 0;
+        const row = document.createElement("label"); row.className = "opt" + (c === 0 ? " zero" : "");
+        const box = document.createElement("input"); box.type = "checkbox"; box.checked = filters[d.key].has(v);
+        box.onchange = () => { box.checked ? filters[d.key].add(v) : filters[d.key].delete(v); refresh(); };
+        const lbl = document.createElement("span"); lbl.className = "lbl"; lbl.textContent = v; lbl.title = v;
+        const cnt = document.createElement("span"); cnt.className = "cnt"; cnt.textContent = c;
+        row.append(box, lbl, cnt); opts.append(row);
+      }
+    };
+    fill();
+    if (search) search.oninput = () => { groupSearch[d.key] = search.value; fill(); };
+    sb.append(g);
+  }
+  renderTagGroup(sb);
+}
+
+function renderTagGroup(sb) {
+  const keyCount = new Map();
+  for (const it of items) {
+    if (!showData && it.mode === "data") continue;
+    for (const k of Object.keys(it.tags)) keyCount.set(k, (keyCount.get(k) || 0) + 1);
+  }
+  const g = document.createElement("div"); g.className = "group";
+  const head = document.createElement("div"); head.className = "ghead";
+  const h = document.createElement("h2"); h.textContent = `Tags (${keyCount.size})`;
+  const links = document.createElement("span"); links.className = "links";
+  const clear = document.createElement("a"); clear.textContent = "clear";
+  clear.onclick = () => { tagFilters = {}; refresh(); };
+  links.append(clear); head.append(h, links); g.append(head);
+  if (!keyCount.size) {
+    const n = document.createElement("div"); n.className = "hint"; n.textContent = "No tags found in this state.";
+    g.append(n); sb.append(g); return;
+  }
+  if (keyCount.size > 8) {
+    const ks = document.createElement("input"); ks.type = "text"; ks.className = "gsearch"; ks.placeholder = "Filter tag keys…"; ks.value = tagKeyQuery;
+    ks.oninput = () => { tagKeyQuery = ks.value; drawKeys(); };
+    g.append(ks);
+  }
+  const wrap = document.createElement("div"); g.append(wrap);
+
+  const drawKeys = () => {
+    wrap.textContent = "";
+    const needle = tagKeyQuery.toLowerCase();
+    const keys = [...keyCount.keys()].sort((a, b) => keyCount.get(b) - keyCount.get(a) || a.localeCompare(b));
+    for (const key of keys) {
+      if (needle && !key.toLowerCase().includes(needle) && !(tagFilters[key] && tagFilters[key].size)) continue;
+      const sel = tagFilters[key] || new Set();
+      const d = document.createElement("details"); d.className = "tag"; d.open = tagOpen.has(key) || sel.size > 0;
+      d.ontoggle = () => { d.open ? tagOpen.add(key) : tagOpen.delete(key); };
+      const sum = document.createElement("summary");
+      const kk = document.createElement("span"); kk.className = "k"; kk.textContent = key; kk.title = key;
+      sum.append(kk);
+      if (sel.size) { const b = document.createElement("span"); b.className = "sel"; b.textContent = sel.size; sum.append(b); }
+      const kc = document.createElement("span"); kc.className = "cnt"; kc.style.cssText = "color:var(--tf-muted);font-size:12px"; kc.textContent = keyCount.get(key);
+      sum.append(kc); d.append(sum);
+
+      // faceted counts for values of this key (ignoring this key's own selection)
+      const counts = new Map(), universe = new Set();
+      for (const it of items) {
+        if (!showData && it.mode === "data") continue;
+        const v = it.tags[key] === undefined ? NONE : it.tags[key];
+        universe.add(v);
+        if (matches(it, null, key)) counts.set(v, (counts.get(v) || 0) + 1);
+      }
+      const vals = [...universe].sort((a, b) => (counts.get(b) || 0) - (counts.get(a) || 0) || (a === NONE ? 1 : b === NONE ? -1 : a.localeCompare(b)));
+      const body = document.createElement("div"); body.className = "body";
+      let vs;
+      if (vals.length > 8) {
+        vs = document.createElement("input"); vs.type = "text"; vs.className = "gsearch"; vs.placeholder = "Filter values…";
+        body.append(vs);
+      }
+      const opts = document.createElement("div"); opts.className = "opts"; body.append(opts);
+      const fill = () => {
+        opts.textContent = "";
+        const nd = vs ? vs.value.toLowerCase() : "";
+        for (const v of vals) {
+          const label = v === NONE ? "(not set)" : v;
+          if (nd && !label.toLowerCase().includes(nd)) continue;
+          const c = counts.get(v) || 0;
+          const row = document.createElement("label"); row.className = "opt" + (c === 0 ? " zero" : "");
+          const box = document.createElement("input"); box.type = "checkbox"; box.checked = sel.has(v);
+          box.onchange = () => {
+            const set = tagFilters[key] || (tagFilters[key] = new Set());
+            box.checked ? set.add(v) : set.delete(v);
+            tagOpen.add(key); refresh();
+          };
+          const lbl = document.createElement("span"); lbl.className = "lbl"; lbl.textContent = label; lbl.title = label;
+          if (v === NONE) lbl.style.fontStyle = "italic";
+          const cnt = document.createElement("span"); cnt.className = "cnt"; cnt.textContent = c;
+          row.append(box, lbl, cnt); opts.append(row);
+        }
+      };
+      fill(); if (vs) vs.oninput = fill;
+      d.append(body); wrap.append(d);
+    }
+  };
+  drawKeys();
+  sb.append(g);
+}
+
+function refresh() { shown = PAGE; renderSidebar(); renderList(); }
+
+/* ---------- list ---------- */
+
+function chip(text, cls) { const s = document.createElement("span"); s.className = "chip " + (cls || ""); s.textContent = text; return s; }
+
+function renderRes(it) {
+  const el = document.createElement("div"); el.className = "res";
+  const top = document.createElement("div"); top.className = "top";
+  const main = document.createElement("div"); main.className = "main";
+
+  const type = document.createElement("div"); type.className = "type mono"; type.textContent = it.type;
+  if (it.mode === "data") { const m = document.createElement("span"); m.className = "mode"; m.textContent = "data"; type.append(m); }
+  main.append(type);
+  if (it.fname) { const n = document.createElement("div"); n.className = "name"; n.textContent = it.fname; main.append(n); }
+  const addr = document.createElement("div"); addr.className = "addr mono"; addr.textContent = it.address; main.append(addr);
+
+  const chips = document.createElement("div"); chips.className = "chips";
+  chips.append(chip("account " + it.account, "acct"));
+  chips.append(chip(it.module, "mod"));
+  if (it.region) chips.append(chip(it.region));
+  for (const k in tagFilters) if (tagFilters[k].size && it.tags[k] !== undefined) chips.append(chip(`${k}=${it.tags[k]}`, "tag"));
+  main.append(chips);
+
+  const caret = document.createElement("span"); caret.className = "caret"; caret.textContent = "▶";
+  top.append(main, caret);
+
+  const attrs = document.createElement("div"); attrs.className = "attrs";
+  let built = false;
+  top.onclick = () => {
+    el.classList.toggle("open");
+    if (el.classList.contains("open") && !built) {
+      built = true;
+      const json = JSON.stringify(it.raw, null, 2);
+      const copy = document.createElement("button"); copy.className = "copy"; copy.textContent = "Copy";
+      copy.onclick = () => navigator.clipboard.writeText(json).then(() => { copy.textContent = "Copied"; setTimeout(() => copy.textContent = "Copy", 1200); });
+      const pre = document.createElement("pre"); pre.className = "mono"; pre.textContent = json;
+      attrs.append(copy, pre);
+    }
+  };
+  el.append(top, attrs);
+  return el;
+}
+
+function renderList() {
+  const list = $("list"); list.textContent = "";
+  const res = items.filter((it) => matches(it));
+  const total = items.filter((i) => showData || i.mode !== "data").length;
+  $("count").textContent = `${res.length} of ${total} resources`;
+  if (!res.length) { const e = document.createElement("div"); e.className = "empty"; e.textContent = "No resources match the current filters."; list.append(e); return; }
+  res.sort((a, b) => a.address.localeCompare(b.address));
+  for (const it of res.slice(0, shown)) list.append(renderRes(it));
+  if (res.length > shown) {
+    const b = document.createElement("button"); b.className = "more"; b.textContent = `Show more (${res.length - shown} remaining)`;
+    b.onclick = () => { shown += PAGE; renderList(); };
+    list.append(b);
+  }
+}
+
+$("q").oninput = (e) => { query = e.target.value.trim().toLowerCase(); shown = PAGE; renderSidebar(); renderList(); };
+$("expandAll").onclick = () => document.querySelectorAll("#list .res:not(.open) .top").forEach((t) => t.click());
+$("collapseAll").onclick = () => document.querySelectorAll("#list .res.open .top").forEach((t) => t.click());
+})();
+</script>
+</div>
+{% endraw %}
