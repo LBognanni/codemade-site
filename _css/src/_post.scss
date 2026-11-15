@@ -59,7 +59,9 @@
   font-weight: 600;
   margin: 1.5rem 0 0.5rem;
 }
-.post-page-content p:not(pre.mermaid p) {
+/* :where() keeps the exclusion from inflating specificity (a plain :not(pre.mermaid p)
+   counts as 0,2,3 and beats rules like the blockquote one below) */
+.post-page-content p:not(:where(pre.mermaid p)) {
   font-size: 0.97rem;
   line-height: 1.8;
   margin-bottom: 1.25rem;
@@ -92,7 +94,7 @@
   background: var(--bg-card);
   border-radius: 0 var(--radius) var(--radius) 0;
 }
-.post-page-content blockquote p {
+.post-page-content blockquote > :last-child {
   margin-bottom: 0;
 }
 .post-page-content pre {
