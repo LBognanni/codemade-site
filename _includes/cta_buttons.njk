@@ -1,9 +1,15 @@
 <div class="block-buttons">
   {% for action in actions %}
-    <a href="{{ action.url }}" 
-      {% if action.new_window %}target="_blank" rel="noopener"{% endif %} 
+    <a href="{{ action.url }}"
+      {% if action.new_window %}target="_blank" rel="noopener"{% endif %}
+      {% if action.os_download %}data-os-download data-repo="{{ action.os_download.repo }}"
+        data-os-label="{{ action.os_download.label or '🔽 Download for {os}' }}"
+        {% for os in ['windows', 'macos', 'linux'] %}{% if action.os_download[os] %}data-asset-{{ os }}="{{ action.os_download[os] }}" {% endif %}{% endfor %}{% endif %}
       class="button{% if action.primary %} primary {% else %} secondary {% endif %}">
       {{ action.label }}
     </a>
   {% endfor %}
 </div>
+{% for action in actions %}{% if action.os_download %}
+<p class="block-buttons-note"><a href="{{ action.url }}">All downloads</a></p>
+{% endif %}{% endfor %}

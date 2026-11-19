@@ -16,6 +16,11 @@
 .block-buttons {
   display: flex; gap: 0.65rem; flex-wrap: wrap; margin-top: 1.5rem;
 }
+.block-buttons-note {
+  margin-top: 0.75rem; font-size: 0.8rem;
+  a { color: var(--text-muted); }
+  a:hover { color: var(--accent); }
+}
 .button {
   font-family: var(--font-body); font-weight: 500; font-size: 0.88rem;
   padding: 0.65rem 1.3rem; border-radius: 10px; border: none; cursor: pointer;
