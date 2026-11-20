@@ -9,20 +9,15 @@
   layout: post
 ---
 
- It's fascinating how much AI has changed the job of software engineer in just a year. We've gone from fancy tab-tab-tab autocomplete to do-it-all software factories at the extreme. (btw, does anyone know someone who wrote a software factory that produced an actual successful application that is not _the software factory itself?_)
+It's fascinating how much AI has changed the job of software engineer in just a year. We've gone from fancy tab-tab-tab autocomplete to do-it-all software factories at the extreme. (btw, does anyone know someone who wrote a software factory that produced an actual successful application that is not _the software factory itself?_)
 
 The topic of code review is perhaps the hottest discussion in the field. On one side stand the purists, who will ask "How can you guarantee quality if you don't review every line of code?"; on another stand the GSD/YOLO people who argue that "we can't review every line of code and move fast at the same time". All while someone reminds them that we don't want to lose our SOC-2 certification so yes, a human must be responsible for the code.
 
 ## So, about code reviews
 
-I can see code review following one of three paths:
+What's happening at the frontier labs and the startups is interesting. Most changes get merged as soon as they pass quality gates such as CI pipelines, adversarial review, and security review. The most critical changes still get a human review, but the human will sometimes skip reading the code and will instead _ask the AI for some sort of summarization_, perhaps as an interactive page with flow diagrams.
 
-1. **No changes are reviewed**: This makes sense for relatively small projects, where it's easier to just check that the app works by running it. **The developer becomes a stakeholder**, simply asking for changes and fixes as the agent does all the work. Often times, the developer is not a developer at all, but a domain expert like a marketing pro, a gym owner, you name it.
-1. **Some changes are reviewed** This is the Anthropics, OpenAIs, startups, the people at the "frontier". Most changes go through a several quality gates like automated testing, adversarial review, and get merged once they are successful. Some changes still get the human review, where they touch critical components. A human will sometimes skip reading the actual code, and will instead ask the AI for some sort of summarization, perhaps as an interactive page with flow diagrams.
-1. **All changes are reviewed** This is mostly everyone else. Either a developer or a machine writes pull requests, and a developer reviews them. Tests and CI are there as an extra guarantee, but the human has the final say.
-
- 
-The problem for people in group #3 is that they want to go faster. With review being the bottleneck, PRs inevitably start to pile up as it's easier to generate code than it is to review it.
+Lots of developers elsewhere read about this way of working and shed a tear. They want to go faster, but with review being the bottleneck, PRs inevitably start to pile up and everything grinds to a halt. It's just so much easier to generate code than it is to review it.
 
 It's so easy in fact, that coding agents have a strong bias for **generating as much code as possible** - writing tests that check for the value of constants, handling edge cases that can never happen in production, inventing requirements. In other words, SLOP.
 
@@ -56,19 +51,37 @@ Feature: User login
 Then you could have, like, domain experts, product managers and business people write the tests! 🤯
 Then instead of writing test first, why not write _behaviours_ first, like when planning a feature. We could call this BDD instead of TDD for Behaviour Driven Development! But this is making too much sense. Let's name this stuff something ridiculous like Gherkin because reasons.
 
-This was such a revolutionary idea that it took off in the industry. Consultants showed teams how having a common language was key to understanding each other. Developers excitedly built the building blocks so that business folks could write tests in English. Business folks said they'll surely get back to them in a few days; it's just suca busy season now with meetings and phone calls and stuff.
+This was such a revolutionary idea that it took off in the industry. Consultants showed teams how having a common language was key to understanding each other. Developers excitedly built the building blocks so that business folks could write tests in English. Business folks said they'll surely get back to them in a few days; it's just such a busy season now with meetings and phone calls and stuff.
 
-In other words, developers wrote the tests framework so that they could then have the honour of writing the damn `.feature` files themselves. Most saw this and went back to their unit testing framework of choice.
+In other words, developers wrote the test framework so that they could then have the honour of writing the damn `.feature` files themselves. Most saw this and went back to their unit testing framework of choice, reasoning that maintaining an English layer on top of the tests was just extra work.
 
 ## Fast forward to now
 
-I started this blog post saying that things have changed. Todays developers write little code, and either review lots of it, or trust the machine. There's a third way: review the tests only. As long as they pass, and are testing the right thing, it can be sufficient for the majority of tasks.
+I started this blog post saying that things have changed. Today's developers write little code, and either review lots of it, or trust the machine. There's a third way: review the tests only. As long as they pass, and are testing the right thing, it can be sufficient for the majority of tasks.
 
-But we can take this a step further: Why review the test _implementation_ when you can review its purpose? Two of the reasons for the disappointing adoption of BDD have now been flipped on their head: the developer job looks a lot like yesterday's project manager's, and the code writing is done by an ever compliant LLM that will follow whatever rules you set for it.
+But we can take this a step further: Why review the test _implementation_ when you can review its purpose? Two of the reasons for the disappointing adoption of BDD have now been flipped on their head: the developer is now a stakeholder and her job looks a lot like yesterday's product manager's, while the code writing is done by an ever compliant LLM that will follow whatever rules you set for it.
 
 #### We don't even have to _write_ the tests. We just need to read them. 
 
 And when they're written in plain English, suddenly reviewing is a lot simpler. 
 
-This is why I think BDD will be making a comeback in 2027. As developers, we will be authoring the specification for a change, and review the behaviour the agent decoded from it. We don't have to stay so close to the implementation that we have to keep every function and variable name in our mental model. By all means, we can go deep when we need to, but for most work we can just speak in domain language.
-	
+The new workflow can look like this: you describe the intent, the agent writes the scenarios and the step definitions, and you review the scenarios. You don't have to stay so close to the implementation that you have to keep every function and variable name in your mental model. By all means, go deep when you need to, but for most work you can just speak in domain language.
+
+Remember those frontier teams asking the AI for a summary instead of reading the code? A `.feature` file is that summary, except it's versioned, reviewable, and it fails the build when it's wrong. And it lets a human vouch for every change without reading every line, which keeps the SOC-2 crowd happy too.
+
+This is why I think BDD will be making a comeback in 2027. 
+
+## A scenario
+
+```
+Scenario: Deleting a draft pre-release on the main branch
+  Given a release is on the main branch
+  And it is a pre-release
+  And it is a draft release
+  When the pull request is merged
+  ...
+  
+STOP OMG PLS STOP IT WILL NEVER HAPPEN FFS
+```
+
+_fin_
