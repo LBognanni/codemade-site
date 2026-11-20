@@ -5,6 +5,7 @@ import markdown from 'markdown-it';
 import markdownFigures from './utils/markdown-figures.js';
 import syntaxHighlight from "@11ty/eleventy-plugin-syntaxhighlight";
 import { feedPlugin } from "@11ty/eleventy-plugin-rss";
+import { llmsPlugin, llmsPages } from "./utils/llms.js";
 
 
 export default function(eleventyConfig) {
@@ -115,6 +116,12 @@ export default function(eleventyConfig) {
   // Create collections for blog posts
   eleventyConfig.addCollection("posts", function(collectionApi) {
     return collectionApi.getFilteredByGlob("blog/**/*.md");
+  });
+
+  // Pages that get a markdown twin for LLMs (see utils/llms.js)
+  eleventyConfig.addPlugin(llmsPlugin);
+  eleventyConfig.addCollection("llmsPages", function(collectionApi) {
+    return llmsPages(collectionApi.getAll());
   });
   
 

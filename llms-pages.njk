@@ -1,0 +1,9 @@
+---
+pagination:
+  data: collections.llmsPages
+  size: 1
+  alias: item
+permalink: "{{ item.url | llmsUrl }}"
+eleventyExcludeFromCollections: true
+---
+{{ item | llmsMarkdown({ posts: collections.posts }) | safe }}

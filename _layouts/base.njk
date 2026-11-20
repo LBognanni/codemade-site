@@ -20,6 +20,9 @@
         <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="/css/style.css?v={{ css.version }}">
         <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+        {%- if page.url | llmsUrl and sitemap !== false %}
+        <link rel="alternate" type="text/markdown" href="{{ page.url | llmsUrl }}">
+        {%- endif %}
         <link rel="icon" href="/favicon.png" />
 
         <meta name="description" content="{{ subtitle or excerpt or site.tagline }}" />

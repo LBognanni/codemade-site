@@ -1,0 +1,30 @@
+---
+permalink: /llms.txt
+eleventyExcludeFromCollections: true
+---
+# CodeMade
+
+> CodeMade is Loris Bognanni's home for free, open source software and a blog about software development. The apps are made for personal use but shared with everyone: desktop utilities for Windows, macOS and Linux, plus small in-browser tools ("vibelets").
+
+Every page on {{ site.url }} has a Markdown version at the same address with `.md` instead of the trailing slash (for example {{ site.url }}/blog/building-for-one.md).
+
+{%- for home in collections.llmsPages %}{% if home.url == "/" %}
+{% for section in home.data.sections %}{% if section.type == "section_features" %}
+## {{ "Software" if section.section_id == "software" else section.title }}
+
+{{ section.subtitle | trim | safe }}
+{% for f in section.features %}{% set link = f.actions[0].url %}
+- [{{ f.title | safe }}]({{ link | llmsLink }}): {{ f.content | trim | safe }}{% if f.tags %} ({{ f.tags | join(", ") }}){% endif %}{% endfor %}
+
+{% endif %}{% endfor %}
+{%- endif %}{% endfor %}
+
+## Blog
+{% for p in collections.posts | reverse %}
+- [{{ p.data.title | safe }}]({{ p.url | llmsUrl | toAbsoluteUrl }}): {{ p.data.excerpt | striptags | trim | safe }}{% endfor %}
+
+## Optional
+
+- [Home page]({{ "/index.md" | toAbsoluteUrl }})
+- [Privacy policy]({{ "/privacy.md" | toAbsoluteUrl }})
+- [Atom feed]({{ "/atom.xml" | toAbsoluteUrl }})
