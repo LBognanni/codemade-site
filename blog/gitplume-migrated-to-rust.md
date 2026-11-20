@@ -60,5 +60,3 @@ I do think that writing the MVP in Python was the right call: it allowed me to i
 There's probably a lesson here about the value of writing a specification. But also about how working code is perhaps the best specification you can have. 
 
 As proper academics often say, "more research is needed". And when "research" is building working, personal software that solves a real need, it starts looking a lot like having fun to me!
-
----

@@ -68,5 +68,3 @@ You can then run it by typing `gitpane` in any git repository. It will automatic
 That's the beauty of working in a terminal multiplexer: you can have a terminal open next to GitPane, and you can commit from there. You can even have a coding agent open in another pane, and ask it to write the commit message for you.
 
 And yes, I usually ask my agent to commit for me 🙃
-
----
