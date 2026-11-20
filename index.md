@@ -1,5 +1,5 @@
 ---
-title: Home
+title: "CodeMade: free, open source software and a blog about building it"
 description: >-
   Free and open source apps for Windows, macOS, Linux and the browser, plus a blog about software development, AI and the craft of building things.
 image: images/hero.png

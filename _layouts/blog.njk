@@ -4,7 +4,7 @@ layout: body
 
 <section class="blog blog-listing">
 
-  <div class="section-label">{{ title }}</div>
+  <h1 class="section-label">{{ heading or title }}</h1>
   <div class="blog-grid">
     {% for post in collections.posts | reverse %}
     <a href="{{ post.url | relativeUrl }}" class="blog-card">

@@ -14,7 +14,8 @@ sections:
     type: section_content
     background: gray
     image: images/hero-clocks.png
-    title: 🕒 Never miss a beat
+    h1: true
+    title: "🕒 CodeMade Clock: never miss a beat"
     content: >-
       Ever been late for a meeting because you were just too focussed on another task?
       Even when you have reminders set, time just slips by and "just five minutes" turns into an hour.

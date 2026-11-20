@@ -15,7 +15,8 @@ sections:
     type: section_content
     background: gray
     image: images/hero-imageviewer.png
-    title: 🌄 Explore your photos
+    h1: true
+    title: "🌄 Image Viewer: explore your photos"
     content: >-
         Most photo apps are slow to load and slow to use. They try to build a catalogue of all your pictures, and some keep connecting to servers you never asked them to talk to.
 
