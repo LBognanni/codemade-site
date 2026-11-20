@@ -1,5 +1,7 @@
 ---
 title: Roundabout
+description: >-
+  A free, open source browser picker for Windows: choose which browser opens each link you click, instead of always using your default one.
 layout: landing
 image: images/hero-roundabout.png
 software:

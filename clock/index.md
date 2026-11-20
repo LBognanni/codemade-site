@@ -1,5 +1,7 @@
 ---
 title: Analog and digital clock for Windows 10 and 11 - CodeMade Clock
+description: >-
+  A free, open source analog and digital clock for Windows 10 and 11 that stays on top of your other windows. Includes 10 crisp, scalable skins.
 image: images/hero-clocks.png
 software:
   name: CodeMade Clock

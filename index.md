@@ -1,5 +1,7 @@
 ---
 title: Home
+description: >-
+  Free and open source apps for Windows, macOS, Linux and the browser, plus a blog about software development, AI and the craft of building things.
 image: images/hero.png
 keywords: free software, software development, open source, clock, wayd
 sections:

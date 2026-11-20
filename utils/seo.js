@@ -44,12 +44,12 @@ export function summarize(text, max = 160) {
   return out;
 }
 
-// Meta description for a page. A `description` in front matter always wins. Vibelets use their "about" text, which is far more
+// Meta description for a page, as plain text. A `description` in front matter always wins. Vibelets use their "about" text, which is far more
 // descriptive than the short subtitle shown under the tool's title.
 export function metaDescription(data, fallback) {
-  if (data.description) return data.description;
+  if (data.description) return plainText(data.description);
   if (data.layout === 'vibelet' && data.about) return summarize(data.about);
-  return data.subtitle || data.excerpt || fallback;
+  return plainText(data.subtitle || data.excerpt || fallback);
 }
 
 const isoDate = (date) => (date instanceof Date ? date.toISOString().slice(0, 10) : undefined);

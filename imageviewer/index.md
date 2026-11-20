@@ -1,5 +1,7 @@
 ---
 title: Image Viewer - fast and private image viewer for Windows, macOS and Linux
+description: >-
+  A fast, private and free image viewer for Windows, macOS and Linux. Opens HEIC, AVIF, JPEG XL, PSD, camera raw files and dozens more formats.
 layout: landing
 image: images/hero-imageviewer.png
 software:

@@ -1,5 +1,7 @@
 ---
 title: Blog
+description: >-
+  Posts about software development, AI-assisted coding, Deno, Docker, self-hosting, and the free apps I build along the way.
 layout: blog
 ---
 

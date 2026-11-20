@@ -93,7 +93,7 @@ export function llmsMarkdown(item, ctx = {}) {
   const data = item.data;
   const out = [`# ${stripTags(data.title || 'CodeMade')}`];
 
-  const summary = data.subtitle || data.excerpt;
+  const summary = data.description || data.subtitle || data.excerpt;
   if (summary) out.push(`> ${stripTags(summary)}`);
 
   const meta = [`Source: ${absoluteUrl(item.url)}`];
