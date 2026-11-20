@@ -82,7 +82,7 @@ sections:
       - title: CodeMade Image Viewer
         icon: 🖼️
         image: images/hero-imageviewer.png
-        tags: [windows]
+        tags: [windows, linux, macos]
         content: >-
           A fast and private image viewer.
         actions:
