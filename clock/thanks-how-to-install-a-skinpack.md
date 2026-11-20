@@ -1,6 +1,7 @@
 ---
 title: Thanks for your support!
 layout: page
+sitemap: false
 ---
 
 ### Your contribution is vital to the continued investment in improvements, bug fixes and the creation of new skinpacks
