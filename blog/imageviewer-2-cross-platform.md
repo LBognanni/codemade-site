@@ -28,6 +28,8 @@ And so the old ImageViewer finally got the upgrade it needed. Version 2 is a com
 
 It's still free, and it's permissively licensed under the [GPLv3](https://github.com/LBognanni/ImageViewer/blob/main/LICENSE.md). It still doesn't call home.
 
+![ImageViewer Help screen](/images/imageviewer-help.webp "New help screen. Photo of the Vatican Museums by Daniel Zbroja in the background")
+
 ## Under the hood
 
 The old app was WinForms and FreeImage, which kept it on Windows. The new one is an [Avalonia](https://avaloniaui.net/) app on .NET 10. It's compiled with Native AOT, so it starts quickly and doesn't need a .NET runtime installed.
