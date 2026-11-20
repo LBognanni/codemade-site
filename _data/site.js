@@ -1,6 +1,10 @@
 export default {
   title: "CodeMade",
   url: "https://codemade.net",
+  // Social preview image for pages that don't set their own `image`.
+  // A page can set `social_image` to use a different preview than its on-page `image`
+  // (e.g. a PNG when the page image is an SVG, which most platforms won't render).
+  default_image: "images/hero.png",
   baseurl: "",
   palette: "blue",
   tagline: "Software that is free, open, and personal. Made for [me](https://loris.codes), but shared with you.",

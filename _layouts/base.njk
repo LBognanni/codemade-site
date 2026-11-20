@@ -27,7 +27,7 @@
         {%- endif %}
         <link rel="icon" href="/favicon.png" />
 
-        {%- set seo = { description: description, layout: layout, title: title, image: image, about: about, subtitle: subtitle, excerpt: excerpt, software: software, site: site } %}
+        {%- set seo = { description: description, layout: layout, title: title, image: social_image or image, about: about, subtitle: subtitle, excerpt: excerpt, software: software, site: site } %}
         {%- set description = seo | metaDescription(site.tagline) %}
         {%- if page.url and page.url.endsWith("/") %}
         <link rel="canonical" href="{{ page.url | toAbsoluteUrl }}" />
@@ -36,12 +36,14 @@
         <meta name="robots" content="noindex" />
         {%- endif %}
         <meta name="description" content="{{ description }}" />
+        {%- if keywords %}
         <meta name="keywords" content="{{ keywords }}" />
+        {%- endif %}
         <meta name="author" content="Loris Bognanni" />
 
         <meta property="og:title" content="{{ title }}" />
         <meta property="og:description" content="{{ description }}" />
-        <meta property="og:image" content="{{ image | toAbsoluteUrl }}" />
+        <meta property="og:image" content="{{ (social_image or image or site.default_image) | toAbsoluteUrl }}" />
         <meta property="og:url" content="{{ page.url | toAbsoluteUrl }}" />
         {%- if layout == "post" %}
         <meta property="og:type" content="article" />
@@ -52,15 +54,13 @@
         {%- endif %}
         <meta property="og:site_name" content="codemade.net" />
         <meta property="og:locale" content="en_US" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
 
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="codemade.net" />
+        <meta name="twitter:site" content="@lorisdev" />
         <meta name="twitter:creator" content="@lorisdev" />
         <meta name="twitter:title" content="{{ title }}" />
         <meta name="twitter:description" content="{{ description }}" />
-        <meta name="twitter:image" content="{{ image | toAbsoluteUrl }}" />
+        <meta name="twitter:image" content="{{ (social_image or image or site.default_image) | toAbsoluteUrl }}" />
         <meta name="twitter:url" content="{{ page.url | toAbsoluteUrl }}" />
         {%- set ld = seo | structuredData(page) %}
         {%- if ld %}

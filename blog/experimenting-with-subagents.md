@@ -6,6 +6,7 @@ excerpt: >-
 date: '2026-08-25'
 thumb_image: images/axes-mixing-desk.svg
 image: images/axes-mixing-desk.svg
+social_image: images/axes-mixing-desk.png
 layout: post
 tags: 
   - ai coding
