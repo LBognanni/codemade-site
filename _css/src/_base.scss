@@ -3,6 +3,7 @@
 @property --bg-card { syntax: '<color>'; inherits: true; initial-value: #1e1c24; }
 @property --bg-card-hover { syntax: '<color>'; inherits: true; initial-value: #26232e; }
 @property --bg-img { syntax: '<color>'; inherits: true; initial-value: #15131b; }
+@property --bg-post-navigation { syntax: '<color>'; inherits: true; initial-value: rgba(160, 160, 160, 0.08); }
 @property --text { syntax: '<color>'; inherits: true; initial-value: #ece8e1; }
 @property --text-muted { syntax: '<color>'; inherits: true; initial-value: #abb2c0; }
 @property --text-dim { syntax: '<color>'; inherits: true; initial-value: #55505f; }
@@ -29,6 +30,7 @@
   --bg-card: #1e1c24;
   --bg-card-hover: #26232e;
   --bg-img: #15131b;
+  --bg-post-navigation: rgba(160, 160, 160, 0.08);
   --text: #ece8e1;
   --text-muted: #abb2c0;
   --text-dim: #55505f;
@@ -53,7 +55,7 @@
   --code-comment: #616161;
   color-scheme: dark;
   transition: --bg 0.2s ease, --bg-elevated 0.2s ease, --bg-card 0.2s ease,
-    --bg-card-hover 0.2s ease, --bg-img 0.2s ease, --text 0.2s ease,
+    --bg-card-hover 0.2s ease, --bg-img 0.2s ease, --bg-post-navigation 0.2s ease, --text 0.2s ease,
     --text-muted 0.2s ease, --text-dim 0.2s ease, --accent 0.2s ease,
     --accent-glow 0.2s ease, --accent-soft 0.2s ease, --accent-rose 0.2s ease,
     --accent-mint 0.2s ease, --accent-blue 0.2s ease, --border 0.2s ease,
@@ -68,6 +70,7 @@
   --bg-card: #fffcf7;
   --bg-card-hover: #f7f0e7;
   --bg-img: #f9f4f5;
+  --bg-post-navigation: rgba(239, 173, 96, 0.07);
   --text: #28232b;
   --text-muted: #5f5a65;
   --text-dim: #8e8790;

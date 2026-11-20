@@ -20,6 +20,24 @@ layout: body
   <div class="post-page-content">
     {{ content | safe }}
   </div>
+  {% set previous_post = collections.posts | getPreviousCollectionItem(page) %}
+  {% set next_post = collections.posts | getNextCollectionItem(page) %}
+  {% if previous_post or next_post %}
+  <nav class="post-navigation" aria-label="Adjacent blog posts">
+    {% if previous_post %}
+    <a class="post-navigation-prev" href="{{ previous_post.url | relativeUrl }}" rel="prev">
+      <span aria-hidden="true">⬅&#xFE0E;</span>
+      <span>{{ previous_post.data.title }}</span>
+    </a>
+    {% endif %}
+    {% if next_post %}
+    <a class="post-navigation-next" href="{{ next_post.url | relativeUrl }}" rel="next">
+      <span>{{ next_post.data.title }}</span>
+      <span aria-hidden="true">➡&#xFE0E;</span>
+    </a>
+    {% endif %}
+  </nav>
+  {% endif %}
   <div id="comments-container"></div>
   <script>
     window.COMMENTS_CONFIG = {
