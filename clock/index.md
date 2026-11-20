@@ -1,6 +1,12 @@
 ---
 title: Analog and digital clock for Windows 10 and 11 - CodeMade Clock
 image: images/hero-clocks.png
+software:
+  name: CodeMade Clock
+  description: A beautiful, customizable analog and digital clock for Windows that always stays on top of other windows.
+  category: UtilitiesApplication
+  os: Windows 10, Windows 11
+  download: https://github.com/LBognanni/CodeMadeClock/releases/latest/download/clock-setup.exe
 sections:
   - section_id: features
     type: section_content

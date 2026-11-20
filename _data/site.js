@@ -11,7 +11,7 @@ export default {
     nav_links: [
       {
         label: "Clock",
-        url: "/clock"
+        url: "/clock/"
       },
       {
         label: "🕹️ Games!",
@@ -20,7 +20,7 @@ export default {
       },
       {
         label: "Blog",
-        url: "/blog",
+        url: "/blog/",
         primary: true
       }
     ]
@@ -33,7 +33,7 @@ export default {
     nav_links: [
       {
         label: "Blog",
-        url: "/blog"
+        url: "/blog/"
       }
     ],
     has_social: false,
@@ -53,6 +53,6 @@ export default {
     has_subscribe: false,
     subscribe_title: "Subscribe",
     subscribe_content: "Stay up to date with our latest developments.",
-    content: "Content &copy; [Loris Bognanni](https://loris.codes). All rights reserved. &middot; [Privacy Policy](/privacy)"
+    content: "Content &copy; [Loris Bognanni](https://loris.codes). All rights reserved. &middot; [Privacy Policy](/privacy/)"
   }
 };

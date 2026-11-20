@@ -55,7 +55,7 @@ The solution is 🐋 containers! I used a heavily customized version of [contai]
 
 > I had to tell the LLM that it's running inside a container, and it doesn't have an X11 display or the ability to install system packages, otherwise it would spend a lot of tokens trying to do the impossible
 
-It worked so well that all my new projects are now developed in a [dev container](/blog/devcontainers) that borrows heavily from the `contai` configuration.
+It worked so well that all my new projects are now developed in a [dev container](/blog/devcontainers/) that borrows heavily from the `contai` configuration.
 
 ## Trying different tools, and running out of tokens
 

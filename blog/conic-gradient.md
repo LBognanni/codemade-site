@@ -9,7 +9,7 @@ image: images/conic-gradient.jpg
 layout: post
 ---
 
-Recently, I have been working on adding support for conic gradient (or conical gradients, as some say) to [Clock](/clock). Now, Clock uses GdiPlus, or the `System.Drawing` namespace in C# to do all of its drawing. My aim was to replicate the `conic-gradient()` [CSS function](https://developer.mozilla.org/en-US/docs/Web/CSS/conic-gradient()).
+Recently, I have been working on adding support for conic gradient (or conical gradients, as some say) to [Clock](/clock/). Now, Clock uses GdiPlus, or the `System.Drawing` namespace in C# to do all of its drawing. My aim was to replicate the `conic-gradient()` [CSS function](https://developer.mozilla.org/en-US/docs/Web/CSS/conic-gradient()).
 
 Imagine my surprise when searching online for "gdiplus conic gradient" yielded few and very old results. Ok, maybe you're not very surprised because all the cool kids are now writing Electron apps and mid-2000s `System.Drawing` has been relegated to history 😄
 

@@ -13,7 +13,7 @@ One small annoyance I contend with everyday is links opening in the "wrong" brow
 
 Chrome is the browser I use for all my work stuff, partially because I prefer its Dev tools and also because most SaaS apps I use for work tend to work better with it. Firefox however is my preferred browser and has the advantage of not being built by an advertisement company, so I tend to do all my personal browsing there. I also use Edge for Netflix because why not.
 
-So I spent a few hours hacking together [Roundabout](/roundabout), a simple app that registers itself as a web browser and allows you to pick the browser you'd like to open your link in.
+So I spent a few hours hacking together [Roundabout](/roundabout/), a simple app that registers itself as a web browser and allows you to pick the browser you'd like to open your link in.
 
 ![Roundabout screenshot](/images/hero-roundabout.png)
 

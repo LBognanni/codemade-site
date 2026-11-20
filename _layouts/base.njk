@@ -17,6 +17,8 @@
             document.documentElement.dataset.theme = preference;
           }());
         </script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="/css/style.css?v={{ css.version }}">
         <link rel="alternate" type="application/atom+xml" href="/atom.xml">
@@ -25,15 +27,29 @@
         {%- endif %}
         <link rel="icon" href="/favicon.png" />
 
-        <meta name="description" content="{{ subtitle or excerpt or site.tagline }}" />
+        {%- set seo = { description: description, layout: layout, title: title, image: image, about: about, subtitle: subtitle, excerpt: excerpt, software: software, site: site } %}
+        {%- set description = seo | metaDescription(site.tagline) %}
+        {%- if page.url and page.url.endsWith("/") %}
+        <link rel="canonical" href="{{ page.url | toAbsoluteUrl }}" />
+        {%- endif %}
+        {%- if sitemap === false %}
+        <meta name="robots" content="noindex" />
+        {%- endif %}
+        <meta name="description" content="{{ description }}" />
         <meta name="keywords" content="{{ keywords }}" />
         <meta name="author" content="Loris Bognanni" />
 
         <meta property="og:title" content="{{ title }}" />
-        <meta property="og:description" content="{{ subtitle or excerpt or site.tagline }}" />
+        <meta property="og:description" content="{{ description }}" />
         <meta property="og:image" content="{{ image | toAbsoluteUrl }}" />
         <meta property="og:url" content="{{ page.url | toAbsoluteUrl }}" />
+        {%- if layout == "post" %}
+        <meta property="og:type" content="article" />
+        <meta property="article:published_time" content="{{ page.date | isoDate }}" />
+        <meta property="article:author" content="https://loris.codes" />
+        {%- else %}
         <meta property="og:type" content="website" />
+        {%- endif %}
         <meta property="og:site_name" content="codemade.net" />
         <meta property="og:locale" content="en_US" />
         <meta property="og:image:width" content="1200" />
@@ -43,9 +59,13 @@
         <meta name="twitter:site" content="codemade.net" />
         <meta name="twitter:creator" content="@lorisdev" />
         <meta name="twitter:title" content="{{ title }}" />
-        <meta name="twitter:description" content="{{ subtitle or excerpt or site.tagline }}" />
+        <meta name="twitter:description" content="{{ description }}" />
         <meta name="twitter:image" content="{{ image | toAbsoluteUrl }}" />
         <meta name="twitter:url" content="{{ page.url | toAbsoluteUrl }}" />
+        {%- set ld = seo | structuredData(page) %}
+        {%- if ld %}
+        <script type="application/ld+json">{{ ld | safe }}</script>
+        {%- endif %}
     </head>
     <body>
         {{ content | safe }}

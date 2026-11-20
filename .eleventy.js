@@ -6,6 +6,7 @@ import markdownFigures from './utils/markdown-figures.js';
 import syntaxHighlight from "@11ty/eleventy-plugin-syntaxhighlight";
 import { feedPlugin } from "@11ty/eleventy-plugin-rss";
 import { llmsPlugin, llmsPages } from "./utils/llms.js";
+import { seoPlugin, withTrailingSlash } from "./utils/seo.js";
 
 
 export default function(eleventyConfig) {
@@ -62,7 +63,7 @@ export default function(eleventyConfig) {
     if (url?.startsWith('https://')) {
       return url;
     }
-    return url?.startsWith('/') ? url : '/' + url;
+    return withTrailingSlash(url?.startsWith('/') ? url : '/' + url);
   });
   
   eleventyConfig.addFilter("toAbsoluteUrl", function(url) {
@@ -120,6 +121,7 @@ export default function(eleventyConfig) {
 
   // Pages that get a markdown twin for LLMs (see utils/llms.js)
   eleventyConfig.addPlugin(llmsPlugin);
+  eleventyConfig.addPlugin(seoPlugin);
   eleventyConfig.addCollection("llmsPages", function(collectionApi) {
     return llmsPages(collectionApi.getAll());
   });

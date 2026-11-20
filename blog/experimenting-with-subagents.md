@@ -33,7 +33,7 @@ If you're on tech twitter for any amount of time, "subagents" are already a thin
 
 The cool kids also have infinite budgets and work for the token factories. I only have a "Pro" Claude subscription for personal use, meaning that each token needs to earn its keep. I need to _token-minn_, not token-maxx!
 
-In my [previous post on the matter](/blog/building-for-one), my experience with subagents was 
+In my [previous post on the matter](/blog/building-for-one/), my experience with subagents was 
 
 >I found that the multi-agent system was exceptional at consuming tokens, while producing the same results that I could have achieved with a single agent.
 

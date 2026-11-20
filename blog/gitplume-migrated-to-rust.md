@@ -38,7 +38,7 @@ The original estimate was 9,000 to 10,000 lines and **two to three weeks with he
 
 Once the plan was approved, the bulk of the rewrite took _an evening_, with a few extra hours spent manually testing the application and polishing the UI interactions. 
 
-*Of course, I used my tried and tested [subagents workflow](/blog/experimenting-with-subagents) to ensure that the rewrite was done well, and that the specification was followed* 😉
+*Of course, I used my tried and tested [subagents workflow](/blog/experimenting-with-subagents/) to ensure that the rewrite was done well, and that the specification was followed* 😉
 
 
 ## A new name: 🪶GitPlume

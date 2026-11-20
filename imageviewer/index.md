@@ -1,6 +1,13 @@
 ---
 title: Image Viewer - fast and private image viewer for Windows, macOS and Linux
 layout: landing
+image: images/hero-imageviewer.png
+software:
+  name: CodeMade Image Viewer
+  description: A fast and private image viewer that opens almost any format, including HEIC, AVIF, JPEG XL, PSD and camera raw files.
+  category: MultimediaApplication
+  os: Windows, macOS, Linux
+  download: https://github.com/LBognanni/ImageViewer/releases/latest
 sections:
   - section_id: features
     type: section_content

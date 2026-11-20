@@ -1,6 +1,13 @@
 ---
 title: Roundabout
 layout: landing
+image: images/hero-roundabout.png
+software:
+  name: Roundabout
+  description: A browser prompter for Windows that lets you pick which browser opens each link.
+  category: UtilitiesApplication
+  os: Windows
+  download: https://github.com/LBognanni/Roundabout/releases/latest/download/roundabout-setup.exe
 sections:
   - section_id: hero
     type: section_hero
