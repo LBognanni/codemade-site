@@ -1,4 +1,44 @@
 (() => {
+  const images = [...document.querySelectorAll('.post-page-content figure img')]
+    .filter(image => !image.closest('a, button'));
+  if (!images.length || typeof HTMLDialogElement === 'undefined' ||
+      typeof HTMLDialogElement.prototype.showModal !== 'function') return;
+
+  const dialog = document.createElement('dialog');
+  dialog.className = 'post-image-dialog';
+  dialog.setAttribute('aria-label', 'Enlarged image');
+  const enlarged = document.createElement('img');
+  const close = document.createElement('button');
+  close.className = 'post-image-close';
+  close.type = 'button';
+  close.textContent = '×';
+  close.setAttribute('aria-label', 'Close enlarged image');
+  dialog.append(enlarged, close);
+  document.body.append(dialog);
+
+  close.addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', event => {
+    if (event.target === dialog) dialog.close();
+  });
+
+  for (const image of images) {
+    const media = image.closest('picture') || image;
+    const trigger = document.createElement('button');
+    trigger.className = 'post-image-expand';
+    trigger.type = 'button';
+    trigger.setAttribute('aria-label', image.alt ? `Enlarge image: ${image.alt}` : 'Enlarge image');
+    trigger.setAttribute('aria-haspopup', 'dialog');
+    media.before(trigger);
+    trigger.append(media);
+    trigger.addEventListener('click', () => {
+      enlarged.alt = image.alt;
+      enlarged.src = image.currentSrc || image.src;
+      dialog.showModal();
+    });
+  }
+})();
+
+(() => {
   const diagrams = Array.from(document.querySelectorAll('.mermaid')).map((element, index) => ({
     element,
     id: `mermaid-${index}`,
