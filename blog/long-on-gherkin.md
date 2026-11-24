@@ -19,11 +19,11 @@ What's happening at the frontier labs and the startups is interesting. Most chan
 
 Lots of developers elsewhere read about this way of working and shed a tear. They want to go faster, but with review being the bottleneck, PRs inevitably start to pile up and everything grinds to a halt. It's just so much easier to generate code than it is to review it.
 
-It's so easy in fact, that coding agents have a strong bias for **generating as much code as possible** - writing tests that check for the value of constants, handling edge cases that can never happen in production, inventing requirements. In other words, SLOP.
+It's so easy, in fact, that coding agents have a strong bias for **generating as much code as possible** - writing tests that check for the value of constants, handling edge cases that can never happen in production, inventing requirements. In other words, SLOP.
 
 ## Tests to fight slop
 
-So here's a scenario. One of our github workflows tags and pre-releases at each push on pull requests, so that we can deploy the binaries (should we choose to do so). This is on a busy repo with lots of commits, so inevitably the releases start piling up and making the github APIs slow to unresponsive.
+One of our GitHub workflows creates a tag and a pre-release every time someone pushes to a pull request, so that we can deploy the binaries to a test environment (should we choose to do so). On a busy repo with lots of commits, those releases start piling up fast, and at some point querying the GitHub releases APIs becomes slow to unresponsive.
 
 So I asked my agent for a simple python script to delete those pre-releases when pull requests get merged.
 
@@ -33,7 +33,7 @@ This, on a side-of-desk type of task while I was busy working on actual things I
 
 I asked for a simple change: Rename the tests so they follow a "When x then y" structure.
 
-And then I saw it. **The Slop**. Renaming the tests finally made it clear what all the lines of code were there for. Conditional logic on top of conditional logic for things that will just not happen like "what if it's a draft release and also a pre-release", "what if this is a release on the main branch" and so on. Technically it was very thorough, but in practice this was just added cognitive load for zero benefit. YAGNI!
+And then I saw it. **The Slop**. Renaming the tests finally made it clear what all the lines of code were there for. Conditional logic on top of conditional logic for things that will just not happen like "what if it's a draft release and also a pre-release", "what if this is a release on the main branch" and so on. Technically it was very thorough, but in practice this was just adding cognitive load for zero benefit. YAGNI!
 
 ## A brief history of BDD
 
@@ -49,11 +49,11 @@ Feature: User login
 ```
 
 Then you could have, like, domain experts, product managers and business people write the tests! 🤯
-Then instead of writing test first, why not write _behaviours_ first, like when planning a feature. We could call this BDD instead of TDD for Behaviour Driven Development! But this is making too much sense. Let's name this stuff something ridiculous like Gherkin because reasons.
+Then instead of writing tests first, why not write _behaviours_ first, like when planning a feature. We could call this BDD instead of TDD for Behaviour Driven Development! But this is making too much sense. Let's name this stuff something ridiculous like Gherkin because reasons.
 
-This was such a revolutionary idea that it took off in the industry. Consultants showed teams how having a common language was key to understanding each other. Developers excitedly built the building blocks so that business folks could write tests in English. Business folks said they'll surely get back to them in a few days; it's just such a busy season now with meetings and phone calls and stuff.
+This was such a revolutionary idea that it took off in the industry. Consultants showed teams how having a common language was key to understanding each other. Developers excitedly built the underlying test structure so that business folks could write tests in English. Business folks said they'll surely get back to them in a few days; it's just such a busy season now with meetings and phone calls and stuff.
 
-In other words, developers wrote the test framework so that they could then have the honour of writing the damn `.feature` files themselves. Most saw this and went back to their unit testing framework of choice, reasoning that maintaining an English layer on top of the tests was just extra work.
+In other words, developers wrote the test framework so that they could then have the privilege of writing the damn `.feature` files themselves. Most saw this and went back to their unit testing framework of choice, reasoning that maintaining an English layer on top of the tests was just extra work.
 
 ## Fast forward to now
 
@@ -84,4 +84,4 @@ Scenario: Deleting a draft pre-release on the main branch
 STOP OMG PLS STOP IT WILL NEVER HAPPEN FFS
 ```
 
-_fin_
+_fin._
