@@ -3,15 +3,19 @@
   author: _data/authors/loris-bognanni.yaml
   excerpt: >-
     How do we keep up with agents that can churn out reams of code every day? A 20 year old idea could be the key
-  date: '2026-11-27'
-  thumb_image: images/gherkinator-sm.webp
-  image: images/gherkinator.webp
+  date: '2026-11-26'
+  thumb_image: images/given-when-then-sm.webp
+  image: images/given-when-then.webp
   layout: post
+  tags:
+  	- AI Coding
+  	- Testing
+  	- Technical writing
 ---
 
 It's fascinating how much AI has changed the job of software engineer in just a year. We've gone from fancy tab-tab-tab autocomplete to do-it-all software factories at the extreme. (btw, does anyone know someone who wrote a software factory that produced an actual successful application that is not _the software factory itself?_)
 
-The topic of code review is perhaps the hottest discussion in the field. On one side stand the purists, who will ask "How can you guarantee quality if you don't review every line of code?"; on another stand the GSD/YOLO people who argue that "we can't review every line of code and move fast at the same time". All while someone reminds them that we don't want to lose our SOC-2 certification so yes, a human must be responsible for the code.
+The topic of code review is perhaps the hottest discussion in the field. On one side stand the purists, who ask "How can you guarantee quality if you don't review every line of code?"; on another stand the GSD/YOLO people who argue that "we can't review every line of code and move fast at the same time". All while someone reminds them that we don't want to lose our SOC-2 certification so yes, a human must be responsible for the code.
 
 ## So, about code reviews
 
@@ -19,21 +23,23 @@ What's happening at the frontier labs and the startups is interesting. Most chan
 
 Lots of developers elsewhere read about this way of working and shed a tear. They want to go faster, but with review being the bottleneck, PRs inevitably start to pile up and everything grinds to a halt. It's just so much easier to generate code than it is to review it.
 
+![Illustration: an overwhelmed developer needs with lots of PRs to review dreams of the startup way](/images/review-overload.webp)
+
 It's so easy, in fact, that coding agents have a strong bias for **generating as much code as possible** - writing tests that check for the value of constants, handling edge cases that can never happen in production, inventing requirements. In other words, SLOP.
 
-## Tests to fight slop
+## Storytime: Tests to fight slop
 
-One of our GitHub workflows creates a tag and a pre-release every time someone pushes to a pull request, so that we can deploy the binaries to a test environment (should we choose to do so). On a busy repo with lots of commits, those releases start piling up fast, and at some point querying the GitHub releases APIs becomes slow to unresponsive.
+On a repo I contribute to, there's a GitHub workflow that creates a tag and a pre-release every time someone pushes to a pull request, so that we can deploy the binaries to a test environment (should we choose to do so). On a busy repo with lots of commits, those releases start piling up fast, and at some point querying the GitHub releases APIs becomes slow to unresponsive.
 
 So I asked my agent for a simple python script to delete those pre-releases when pull requests get merged.
 
 What I got was a totally reasonable but very long script. It had a test file too, which was of course at least as long as the script itself. Looking at the code, my eyes glazed over. I mean the code was tested and working (I did test the script on an already closed PR), but oh my god I could not make heads or tails of it without some serious focus time. Even looking at the tests, they were all reasonable-sounding, but as clear as mud. 
 
-This, on a side-of-desk type of task while I was busy working on actual things I needed to deliver. (I'll spare you the blog post about CI being a tragedy of the commons and the place where hopes go to die)
+This, on a side-of-desk type of task while I was busy working on actual things I needed to deliver. (I'll spare you the blog post about CI being a tragedy of the commons and the place where hope goes to die)
 
 I asked for a simple change: Rename the tests so they follow a "When x then y" structure.
 
-And then I saw it. **The Slop**. Renaming the tests finally made it clear what all the lines of code were there for. Conditional logic on top of conditional logic for things that will just not happen like "what if it's a draft release and also a pre-release", "what if this is a release on the main branch" and so on. Technically it was very thorough, but in practice this was just adding cognitive load for zero benefit. YAGNI!
+And then I saw it. **The Slop**. Renaming the tests finally made it clear what all the lines of code were there for. Conditional logic on top of conditional logic for things that will just not happen like "what if it's a draft release and also a pre-release", "what if this is a release on the main branch" and so on. Technically it was very thorough, but in practice this was just adding cognitive load for zero benefit. [YAGNI](https://en.wikipedia.org/wiki/You_aren%27t_gonna_need_it)!
 
 ## A brief history of BDD
 
@@ -65,7 +71,7 @@ But we can take this a step further: Why review the test _implementation_ when y
 
 And when they're written in plain English, suddenly reviewing is a lot simpler. 
 
-The new workflow can look like this: you describe the intent, the agent writes the scenarios and the step definitions, and you review the scenarios. You don't have to stay so close to the implementation that you have to keep every function and variable name in your mental model. By all means, go deep when you need to, but for most work you can just speak in domain language.
+The new workflow can look like this: you describe the intent, the agent writes the code change, the scenarios and the step definitions, and you review the scenarios. You don't have to stay so close to the implementation that you have to keep every function and variable name in your mental model. By all means, go deep when you need to, but for most work you can just speak in domain language.
 
 Remember those frontier teams asking the AI for a summary instead of reading the code? A `.feature` file is that summary, except it's versioned, reviewable, and it fails the build when it's wrong. And it lets a human vouch for every change without reading every line, which keeps the SOC-2 crowd happy too.
 
